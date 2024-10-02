@@ -1,0 +1,2 @@
+Converter - STRING -> JSONOBJECT/POJO
+Mapper - POJO -> JSONOBJECT
