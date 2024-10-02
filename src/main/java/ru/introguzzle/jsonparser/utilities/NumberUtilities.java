@@ -1,10 +1,18 @@
 package ru.introguzzle.jsonparser.utilities;
 
 /**
- * Copied from:
- * <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/math/NumberUtils.java?ysclid=m1l56zcwo6647001885">...</a>
+ * <p>
+ * This implementation has been taken from the Apache Commons Lang library,
+ * specifically from the <code>NumberUtils</code> class.
+ * <br><br>
+ * For reference, you can view
+ * the original source at:
+ * <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/math/NumberUtils.java?ysclid=m1l56zcwo6647001885">Apache Commons Lang - NumberUtils</a>.
+ * </p>
  */
-public class NumberUtilities {
+public final class NumberUtilities {
+    private NumberUtilities() {}
+
     /**
      * Checks whether the String is a valid Java number.
      *

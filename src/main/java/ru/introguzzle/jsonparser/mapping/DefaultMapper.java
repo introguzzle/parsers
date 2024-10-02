@@ -2,11 +2,12 @@ package ru.introguzzle.jsonparser.mapping;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.introguzzle.jsonparser.ReflectionUtilities;
+import ru.introguzzle.jsonparser.utilities.ReflectionUtilities;
 import ru.introguzzle.jsonparser.entity.JSONObject;
 import ru.introguzzle.jsonparser.mapping.context.MappingContext;
 import ru.introguzzle.jsonparser.mapping.type.JSONType;
 import ru.introguzzle.jsonparser.mapping.type.TypeHandlers;
+import ru.introguzzle.jsonparser.utilities.NamingUtilities;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

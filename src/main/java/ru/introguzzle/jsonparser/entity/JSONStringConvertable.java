@@ -5,24 +5,76 @@ import ru.introguzzle.jsonparser.mapping.context.CircularReferenceStrategy;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Interface representing an entity that can be converted to a JSON string.
+ * <p>
+ * This interface defines methods to retrieve the opening and closing symbols,
+ * iterate over its contents, and obtain the size of the entity. It provides
+ * default methods for converting the entity to a JSON string in both compact
+ * and pretty-printed formats.
+ * </p>
+ */
 public interface JSONStringConvertable {
+
+    /** A string representing a tab for indentation. */
     String TAB = "    ";
 
+    /** The initial indentation level for JSON serialization. */
     int INITIAL_LEVEL = 1;
 
+    /**
+     * Returns an iterator for the contents of this entity.
+     *
+     * @return an iterator over the contents
+     */
     Iterator<?> getIterator();
+
+    /**
+     * Returns the opening symbol (e.g., '{' for a JSON object or '[' for a JSON array).
+     *
+     * @return the opening symbol
+     */
     String getOpeningSymbol();
+
+    /**
+     * Returns the closing symbol (e.g., '}' for a JSON object or ']' for a JSON array).
+     *
+     * @return the closing symbol
+     */
     String getClosingSymbol();
+
+    /**
+     * Returns the number of elements in this entity.
+     *
+     * @return the size of the entity
+     */
     int size();
 
+    /**
+     * Converts this entity to a JSON string in a pretty-printed format.
+     *
+     * @return a pretty-printed JSON string representation of this entity
+     */
     default String toJSONString() {
         return toJSONStringRecursive(INITIAL_LEVEL, false);
     }
 
+    /**
+     * Converts this entity to a JSON string in a compact format.
+     *
+     * @return a compact JSON string representation of this entity
+     */
     default String toJSONStringCompact() {
         return toJSONStringRecursive(INITIAL_LEVEL, true);
     }
 
+    /**
+     * Recursively converts this entity to a JSON string.
+     *
+     * @param level  the current indentation level
+     * @param compact whether to produce a compact JSON string
+     * @return a JSON string representation of this entity
+     */
     private String toJSONStringRecursive(int level, boolean compact) {
         String newLine = compact ? "" : System.lineSeparator();
 
