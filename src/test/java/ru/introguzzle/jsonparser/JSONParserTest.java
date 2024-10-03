@@ -1,6 +1,7 @@
 package ru.introguzzle.jsonparser;
 
 import org.junit.Test;
+import ru.introguzzle.jsonparser.convert.ConversionException;
 import ru.introguzzle.jsonparser.entity.JSONArray;
 import ru.introguzzle.jsonparser.entity.JSONObject;
 
@@ -13,6 +14,7 @@ public class JSONParserTest {
     public void test_simple_case() {
         String data = "{\"string_value\":\"Hello, World!\",\"integer_value\":42,\"float_value\":3.1415,\"boolean_true\":true,\"boolean_false\":false,\"null_value\":null,\"object_value\":{\"nested_string\":\"Nested\",\"nested_integer\":123},\"array_of_primitives\":[1,\"two\",false],\"array_of_objects\":[{\"id\":1,\"name\":\"Alice\"},{\"id\":2,\"name\":\"Bob\"}]}";
         JSONObject o = parser.parse(data, JSONObject.class);
+        System.out.println(o.toJSONString());
 
         String stringValue = o.get("string_value", String.class);
         Number integerValue = o.get("integer_value", Number.class);
@@ -49,6 +51,70 @@ public class JSONParserTest {
 
         assertEquals(1, firstObject.get("id", Number.class).intValue());
         assertEquals("Alice", firstObject.get("name", String.class));
+
+        assertEquals(2, secondObject.get("id", Number.class).intValue());
+        assertEquals("Bob", secondObject.get("name", String.class));
+    }
+
+    @Test
+    public void test_empty_json_object() {
+        String data = "{}";
+        JSONObject o = parser.parse(data, JSONObject.class);
+        assertNotNull(o);
+        assertTrue(o.isEmpty());
+    }
+
+    @Test
+    public void test_empty_json_array() {
+        String data = "[]";
+        JSONArray o = parser.parse(data, JSONArray.class);
+        assertNotNull(o);
+        assertTrue(o.isEmpty());
+    }
+
+    @Test
+    public void test_empty_string() {
+        String data = "";
+        String o = parser.parse(data, String.class);
+        assertNotNull(o);
+        assertTrue(o.isEmpty());
+    }
+
+    @Test
+    public void test_null() {
+        String s = parser.parse(null, String.class);
+        Boolean b = parser.parse(null, Boolean.class);
+
+        assertNull(s);
+        assertNull(b);
+    }
+
+    @Test(expected = ConversionException.class)
+    public void test_invalid_json1() {
+        String data = "{\"string_value\":\"Hello, World!\",\"integer_value\":42,,,,,}";
+        JSONObject object = parser.parse(data, JSONObject.class);
+        System.out.println(object.toJSONString());
+    }
+
+    @Test(expected = ConversionException.class)
+    public void test_invalid_json2() {
+        String data = "{\"string_value\":\"Hello, World!\",\"integer_value\":42&;^}";
+        JSONObject object = parser.parse(data, JSONObject.class);
+        System.out.println(object.toJSONString());
+    }
+
+    @Test
+    public void test_json_array() {
+        String data = "[{\"id\":1,\"name\":\"Alice^^^^,m,mmn,\"},{\"id\":2,\"name\":\"Bob\"}]";
+        JSONArray array = parser.parse(data, JSONArray.class);
+        assertNotNull(array);
+        assertEquals(2, array.size());
+
+        JSONObject firstObject = array.get(0, JSONObject.class);
+        JSONObject secondObject = array.get(1, JSONObject.class);
+
+        assertEquals(1, firstObject.get("id", Number.class).intValue());
+        assertEquals("Alice^^^^,m,mmn,", firstObject.get("name", String.class));
 
         assertEquals(2, secondObject.get("id", Number.class).intValue());
         assertEquals("Bob", secondObject.get("name", String.class));

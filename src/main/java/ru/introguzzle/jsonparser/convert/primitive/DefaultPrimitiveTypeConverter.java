@@ -22,12 +22,24 @@ public class DefaultPrimitiveTypeConverter implements PrimitiveTypeConverter {
             }
         }
 
-        if (type == Number.class) {
-            if (NumberUtilities.isNumeric(data)) return Double.parseDouble(data);
-            throw new ConversionException("Not a numeric value: " + data);
+        String unescaped = unescape(data);
 
-        } else {
-            return data.replace("\"", "");
+        if (type == Number.class) {
+            return Double.parseDouble(unescaped);
         }
+
+        if (data.startsWith("\"") && data.endsWith("\"")) {
+            return unescaped;  // Return unescaped string
+        }
+
+        if (NumberUtilities.isNumeric(unescaped)) {
+            return Double.parseDouble(unescaped);
+        }
+
+        throw new ConversionException("Not a numeric or string value: " + data);
+    }
+
+    private String unescape(String data) {
+        return data.replace("\"", "");
     }
 }

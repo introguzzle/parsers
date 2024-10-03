@@ -43,13 +43,23 @@ public class DefaultConverter implements Converter {
         data = data.substring(1, data.length() - 1).trim();
 
         // Break down the JSON object into key-value pairs
-        String[] lines = getLines(data);
+        List<String> lines = getLines(data);
+        int index = 0;
         for (String line : lines) {
+            if (line.isEmpty() || line.isBlank()) {
+                String problem = index > 1
+                        ? lines.get(index - 1)
+                        : lines.get(index);
+
+                throw new ConversionException("Invalid JSON syntax in line: " + problem);
+            }
+
             // Split each line into a key-value pair by the first colon
             String[] split = line.split(":", 2);
             String key = split[0].trim().replace("\"", ""); // Remove double quotes from keys
             Object value = map(split[1].trim(), JSONObject.class); // Recursively map the value
             object.put(key, value);
+            index++;
         }
 
         return object;
@@ -67,7 +77,7 @@ public class DefaultConverter implements Converter {
         data = data.substring(1, data.length() - 1).trim();
 
         // Break down the array into individual elements
-        String[] elements = getLines(data);
+        List<String> elements = getLines(data);
         for (String element : elements) {
             array.add(map(element.trim(), JSONArray.class)); // Recursively map each element
         }
@@ -81,10 +91,10 @@ public class DefaultConverter implements Converter {
      * as single entities.
      *
      * @param data the raw JSON string representing an object or array
-     * @return an array of strings where each string is either a key-value pair (for objects)
+     * @return a list of strings where each string is either a key-value pair (for objects)
      *         or an element (for arrays)
      */
-    private String[] getLines(String data) {
+    private List<String> getLines(String data) {
         List<String> entries = new ArrayList<>();
         int bracketCount = 0;
         boolean inQuotes = false;
@@ -125,6 +135,6 @@ public class DefaultConverter implements Converter {
             entries.add(entry.toString().trim());
         }
 
-        return entries.toArray(new String[0]);
+        return entries;
     }
 }
