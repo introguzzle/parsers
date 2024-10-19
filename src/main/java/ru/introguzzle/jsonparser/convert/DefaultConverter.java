@@ -4,6 +4,7 @@ import ru.introguzzle.jsonparser.entity.JSONArray;
 import ru.introguzzle.jsonparser.entity.JSONObject;
 import ru.introguzzle.jsonparser.convert.primitive.DefaultPrimitiveTypeConverter;
 import ru.introguzzle.jsonparser.convert.primitive.PrimitiveTypeConverter;
+import ru.introguzzle.jsonparser.parse.JSONParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +18,22 @@ public class DefaultConverter implements Converter {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T map(String data, Class<? extends T> type) {
+        Object result;
+
         // If the string starts with '{', treat it as a JSON object
         if (data.startsWith("{")) {
-            return (T) parseObject(data);
+            result = parseObject(data);
         }
         // If the string starts with '[', treat it as a JSON array
         else if (data.startsWith("[")) {
-            return (T) parseArray(data);
+            result = parseArray(data);
         }
         // Otherwise, assume it is a primitive value (number, boolean, or string)
         else {
-            return (T) primitiveTypeConverter.map(data, type);
+            result = primitiveTypeConverter.map(data, type);
         }
+
+        return (T) result;
     }
 
     /**
@@ -51,7 +56,7 @@ public class DefaultConverter implements Converter {
                         ? lines.get(index - 1)
                         : lines.get(index);
 
-                throw new ConversionException("Invalid JSON syntax in line: " + problem);
+                throw new JSONParseException("Invalid JSON syntax in line: " + problem);
             }
 
             // Split each line into a key-value pair by the first colon

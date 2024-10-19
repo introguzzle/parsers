@@ -1,15 +1,9 @@
 package ru.introguzzle.jsonparser.mapping.type;
 
 import org.jetbrains.annotations.Nullable;
-import ru.introguzzle.jsonparser.entity.JSONArray;
 import ru.introguzzle.jsonparser.entity.JSONObject;
-import ru.introguzzle.jsonparser.mapping.DefaultMapper;
 import ru.introguzzle.jsonparser.mapping.Mapper;
 import ru.introguzzle.jsonparser.mapping.context.MappingContext;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 public enum JSONType implements TypeHandler {
     UNSPECIFIED(null),

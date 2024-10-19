@@ -71,6 +71,7 @@ public class JSONObject extends LinkedHashMap<String, Object>
                 if (CircularReferenceStrategy.PLACEHOLDER.equals(value)) {
                     value = referenceMap.get(this);
                 }
+
                 field.set(instance, value);
             }
             return instance;
@@ -97,6 +98,7 @@ public class JSONObject extends LinkedHashMap<String, Object>
             }
             return object.map(type);
         }
+
         if (value instanceof JSONArray array) {
             return handleArray(type, array);
         }
@@ -124,6 +126,7 @@ public class JSONObject extends LinkedHashMap<String, Object>
             }
             return resultArray;
         }
+
         if (Set.class.isAssignableFrom(fieldType)) {
             Set<Object> resultSet = new HashSet<>();
             for (Object element : array) {
@@ -132,6 +135,7 @@ public class JSONObject extends LinkedHashMap<String, Object>
             }
             return resultSet;
         }
+
         return array;
     }
 
@@ -258,6 +262,7 @@ public class JSONObject extends LinkedHashMap<String, Object>
         if (value == null) {
             return defaultValue;
         }
+
         return type.cast(value);
     }
 

@@ -1,14 +1,13 @@
-package ru.introguzzle.jsonparser;
+package ru.introguzzle.jsonparser.parse;
 
 import org.junit.Test;
-import ru.introguzzle.jsonparser.convert.ConversionException;
 import ru.introguzzle.jsonparser.entity.JSONArray;
 import ru.introguzzle.jsonparser.entity.JSONObject;
 
 import static org.junit.Assert.*;
 
 public class JSONParserTest {
-    private final Parser parser = new JSONParser();
+    private final Parser parser = new JSONTokenParser();
 
     @Test
     public void test_simple_case() {
@@ -89,14 +88,14 @@ public class JSONParserTest {
         assertNull(b);
     }
 
-    @Test(expected = ConversionException.class)
+    @Test(expected = JSONParseException.class)
     public void test_invalid_json1() {
         String data = "{\"string_value\":\"Hello, World!\",\"integer_value\":42,,,,,}";
         JSONObject object = parser.parse(data, JSONObject.class);
         System.out.println(object.toJSONString());
     }
 
-    @Test(expected = ConversionException.class)
+    @Test(expected = JSONParseException.class)
     public void test_invalid_json2() {
         String data = "{\"string_value\":\"Hello, World!\",\"integer_value\":42&;^}";
         JSONObject object = parser.parse(data, JSONObject.class);

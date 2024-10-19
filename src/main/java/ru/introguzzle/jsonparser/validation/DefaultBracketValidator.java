@@ -1,6 +1,6 @@
 package ru.introguzzle.jsonparser.validation;
 
-import ru.introguzzle.jsonparser.JSONParseException;
+import ru.introguzzle.jsonparser.parse.JSONParseException;
 
 import java.util.Stack;
 

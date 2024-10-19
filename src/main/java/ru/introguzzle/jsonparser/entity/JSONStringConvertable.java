@@ -21,6 +21,7 @@ public interface JSONStringConvertable {
 
     /** The initial indentation level for JSON serialization. */
     int INITIAL_LEVEL = 1;
+    String QUOTE = "\"";
 
     /**
      * Returns an iterator for the contents of this entity.
@@ -90,7 +91,7 @@ public interface JSONStringConvertable {
             result.append(TAB.repeat(level));
 
             if (value instanceof Map.Entry<?, ?> entry) {
-                result.append("\"").append(entry.getKey()).append("\"").append(": ");
+                result.append(QUOTE).append(entry.getKey()).append(QUOTE).append(": ");
                 value = entry.getValue();
             }
 
@@ -110,9 +111,9 @@ public interface JSONStringConvertable {
                         && s.charAt(s.length() - 1) != '\"'
                         && !s.contentEquals(CircularReferenceStrategy.PLACEHOLDER)) {
 
-                    result.append("\"")
+                    result.append(QUOTE)
                             .append(s)
-                            .append("\"");
+                            .append(QUOTE);
                 } else {
                     result.append(value);
                 }

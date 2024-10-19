@@ -1,7 +1,7 @@
 package ru.introguzzle.jsonparser.mapping.context;
 
 public class MappingContext {
-    public CircularReferenceStrategy circularReferenceStrategy;
+    public final CircularReferenceStrategy circularReferenceStrategy;
 
     public MappingContext(CircularReferenceStrategy circularReferenceStrategy) {
         this.circularReferenceStrategy = circularReferenceStrategy;

@@ -1,4 +1,4 @@
-package ru.introguzzle.jsonparser;
+package ru.introguzzle.jsonparser.parse;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,4 +36,21 @@ public interface Parser {
      *         <br> otherwise, the converted object of type {@code T} <br>
      */
     <T> T parse(@Nullable String data, @NotNull Class<? extends T> type);
+
+    @SuppressWarnings("unchecked")
+    default <T> @Nullable T handleEmptyString(@NotNull String data, Class<? extends T> type) {
+        if (type == JSONObject.class) {
+            return (T) new JSONObject();
+        }
+
+        if (type == JSONArray.class) {
+            return (T) new JSONArray();
+        }
+
+        if (type == String.class) {
+            return (T) data;
+        }
+
+        return null;
+    }
 }

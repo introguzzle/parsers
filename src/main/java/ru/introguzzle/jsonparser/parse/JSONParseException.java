@@ -1,4 +1,4 @@
-package ru.introguzzle.jsonparser;
+package ru.introguzzle.jsonparser.parse;
 
 public class JSONParseException extends ParseException {
     public JSONParseException() {

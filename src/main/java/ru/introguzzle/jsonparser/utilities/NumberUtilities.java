@@ -28,15 +28,16 @@ public final class NumberUtilities {
      * <p>{@code null} and empty/blank {@link String} will return
      * {@code false}.</p>
      *
-     * @param str  the {@link String} to check
+     * @param string  the {@link String} to check
      * @return {@code true} if the string is a correctly formatted number
      * @since 3.5
      */
-    public static boolean isNumeric(final String str) {
-        if (str.isEmpty()) {
+    public static boolean isNumeric(final String string) {
+        if (string.isEmpty()) {
             return false;
         }
-        final char[] chars = str.toCharArray();
+
+        final char[] chars = string.toCharArray();
         int sz = chars.length;
         boolean hasExp = false;
         boolean hasDecPoint = false;
@@ -44,7 +45,7 @@ public final class NumberUtilities {
         boolean foundDigit = false;
         // deal with any possible sign up front
         final int start = chars[0] == '-' || chars[0] == '+' ? 1 : 0;
-        if (sz > start + 1 && chars[start] == '0' && !str.contains(".")) { // leading 0, skip if is a decimal number
+        if (sz > start + 1 && chars[start] == '0' && !string.contains(".")) { // leading 0, skip if is a decimal number
             if (chars[start + 1] == 'x' || chars[start + 1] == 'X') { // leading 0x/0X
                 int i = start + 2;
                 if (i == sz) {
@@ -71,7 +72,7 @@ public final class NumberUtilities {
                 return true;
             }
         }
-        sz--; // don't want to loop to the last char, check it afterwards
+        sz--; // don't want to loop to the last char, check it afterward
         // for type qualifiers
         int i = start;
         // loop to the next to last char or to the last char if we need another digit to

@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public final class TypeHandlers {
-    private static final Map<Class<?>, TypeHandler> HANDLERS = new HashMap<>();;
+    private static final Map<Class<?>, TypeHandler> HANDLERS = new HashMap<>();
     static {
         HANDLERS.put(Collection.class, (mapper, value, context) -> {
             JSONArray array = new JSONArray();

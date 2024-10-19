@@ -1,7 +1,7 @@
 package ru.introguzzle.jsonparser.convert.primitive;
 
 import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.jsonparser.convert.ConversionException;
+import ru.introguzzle.jsonparser.parse.JSONParseException;
 import ru.introguzzle.jsonparser.utilities.NumberUtilities;
 
 public class DefaultPrimitiveTypeConverter implements PrimitiveTypeConverter {
@@ -36,10 +36,10 @@ public class DefaultPrimitiveTypeConverter implements PrimitiveTypeConverter {
             return Double.parseDouble(unescaped);
         }
 
-        throw new ConversionException("Not a numeric or string value: " + data);
+        throw new JSONParseException("Not a numeric or string value: " + data);
     }
 
-    private String unescape(String data) {
+    private static String unescape(String data) {
         return data.replace("\"", "");
     }
 }
