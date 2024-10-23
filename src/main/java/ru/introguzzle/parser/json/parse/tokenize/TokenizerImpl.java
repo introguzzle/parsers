@@ -2,7 +2,7 @@ package ru.introguzzle.parser.json.parse.tokenize;
 
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parser.json.parse.JSONParseException;
-import ru.introguzzle.parser.json.utilities.NumberUtilities;
+import ru.introguzzle.parser.common.utilities.NumberUtilities;
 
 import java.util.ArrayList;
 import java.util.List;

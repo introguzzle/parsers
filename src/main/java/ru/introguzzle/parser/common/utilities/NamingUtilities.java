@@ -1,4 +1,4 @@
-package ru.introguzzle.parser.json.utilities;
+package ru.introguzzle.parser.common.utilities;
 
 public final class NamingUtilities {
     private NamingUtilities() {}
@@ -8,7 +8,7 @@ public final class NamingUtilities {
      * <p>
      * This method transforms each uppercase letter in the input string to lowercase and
      * precedes it with an underscore ('_') if it's not the first character.
-     * For example, "camelCase" becomes "camel_case".
+     * For example, "camelCase" or "TitleCase" becomes "camel_case".
      * </p>
      *
      * @param input the string to be converted to snake_case
@@ -21,10 +21,25 @@ public final class NamingUtilities {
 
         StringBuilder result = new StringBuilder();
 
-        for (char c : input.toCharArray()) {
+
+        char[] characters = input.toCharArray();
+        char first = characters[0];
+        if (Character.isUpperCase(first)) {
+            first = Character.toLowerCase(first);
+        }
+
+        result.append(first);
+
+        if (characters.length < 2) {
+            return result.toString();
+        }
+
+        for (int i = 1; i < characters.length; i++) {
+            char c = characters[i];
             if (Character.isUpperCase(c) && !result.isEmpty()) {
                 result.append('_'); // Append an underscore before uppercase letters
             }
+
             result.append(Character.toLowerCase(c)); // Append the lowercase version of the character
         }
 

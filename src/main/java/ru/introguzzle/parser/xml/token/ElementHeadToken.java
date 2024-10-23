@@ -1,12 +1,18 @@
 package ru.introguzzle.parser.xml.token;
 
+import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parser.xml.Type;
 import ru.introguzzle.parser.xml.XMLElement;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class ElementHeadToken extends ElementToken {
+    @Serial
+    private static final long serialVersionUID = -4985289472805806457L;
+
     private final List<Token> children;
 
     public ElementHeadToken(String name,
@@ -40,14 +46,8 @@ public class ElementHeadToken extends ElementToken {
                 .toList()
         );
 
-        element.setText(getChildren()
-                .stream()
-                .filter(TextToken.class::isInstance)
-                .map(Token::getData)
-                .reduce(String::concat)
-                .orElse("")
-        );
-
+        element.setText(reduce(TextToken.class, TextToken::getData));
+        element.setCData(reduce(CDataToken.class, CDataToken::getText));
         for (Token child : children) {
             if (child instanceof ElementHeadToken headToken) {
                 element.addChild(headToken.toXMLElement());
@@ -55,5 +55,16 @@ public class ElementHeadToken extends ElementToken {
         }
 
         return element;
+    }
+
+    private <T extends Token> @NotNull String reduce(@NotNull Class<? extends T> type,
+                                                     @NotNull Function<? super T, String> mapper) {
+        return getChildren()
+                .stream()
+                .filter(type::isInstance)
+                .map(type::cast)
+                .map(mapper)
+                .reduce(String::concat)
+                .orElse("");
     }
 }

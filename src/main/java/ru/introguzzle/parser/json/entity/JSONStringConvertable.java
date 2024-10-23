@@ -17,7 +17,7 @@ import java.util.Map;
 public interface JSONStringConvertable {
 
     /** A string representing a tab for indentation. */
-    String TAB = "    ";
+    String TAB = "\t";
 
     /** The initial indentation level for JSON serialization. */
     int INITIAL_LEVEL = 1;

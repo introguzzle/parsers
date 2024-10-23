@@ -5,8 +5,8 @@ import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parser.json.mapping.context.MappingContext;
 import ru.introguzzle.parser.json.mapping.type.JSONType;
 import ru.introguzzle.parser.json.mapping.type.TypeHandlers;
-import ru.introguzzle.parser.json.utilities.NamingUtilities;
-import ru.introguzzle.parser.json.utilities.ReflectionUtilities;
+import ru.introguzzle.parser.common.utilities.NamingUtilities;
+import ru.introguzzle.parser.common.utilities.ReflectionUtilities;
 import ru.introguzzle.parser.json.entity.JSONObject;
 
 import java.lang.reflect.Field;

@@ -48,6 +48,7 @@ public class JSONArray extends ArrayList<Object> implements JSONStringConvertabl
         if (value == null) {
             return defaultValue;
         }
+
         return type.cast(value);
     }
 

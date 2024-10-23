@@ -1,4 +1,4 @@
-package ru.introguzzle.parser.json.utilities;
+package ru.introguzzle.parser.common.utilities;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ public final class ReflectionUtilities {
         while (type != null && type != Object.class) {
             Field[] declaredFields = type.getDeclaredFields();
             for (Field field : declaredFields) {
-                field.setAccessible(true); // Allows access to private fields
-                fields.add(field); // Corrected from addLast to add
+                field.setAccessible(true);
+                fields.add(field);
             }
-            type = type.getSuperclass(); // Move to the superclass
+            type = type.getSuperclass();
         }
 
         return fields;

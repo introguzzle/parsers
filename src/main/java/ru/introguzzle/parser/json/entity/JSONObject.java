@@ -1,10 +1,15 @@
 package ru.introguzzle.parser.json.entity;
 
 import org.jetbrains.annotations.NotNull;
+import ru.introguzzle.parser.common.Converter;
+import ru.introguzzle.parser.common.ConverterFactory;
+import ru.introguzzle.parser.common.JSONObjectToXMLDocumentConverter;
 import ru.introguzzle.parser.json.mapping.JSONObjectConvertable;
 import ru.introguzzle.parser.json.mapping.context.CircularReferenceStrategy;
-import ru.introguzzle.parser.json.utilities.NamingUtilities;
-import ru.introguzzle.parser.json.utilities.ReflectionUtilities;
+import ru.introguzzle.parser.common.utilities.NamingUtilities;
+import ru.introguzzle.parser.common.utilities.ReflectionUtilities;
+import ru.introguzzle.parser.xml.XMLDocument;
+import ru.introguzzle.parser.xml.XMLDocumentConvertable;
 
 import java.io.Serial;
 import java.lang.reflect.Array;
@@ -22,7 +27,10 @@ import java.util.function.Supplier;
  * </p>
  */
 public class JSONObject extends LinkedHashMap<String, Object>
-        implements JSONStringConvertable, JSONObjectConvertable {
+        implements JSONStringConvertable, JSONObjectConvertable, XMLDocumentConvertable {
+
+    public static final Converter<JSONObject, XMLDocument> CONVERTER
+            = ConverterFactory.getDefaultFactory().getJSONDocumentToXMLConverter();
 
     @Serial
     private static final long serialVersionUID = -697931640108868641L;
@@ -41,6 +49,10 @@ public class JSONObject extends LinkedHashMap<String, Object>
         M map = supplier.get();
         map.putAll(this);
         return map;
+    }
+
+    public boolean add(String key, Object value) {
+        return put(key, value) != null;
     }
 
     /**
@@ -284,5 +296,36 @@ public class JSONObject extends LinkedHashMap<String, Object>
     @Override
     public JSONObject toJSONObject() {
         return this;
+    }
+
+    @Override
+    public XMLDocument toXMLDocument() {
+        return CONVERTER.convert(this);
+    }
+
+    public JSONObject flatten(String textKey) {
+        Iterator<Map.Entry<String, Object>> iterator = entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Object> entry = iterator.next();
+            if (entry.getKey().equals("title")) {
+                System.out.println();
+            }
+
+            Object value = entry.getValue();
+            if (value instanceof JSONObject object) {
+                if (object.containsKey(textKey) && object.keySet().size() == 1) {
+                    put(entry.getKey(), object.get(textKey));
+                } else {
+                    object.flatten(textKey);
+                }
+            }
+        }
+
+        return this;
+    }
+
+    @Override
+    public XMLDocument toXMLDocumentWithMetadata() {
+        return CONVERTER.convertWithMetadata(this);
     }
 }

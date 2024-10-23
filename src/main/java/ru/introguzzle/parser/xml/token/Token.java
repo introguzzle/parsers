@@ -3,9 +3,15 @@ package ru.introguzzle.parser.xml.token;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parser.xml.Type;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Objects;
 
-public abstract sealed class Token permits AttributeToken, CDataToken, CommentToken, DeclarationToken, ElementTailToken, ElementToken, TextToken {
+public abstract sealed class Token implements Serializable permits AttributeToken,
+        CDataToken, CommentToken, DeclarationToken,
+        ElementTailToken, ElementToken, TextToken {
+    @Serial
+    private static final long serialVersionUID = -3536243019629556440L;
 
     private final String data;
     private final Type type;
@@ -43,5 +49,4 @@ public abstract sealed class Token permits AttributeToken, CDataToken, CommentTo
                 "data=" + data + ", " +
                 "type=" + type + ']';
     }
-
 }

@@ -1,4 +1,4 @@
-package ru.introguzzle.parser.json.utilities;
+package ru.introguzzle.parser.common.utilities;
 
 /**
  * <p>

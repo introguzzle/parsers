@@ -1,13 +1,15 @@
 package ru.introguzzle.parser.xml;
 
 import org.junit.Test;
+import ru.introguzzle.parser.json.entity.JSONObject;
+
 import static org.junit.Assert.*;
 
 public class XMLParserTest {
-    private Parser parser = new XMLParser();
+    private final Parser parser = new XMLParser();
 
     @Test
-    public void test() {
+    public void test1() {
         String string = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<!-- Это комментарий в XML -->\n" +
                 "<library xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"library-schema.xsd\">\n" +
@@ -68,8 +70,104 @@ public class XMLParserTest {
                 "\n" +
                 "</library>\n";
 
-        var tokens = parser.getTokenizer().tokenize(string);
         XMLDocument document = parser.parse(string);
-        System.out.println();
+        assertNotNull(document);
+        JSONObject json = document.toJSONObject();
+        assertNotNull(json);
+
+        System.out.println("########### CONVERTED TO JSON #############\n");
+        System.out.println(json.toJSONString());
+
+        System.out.println("########### CONVERTED TO XML ###############\n");
+        XMLDocument fromJson = json.toXMLDocument();
+        System.out.println(fromJson.toXMLString());
+    }
+
+    @Test
+    public void test2() {
+        String string = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <object></object>";
+        XMLDocument document = parser.parse(string);
+        assertNotNull(document);
+        XMLElement root = document.getRoot();
+
+        assertEquals(root.getChildren().size(), 0);
+        assertEquals(root.getName(), "object");
+        assertEquals(root.getCData(), "");
+        assertEquals(root.getText(), "");
+
+        System.out.println(document.toXMLString());
+    }
+
+    @Test
+    public void test3() {
+        String string = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+                "<object attr=\"attrValue\"> someText" +
+                    "<![CDATA[ <shouldBeIgnored> </shouldBeIgnored> ]]>" +
+                "</object>";
+
+        XMLDocument document = parser.parse(string);
+        assertNotNull(document);
+        JSONObject json = document.toJSONObjectWithMetadata();
+        XMLDocument fromJson = json.toXMLDocumentWithMetadata();
+
+        System.out.println("############ ORIGINAL #############\n");
+        System.out.println(document.toXMLString());
+
+        System.out.println("############ CONVERTED WITH METADATA TO JSON #############\n");
+        System.out.println(json.toJSONString());
+
+        System.out.println("############ CONVERTED WITH METADATA FROM JSON TO XML #############\n");
+        System.out.println(fromJson.toXMLString());
+
+        assertEquals(document, fromJson);
+    }
+
+    @Test
+    public void test4() {
+        String string = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+                "<object attr=\"attrValue\"> someText" +
+                "<![CDATA[ <shouldBeIgnored> </shouldBeIgnored> ]]>" +
+                "</object>";
+
+        XMLDocument document = parser.parse(string);
+        assertNotNull(document);
+        JSONObject json = document.toJSONObject();
+        XMLDocument fromJson = json.toXMLDocument();
+
+        System.out.println("############ ORIGINAL #############\n");
+        System.out.println(document.toXMLString());
+
+        System.out.println("############ CONVERTED TO JSON #############\n");
+        System.out.println(json.toJSONString());
+
+        System.out.println("############ CONVERTED FROM JSON TO XML #############\n");
+        System.out.println(fromJson.toXMLString());
+    }
+
+    @Test
+    public void test5() {
+        String string = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+                "<integer> " +
+                "5" +
+                "<inner> 10 </inner>" +
+                "</integer>";
+
+        XMLDocument document = parser.parse(string);
+        assertNotNull(document);
+
+        System.out.println(document.toJSONObjectWithMetadata().toJSONString());
+        System.out.println("\n");
+        System.out.println(document.toJSONObjectWithMetadata()
+                .toXMLDocumentWithMetadata()
+                .toXMLString());
+
+        System.out.println("FLATTEN\n");
+        System.out.println(document.toJSONObjectWithMetadata().flatten("@text").toJSONString());
+    }
+
+    @Test(expected = XMLParseException.class)
+    public void test_missing_declaration() {
+        String string = "<library xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"library-schema.xsd\">";
+        parser.parse(string);
     }
 }

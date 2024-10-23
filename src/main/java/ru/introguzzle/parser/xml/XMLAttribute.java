@@ -1,13 +1,11 @@
 package ru.introguzzle.parser.xml;
 
-public final class XMLAttribute {
-    private final String name;
-    private final String value;
+import java.io.Serial;
+import java.io.Serializable;
 
-    public XMLAttribute(String name, String value) {
-        this.name = name;
-        this.value = value;
-    }
+public record XMLAttribute(String name, String value) implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 3501024352307557330L;
 
     @Override
     public String toString() {

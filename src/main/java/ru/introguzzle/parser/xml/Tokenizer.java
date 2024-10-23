@@ -4,16 +4,25 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parser.xml.token.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-public class Tokenizer {
+public class Tokenizer implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -2340475536496178165L;
+
     public @NotNull List<Token> tokenize(@Nullable String data) {
         if (data == null) return new ArrayList<>();
         List<Token> tokens = new ArrayList<>();
         List<String> lines = split(data);
+
+        if (!lines.getFirst().startsWith("<?xml")) {
+            throw new XMLParseException("Invalid syntax");
+        }
 
         tokens.add(getDeclarationToken(lines.getFirst()));
         Stack<ElementHeadToken> stack = new Stack<>();
@@ -32,12 +41,12 @@ public class Tokenizer {
                     seenRoot = true;
                     tokens.add(head);
                 } else if (stack.isEmpty()) {
-                    throw new IllegalStateException("More than one root found");
+                    throw new XMLParseException("More than one root found");
                 }
 
             } else if (token instanceof ElementTailToken tail) {
                 if (stack.isEmpty()) {
-                    throw new IllegalStateException("No head match found for tail with name: " + tail.getName());
+                    throw new XMLParseException("No head match found for tail with name: " + tail.getName());
                 }
 
                 stack.pop();
@@ -49,7 +58,7 @@ public class Tokenizer {
         }
 
         if (!stack.isEmpty()) {
-            throw new IllegalStateException("Unmatched tags");
+            throw new XMLParseException("Unmatched tags");
         }
 
         return tokens;
@@ -88,7 +97,7 @@ public class Tokenizer {
         }
 
         if (line.startsWith("<")) {
-            if (line.startsWith("<![CDATA")) return new CDataToken(line);
+            if (line.startsWith(CDataToken.HEAD)) return new CDataToken(line);
             if (line.endsWith("/>")) {
                 return new SelfClosingElementToken(getName(line),
                         line,
@@ -144,9 +153,33 @@ public class Tokenizer {
     }
 
     private List<String> split(@NotNull String data) {
-        return Arrays.stream(data.split("(?=<)|(?<=>)"))
-                .filter(s -> !s.isBlank())
-                .map(s -> s.replace("\n", "").stripLeading())
-                .toList();
+        List<String> parts = new ArrayList<>();
+        StringBuilder buffer = null;
+        boolean inCData = false;
+
+        for (String part : data.split("(?=<)|(?<=>)")) {
+            if (part.startsWith(CDataToken.HEAD)) {
+                if (part.endsWith(CDataToken.TAIL)) {
+                    parts.add(part.replace("\n", "").stripLeading());
+                    continue;
+                }
+
+                inCData = true;
+                buffer = new StringBuilder(part);
+            } else if (inCData) {
+                buffer.append(part);
+                if (part.endsWith(CDataToken.TAIL)) {
+                    inCData = false;
+                    parts.add(buffer.toString());
+                }
+
+            } else {
+                if (!part.isBlank()) {
+                    parts.add(part.replace("\n", "").stripLeading());
+                }
+            }
+        }
+
+        return parts;
     }
 }

@@ -1,7 +1,7 @@
 package ru.introguzzle.parser.json.convert.primitive;
 
 import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.parser.json.utilities.NumberUtilities;
+import ru.introguzzle.parser.common.utilities.NumberUtilities;
 import ru.introguzzle.parser.json.parse.JSONParseException;
 
 public class PrimitiveTypeConverterImpl implements PrimitiveTypeConverter {

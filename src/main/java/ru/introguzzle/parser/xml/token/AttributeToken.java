@@ -2,10 +2,14 @@ package ru.introguzzle.parser.xml.token;
 
 import ru.introguzzle.parser.xml.Type;
 import ru.introguzzle.parser.xml.XMLAttribute;
+import ru.introguzzle.parser.xml.XMLParseException;
 
-import java.util.Arrays;
+import java.io.Serial;
 
 public non-sealed class AttributeToken extends Token {
+    @Serial
+    private static final long serialVersionUID = 1521597783326870820L;
+
     private final String name;
     private final String value;
 
@@ -14,7 +18,7 @@ public non-sealed class AttributeToken extends Token {
         String[] split = getData().split("=", 2);
 
         if (split.length != 2) {
-            throw new AssertionError("Shouldn't happen");
+            throw new XMLParseException("Invalid attribute syntax");
         }
 
         this.name = split[0];
