@@ -1,8 +1,11 @@
 package ru.introguzzle.parser.xml;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
 
+@Getter
 public enum Version implements Serializable {
     V1_0("1.0"),
     V1_1("1.1");
@@ -16,10 +19,6 @@ public enum Version implements Serializable {
         this.value = value;
     }
 
-    public String getValue() {
-        return value;
-    }
-
     public static Version of(String version) {
         return switch (version) {
             case "1.0" -> Version.V1_0;
@@ -31,7 +30,7 @@ public enum Version implements Serializable {
     public static Version orElse(String version, Version defaultVersion) {
         try {
             return of(version);
-        } catch (XMLParseException e) {
+        } catch (NullPointerException | XMLParseException e) {
             return defaultVersion;
         }
     }

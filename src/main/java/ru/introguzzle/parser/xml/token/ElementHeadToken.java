@@ -1,5 +1,6 @@
 package ru.introguzzle.parser.xml.token;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parser.xml.Type;
 import ru.introguzzle.parser.xml.XMLElement;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+@Getter
 public class ElementHeadToken extends ElementToken {
     @Serial
     private static final long serialVersionUID = -4985289472805806457L;
@@ -34,10 +36,6 @@ public class ElementHeadToken extends ElementToken {
         children.add(token);
     }
 
-    public final List<Token> getChildren() {
-        return children;
-    }
-
     public final XMLElement toXMLElement() {
         XMLElement element = new XMLElement(getName());
         element.addAttributes(getAttributes()
@@ -47,7 +45,7 @@ public class ElementHeadToken extends ElementToken {
         );
 
         element.setText(reduce(TextToken.class, TextToken::getData));
-        element.setCData(reduce(CDataToken.class, CDataToken::getText));
+        element.setCharacterData(reduce(CharacterDataToken.class, CharacterDataToken::getText));
         for (Token child : children) {
             if (child instanceof ElementHeadToken headToken) {
                 element.addChild(headToken.toXMLElement());

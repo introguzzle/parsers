@@ -97,7 +97,7 @@ public class Tokenizer implements Serializable {
         }
 
         if (line.startsWith("<")) {
-            if (line.startsWith(CDataToken.HEAD)) return new CDataToken(line);
+            if (line.startsWith(CharacterDataToken.HEAD)) return new CharacterDataToken(line);
             if (line.endsWith("/>")) {
                 return new SelfClosingElementToken(getName(line),
                         line,
@@ -155,21 +155,21 @@ public class Tokenizer implements Serializable {
     private List<String> split(@NotNull String data) {
         List<String> parts = new ArrayList<>();
         StringBuilder buffer = null;
-        boolean inCData = false;
+        boolean inCharacterData = false;
 
         for (String part : data.split("(?=<)|(?<=>)")) {
-            if (part.startsWith(CDataToken.HEAD)) {
-                if (part.endsWith(CDataToken.TAIL)) {
+            if (part.startsWith(CharacterDataToken.HEAD)) {
+                if (part.endsWith(CharacterDataToken.TAIL)) {
                     parts.add(part.replace("\n", "").stripLeading());
                     continue;
                 }
 
-                inCData = true;
+                inCharacterData = true;
                 buffer = new StringBuilder(part);
-            } else if (inCData) {
+            } else if (inCharacterData) {
                 buffer.append(part);
-                if (part.endsWith(CDataToken.TAIL)) {
-                    inCData = false;
+                if (part.endsWith(CharacterDataToken.TAIL)) {
+                    inCharacterData = false;
                     parts.add(buffer.toString());
                 }
 

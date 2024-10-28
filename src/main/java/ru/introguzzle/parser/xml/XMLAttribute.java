@@ -11,12 +11,4 @@ public record XMLAttribute(String name, String value) implements Serializable {
     public String toString() {
         return name + "=\"" + value + "\"";
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
 }

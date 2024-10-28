@@ -2,10 +2,15 @@ package ru.introguzzle.parser.json.entity;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.introguzzle.parser.common.UntypedArray;
+import ru.introguzzle.parser.json.visitor.JSONArrayVisitor;
 
 import java.io.Serial;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -16,40 +21,18 @@ import java.util.function.Function;
  * the {@link JSONStringConvertable} interface.
  * </p>
  */
-public class JSONArray extends ArrayList<Object> implements JSONStringConvertable {
+public class JSONArray extends UntypedArray implements
+        JSONStringConvertable, Consumer<JSONArrayVisitor> {
 
     @Serial
     private static final long serialVersionUID = -1731069894963023770L;
 
-    /**
-     * Retrieves the value at the specified index and casts it to the desired type.
-     *
-     * @param index the index of the value to retrieve
-     * @param type  the class type to cast to
-     * @param <T>   the type to be returned
-     * @return the value at the specified index cast to the specified type
-     */
-    public <T> T get(int index, Class<? extends T> type) {
-        return type.cast(get(index));
+    public JSONArray() {
+        super();
     }
 
-    /**
-     * Retrieves the value at the specified index and casts it to the desired type,
-     * or returns a default value if the index is out of bounds or the value is null.
-     *
-     * @param index        the index of the value to retrieve
-     * @param type         the class type to cast to
-     * @param defaultValue  the default value to return if the index is out of bounds or the value is null
-     * @param <T>          the type to be returned
-     * @return the value at the specified index cast to the specified type, or the default value
-     */
-    public <T> T get(int index, Class<? extends T> type, T defaultValue) {
-        Object value = get(index);
-        if (value == null) {
-            return defaultValue;
-        }
-
-        return type.cast(value);
+    public JSONArray(@NotNull Collection<?> collection) {
+        super(collection);
     }
 
     /**
@@ -98,5 +81,10 @@ public class JSONArray extends ArrayList<Object> implements JSONStringConvertabl
     @Override
     public String getClosingSymbol() {
         return "]";
+    }
+
+    @Override
+    public void accept(JSONArrayVisitor visitor) {
+        visitor.visit(this);
     }
 }

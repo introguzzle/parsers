@@ -2,8 +2,6 @@ package ru.introguzzle.parser.json.parse;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.introguzzle.parser.json.convert.primitive.PrimitiveTypeConverterImpl;
-import ru.introguzzle.parser.json.convert.primitive.PrimitiveTypeConverter;
 import ru.introguzzle.parser.json.entity.JSONArray;
 import ru.introguzzle.parser.json.entity.JSONObject;
 import ru.introguzzle.parser.json.parse.tokenize.TokenizerImpl;
@@ -16,16 +14,13 @@ import java.util.function.Predicate;
 
 public class JSONTokenParser extends Parser {
     private final Tokenizer tokenizer;
-    private final PrimitiveTypeConverter primitiveTypeConverter;
 
     public JSONTokenParser() {
-        this(new TokenizerImpl(), new PrimitiveTypeConverterImpl());
+        this(new TokenizerImpl());
     }
 
-    public JSONTokenParser(Tokenizer tokenizer,
-                           PrimitiveTypeConverter primitiveTypeConverter) {
+    public JSONTokenParser(Tokenizer tokenizer) {
         this.tokenizer = tokenizer;
-        this.primitiveTypeConverter = primitiveTypeConverter;
     }
 
     @Override
@@ -57,7 +52,7 @@ public class JSONTokenParser extends Parser {
         } else if (tokenType == Type.ARRAY_START) {
             result = parseArray(buffer);
         } else {
-            result = primitiveTypeConverter.map(token.getData(), type);
+            result = handlePrimitiveType(token.getData(), type);
         }
 
         return type.cast(result);

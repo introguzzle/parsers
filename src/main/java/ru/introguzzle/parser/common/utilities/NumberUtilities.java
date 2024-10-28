@@ -1,5 +1,7 @@
 package ru.introguzzle.parser.common.utilities;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * <p>
  * This implementation has been taken from the Apache Commons Lang library,
@@ -10,9 +12,8 @@ package ru.introguzzle.parser.common.utilities;
  * <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/math/NumberUtils.java?ysclid=m1l56zcwo6647001885">Apache Commons Lang - NumberUtils</a>.
  * </p>
  */
+@UtilityClass
 public final class NumberUtilities {
-    private NumberUtilities() {}
-
     /**
      * Checks whether the String is a valid Java number.
      *

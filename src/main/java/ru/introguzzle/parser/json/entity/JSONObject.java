@@ -1,13 +1,14 @@
 package ru.introguzzle.parser.json.entity;
 
 import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.parser.common.Converter;
-import ru.introguzzle.parser.common.ConverterFactory;
-import ru.introguzzle.parser.common.JSONObjectToXMLDocumentConverter;
+import ru.introguzzle.parser.common.convert.ConverterFactory;
+import ru.introguzzle.parser.common.convert.Converter;
+import ru.introguzzle.parser.common.UntypedMap;
 import ru.introguzzle.parser.json.mapping.JSONObjectConvertable;
-import ru.introguzzle.parser.json.mapping.context.CircularReferenceStrategy;
+import ru.introguzzle.parser.json.mapping.context.StandardCircularReferenceStrategies;
 import ru.introguzzle.parser.common.utilities.NamingUtilities;
 import ru.introguzzle.parser.common.utilities.ReflectionUtilities;
+import ru.introguzzle.parser.json.visitor.JSONObjectVisitor;
 import ru.introguzzle.parser.xml.XMLDocument;
 import ru.introguzzle.parser.xml.XMLDocumentConvertable;
 
@@ -15,8 +16,9 @@ import java.io.Serial;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 /**
  * Represents a JSON object as a map of key-value pairs.
@@ -26,11 +28,12 @@ import java.util.function.Supplier;
  * {@link JSONStringConvertable} and {@link JSONObjectConvertable} interfaces.
  * </p>
  */
-public class JSONObject extends LinkedHashMap<String, Object>
-        implements JSONStringConvertable, JSONObjectConvertable, XMLDocumentConvertable {
+public class JSONObject extends UntypedMap implements
+        JSONStringConvertable, JSONObjectConvertable,
+        XMLDocumentConvertable, Consumer<JSONObjectVisitor> {
 
-    public static final Converter<JSONObject, XMLDocument> CONVERTER
-            = ConverterFactory.getDefaultFactory().getJSONDocumentToXMLConverter();
+    public static final @NotNull ConverterFactory FACTORY = ConverterFactory.getFactory();
+    public static final Converter<JSONObject, XMLDocument> CONVERTER = FACTORY.getJSONDocumentToXMLConverter();
 
     @Serial
     private static final long serialVersionUID = -697931640108868641L;
@@ -38,21 +41,12 @@ public class JSONObject extends LinkedHashMap<String, Object>
     /** A map to track references for circular references. */
     private final Map<Object, Object> referenceMap = new HashMap<>();
 
-    /**
-     * Maps this JSONObject to a new instance of a specified Map type.
-     *
-     * @param supplier a supplier function to create a new map instance
-     * @param <M>     the type of the map
-     * @return a map containing the entries of this JSONObject
-     */
-    public <M extends Map<Object, Object>> M map(Supplier<M> supplier) {
-        M map = supplier.get();
-        map.putAll(this);
-        return map;
+    public JSONObject() {
+        super();
     }
 
-    public boolean add(String key, Object value) {
-        return put(key, value) != null;
+    public JSONObject(Map<? extends String, ?> map) {
+        super(map);
     }
 
     /**
@@ -66,10 +60,14 @@ public class JSONObject extends LinkedHashMap<String, Object>
     public <T> @NotNull T map(Class<? extends T> type) {
         try {
             if (Map.class.isAssignableFrom(type)) {
-                if (Map.class == type) {
+                if (type == Map.class) {
                     return (T) new HashMap<>(this);
                 }
-                return type.getConstructor(Map.class).newInstance(this);
+
+                Map<String, Object> map = (Map<String, Object>) type.getConstructor().newInstance();
+                map.putAll(this);
+
+                return (T) map;
             }
 
             T instance = type.getConstructor().newInstance();
@@ -80,7 +78,7 @@ public class JSONObject extends LinkedHashMap<String, Object>
                 field.setAccessible(true);
                 String snakeCaseName = NamingUtilities.toSnakeCase(field.getName());
                 Object value = match(field.getType(), get(snakeCaseName));
-                if (CircularReferenceStrategy.PLACEHOLDER.equals(value)) {
+                if (StandardCircularReferenceStrategies.PLACEHOLDER.equals(value)) {
                     value = referenceMap.get(this);
                 }
 
@@ -108,12 +106,14 @@ public class JSONObject extends LinkedHashMap<String, Object>
             if (referenceMap.containsKey(object)) {
                 return referenceMap.get(object);
             }
+
             return object.map(type);
         }
 
         if (value instanceof JSONArray array) {
             return handleArray(type, array);
         }
+
         return handleSimpleType(type, value);
     }
 
@@ -130,12 +130,14 @@ public class JSONObject extends LinkedHashMap<String, Object>
     private Object handleArray(Class<?> fieldType, JSONArray array)
             throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         if (fieldType.isArray()) {
+            int size = array.size();
             Class<?> componentType = fieldType.getComponentType();
-            Object resultArray = Array.newInstance(componentType, array.size());
-            for (int i = 0; i < array.size(); i++) {
+            Object resultArray = Array.newInstance(componentType, size);
+            for (int i = 0; i < size; i++) {
                 Object element = match(componentType, array.get(i));
                 Array.set(resultArray, i, element);
             }
+
             return resultArray;
         }
 
@@ -145,6 +147,7 @@ public class JSONObject extends LinkedHashMap<String, Object>
                 element = match(fieldType, element);
                 resultSet.add(element);
             }
+
             return resultSet;
         }
 
@@ -219,11 +222,15 @@ public class JSONObject extends LinkedHashMap<String, Object>
             for (var entry : NUMBER_METHOD_MAP.entrySet()) {
                 for (Class<?> c : entry.getKey()) {
                     if (c == fieldType) {
-                        return number.getClass().getMethod(entry.getValue()).invoke(number);
+                        Method method = number.getClass().getMethod(entry.getValue());
+                        method.setAccessible(true);
+
+                        return method.invoke(number);
                     }
                 }
             }
         }
+
         return value;
     }
 
@@ -245,37 +252,6 @@ public class JSONObject extends LinkedHashMap<String, Object>
             case "char"    -> '\u0000';
             default        -> throw new IllegalStateException("Unexpected value: " + fieldType.getSimpleName());
         };
-    }
-
-    /**
-     * Retrieves the value associated with the specified key, casting it to the desired type.
-     *
-     * @param key  the key for the desired value
-     * @param type the class type to cast to
-     * @param <T>  the type to be returned
-     * @return the value associated with the key cast to the specified type
-     */
-    public <T> T get(String key, Class<? extends T> type) {
-        return type.cast(get(key));
-    }
-
-    /**
-     * Retrieves the value associated with the specified key, casting it to the desired type,
-     * or returns a default value if the key does not exist.
-     *
-     * @param key         the key for the desired value
-     * @param type        the class type to cast to
-     * @param defaultValue the default value to return if the key does not exist
-     * @param <T>         the type to be returned
-     * @return the value associated with the key cast to the specified type, or the default value
-     */
-    public <T> T get(String key, Class<? extends T> type, T defaultValue) {
-        Object value = get(key);
-        if (value == null) {
-            return defaultValue;
-        }
-
-        return type.cast(value);
     }
 
     @Override
@@ -303,29 +279,65 @@ public class JSONObject extends LinkedHashMap<String, Object>
         return CONVERTER.convert(this);
     }
 
-    public JSONObject flatten(String textKey) {
-        Iterator<Map.Entry<String, Object>> iterator = entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, Object> entry = iterator.next();
-            if (entry.getKey().equals("title")) {
-                System.out.println();
-            }
+    public JSONObject flatten() {
+        return flatten(FACTORY.getTextPlaceholder());
+    }
 
+    public JSONObject flatten(String textKey) {
+        Object flattened = flatten(this, textKey);
+        if (flattened instanceof JSONObject) {
+            return (JSONObject) flattened;
+        }
+
+        throw new ClassCastException("Flattened root is not a JSONObject");
+    }
+
+    private static Object flatten(JSONObject object, String textKey) {
+        if (object.size() == 1 && object.containsKey(textKey)) {
+            return object.get(textKey);
+        }
+
+        JSONObject result = new JSONObject();
+
+        for (Map.Entry<String, Object> entry : object.entrySet()) {
+            String key = entry.getKey();
             Object value = entry.getValue();
-            if (value instanceof JSONObject object) {
-                if (object.containsKey(textKey) && object.keySet().size() == 1) {
-                    put(entry.getKey(), object.get(textKey));
-                } else {
-                    object.flatten(textKey);
-                }
+
+            if (value instanceof JSONObject o) {
+                result.put(key, flatten(o, textKey));
+            } else if (value instanceof JSONArray a) {
+                result.put(key, flatten(a, textKey));
+            } else {
+                result.put(key, value);
             }
         }
 
-        return this;
+        return result;
+    }
+
+    private static Object flatten(JSONArray array, String textKey) {
+        JSONArray result = new JSONArray();
+
+        for (Object item : array) {
+            if (item instanceof JSONObject o) {
+                result.add(flatten(o, textKey));
+            } else if (item instanceof JSONArray a) {
+                result.add(flatten(a, textKey));
+            } else {
+                result.add(item);
+            }
+        }
+
+        return result;
     }
 
     @Override
     public XMLDocument toXMLDocumentWithMetadata() {
         return CONVERTER.convertWithMetadata(this);
+    }
+
+    @Override
+    public void accept(JSONObjectVisitor visitor) {
+        visitor.visit(this);
     }
 }

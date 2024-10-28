@@ -3,7 +3,7 @@ package ru.introguzzle.parser.json.parse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import ru.introguzzle.parser.json.convert.Converter;
+import ru.introguzzle.parser.common.utilities.NumberUtilities;
 import ru.introguzzle.parser.json.entity.JSONArray;
 import ru.introguzzle.parser.json.entity.JSONObject;
 
@@ -26,7 +26,6 @@ import java.util.function.Supplier;
  * @see Number
  * @see Boolean
  * @see String
- * @see Converter
  */
 public abstract class Parser {
     protected Executor executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -72,5 +71,41 @@ public abstract class Parser {
         }
 
         return result == null ? null : type.cast(result);
+    }
+
+    public Object handlePrimitiveType(@NotNull String data, @NotNull Class<?> type) {
+        switch (data.trim()) {
+            case "false" -> {
+                return Boolean.FALSE;
+            }
+
+            case "true" -> {
+                return Boolean.TRUE;
+            }
+
+            case "null" -> {
+                return null;
+            }
+        }
+
+        String unescaped = unescape(data);
+
+        if (type == Number.class) {
+            return Double.parseDouble(unescaped);
+        }
+
+        if (data.startsWith("\"") && data.endsWith("\"")) {
+            return unescaped;
+        }
+
+        if (NumberUtilities.isNumeric(unescaped)) {
+            return Double.parseDouble(unescaped);
+        }
+
+        throw new JSONParseException("Not a numeric or string value: " + data);
+    }
+
+    private static String unescape(String data) {
+        return data.replace("\"", "");
     }
 }

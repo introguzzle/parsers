@@ -1,14 +1,12 @@
 package ru.introguzzle.parser.json.mapping;
 
+import lombok.NoArgsConstructor;
 import java.io.Serial;
 
+@NoArgsConstructor
 public class MappingException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = -688119882777768646L;
-
-    public MappingException() {
-        super();
-    }
 
     public MappingException(String message) {
         super(message);
@@ -16,5 +14,11 @@ public class MappingException extends RuntimeException {
 
     public MappingException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public static MappingException of(Class<?> from, Class<?> to) {
+        String message = String.format("Cannot convert %s to %s", from.getSimpleName(), to.getSimpleName());
+
+        return new MappingException(message);
     }
 }

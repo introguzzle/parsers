@@ -1,8 +1,11 @@
 package ru.introguzzle.parser.xml;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
 
+@Getter
 public enum Encoding implements Serializable {
     UTF_8("UTF-8"),
     ISO_8859_1("ISO-8859-1");
@@ -16,10 +19,6 @@ public enum Encoding implements Serializable {
         this.value = value;
     }
 
-    public String getValue() {
-        return value;
-    }
-
     public static Encoding of(String encoding) {
         return switch (encoding) {
             case "UTF-8"      -> Encoding.UTF_8;
@@ -31,7 +30,7 @@ public enum Encoding implements Serializable {
     public static Encoding orElse(String encoding, Encoding defaultEncoding) {
         try {
             return of(encoding);
-        } catch (XMLParseException e) {
+        } catch (NullPointerException | XMLParseException e) {
             return defaultEncoding;
         }
     }

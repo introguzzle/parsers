@@ -1,11 +1,13 @@
 package ru.introguzzle.parser.xml.token;
 
+import lombok.Getter;
 import ru.introguzzle.parser.xml.Encoding;
 import ru.introguzzle.parser.xml.Type;
 import ru.introguzzle.parser.xml.Version;
 
 import java.io.Serial;
 
+@Getter
 public non-sealed class DeclarationToken extends Token {
     @Serial
     private static final long serialVersionUID = -2475454735183998374L;
@@ -17,13 +19,5 @@ public non-sealed class DeclarationToken extends Token {
         super(data, Type.DECLARATION);
         this.version = version;
         this.encoding = encoding;
-    }
-
-    public Version getVersion() {
-        return version;
-    }
-
-    public Encoding getEncoding() {
-        return encoding;
     }
 }

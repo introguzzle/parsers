@@ -1,11 +1,13 @@
 package ru.introguzzle.parser.xml.token;
 
+import lombok.Getter;
 import ru.introguzzle.parser.xml.Type;
 import ru.introguzzle.parser.xml.XMLAttribute;
 import ru.introguzzle.parser.xml.XMLParseException;
 
 import java.io.Serial;
 
+@Getter
 public non-sealed class AttributeToken extends Token {
     @Serial
     private static final long serialVersionUID = 1521597783326870820L;
@@ -23,14 +25,6 @@ public non-sealed class AttributeToken extends Token {
 
         this.name = split[0];
         this.value = split[1];
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public XMLAttribute toXMLAttribute() {

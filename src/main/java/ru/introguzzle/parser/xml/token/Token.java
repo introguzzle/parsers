@@ -1,5 +1,8 @@
 package ru.introguzzle.parser.xml.token;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parser.xml.Type;
 
@@ -7,41 +10,17 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
+@EqualsAndHashCode
+@RequiredArgsConstructor
 public abstract sealed class Token implements Serializable permits AttributeToken,
-        CDataToken, CommentToken, DeclarationToken,
+        CharacterDataToken, CommentToken, DeclarationToken,
         ElementTailToken, ElementToken, TextToken {
     @Serial
     private static final long serialVersionUID = -3536243019629556440L;
 
     private final String data;
     private final Type type;
-
-    public Token(@NotNull String data, @NotNull Type type) {
-        this.data = data;
-        this.type = type;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (Token) obj;
-        return Objects.equals(this.data, that.data) &&
-                Objects.equals(this.type, that.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(data, type);
-    }
 
     @Override
     public String toString() {

@@ -70,6 +70,9 @@ public class XMLParserTest {
                 "\n" +
                 "</library>\n";
 
+        System.out.println("########## ORIGINAL XML ###############\n");
+        System.out.println(string);
+
         XMLDocument document = parser.parse(string);
         assertNotNull(document);
         JSONObject json = document.toJSONObject();
@@ -78,9 +81,17 @@ public class XMLParserTest {
         System.out.println("########### CONVERTED TO JSON #############\n");
         System.out.println(json.toJSONString());
 
-        System.out.println("########### CONVERTED TO XML ###############\n");
+        System.out.println("########### CONVERTED TO JSON AND FLATTENED ##############\n");
+        JSONObject flattened = json.flatten();
+        System.out.println(flattened.toJSONString());
+
+        System.out.println("########### JSON TO XML ###############\n");
         XMLDocument fromJson = json.toXMLDocument();
         System.out.println(fromJson.toXMLString());
+
+        System.out.println("########### FLATTENED JSON CONVERTED TO XML ###############\n");
+        XMLDocument fromFlattened = flattened.toXMLDocument();
+        System.out.println(fromFlattened.toXMLString());
     }
 
     @Test
@@ -92,7 +103,7 @@ public class XMLParserTest {
 
         assertEquals(root.getChildren().size(), 0);
         assertEquals(root.getName(), "object");
-        assertEquals(root.getCData(), "");
+        assertEquals(root.getCharacterData(), "");
         assertEquals(root.getText(), "");
 
         System.out.println(document.toXMLString());

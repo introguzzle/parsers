@@ -1,7 +1,6 @@
 package ru.introguzzle.parser.xml.token;
 
 import ru.introguzzle.parser.xml.Type;
-
 import java.io.Serial;
 
 public non-sealed class TextToken extends Token {

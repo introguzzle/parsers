@@ -1,8 +1,9 @@
 package ru.introguzzle.parser.common.utilities;
 
-public final class NamingUtilities {
-    private NamingUtilities() {}
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
+public final class NamingUtilities {
     /**
      * Converts a given string to snake_case format.
      * <p>

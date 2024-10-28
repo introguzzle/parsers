@@ -1,6 +1,6 @@
 package ru.introguzzle.parser.json.entity;
 
-import ru.introguzzle.parser.json.mapping.context.CircularReferenceStrategy;
+import ru.introguzzle.parser.json.mapping.context.StandardCircularReferenceStrategies;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -109,7 +109,7 @@ public interface JSONStringConvertable {
                 if (value instanceof String s
                         && s.charAt(0) != '\"'
                         && s.charAt(s.length() - 1) != '\"'
-                        && !s.contentEquals(CircularReferenceStrategy.PLACEHOLDER)) {
+                        && !s.contentEquals(StandardCircularReferenceStrategies.PLACEHOLDER)) {
 
                     result.append(QUOTE)
                             .append(s)

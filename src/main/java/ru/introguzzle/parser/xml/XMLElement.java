@@ -1,41 +1,46 @@
 package ru.introguzzle.parser.xml;
 
-import ru.introguzzle.parser.common.Converter;
-import ru.introguzzle.parser.common.XMLDocumentToJSONConverter;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+import ru.introguzzle.parser.common.convert.ConverterFactory;
+import ru.introguzzle.parser.common.convert.Converter;
 import ru.introguzzle.parser.json.entity.JSONObject;
 import ru.introguzzle.parser.json.mapping.JSONObjectConvertable;
-import ru.introguzzle.parser.xml.token.CDataToken;
+import ru.introguzzle.parser.xml.token.CharacterDataToken;
+import ru.introguzzle.parser.xml.visitor.XMLElementVisitor;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.function.Consumer;
 
-public final class XMLElement implements Serializable, JSONObjectConvertable, XMLStringConvertable {
-    public static final Converter<XMLElement, JSONObject> CONVERTER;
-    static {
-        CONVERTER = XMLDocument.CONVERTER instanceof XMLDocumentToJSONConverter
-                ? ((XMLDocumentToJSONConverter) XMLDocument.CONVERTER).getElementConverter()
-                : null;
+@Getter
+@EqualsAndHashCode
+public final class XMLElement implements Serializable, JSONObjectConvertable,
+        XMLStringConvertable, Consumer<XMLElementVisitor> {
 
-        assert CONVERTER != null;
-    }
+    public static final @NotNull ConverterFactory FACTORY = ConverterFactory.getFactory();
+    public static final Converter<XMLElement, JSONObject> CONVERTER =
+            FACTORY.getXMLElementToJSONConverter();
 
     @Serial
     private static final long serialVersionUID = 5578976260620682139L;
     private static final int INITIAL_LEVEL = 0;
     public static final String TAB = "\t";
 
-    private String name;
+    private final String name;
+
     private final List<XMLAttribute> attributes = new ArrayList<>();
+
     private final List<XMLElement> children = new ArrayList<>();
+
+    @Setter
     private String text;
-    private String cData;
-
-    public XMLElement() {
-
-    }
+    @Setter
+    private String characterData;
 
     public XMLElement(String name) {
         this.name = name;
@@ -51,38 +56,6 @@ public final class XMLElement implements Serializable, JSONObjectConvertable, XM
 
     public void addChild(XMLElement child) {
         children.add(child);
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public void setCData(String cData) {
-        this.cData = cData;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<XMLAttribute> getAttributes() {
-        return attributes;
-    }
-
-    public List<XMLElement> getChildren() {
-        return children;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public String getCData() {
-        return cData;
     }
 
     @Override
@@ -116,12 +89,12 @@ public final class XMLElement implements Serializable, JSONObjectConvertable, XM
             xml.append(indent).append(TAB).append(text).append(newLine);
         }
 
-        if (cData != null && !cData.isEmpty()) {
-            xml.append(indent).append(CDataToken.HEAD)
+        if (characterData != null && !characterData.isEmpty()) {
+            xml.append(indent).append(CharacterDataToken.HEAD)
                     .append(newLine)
-                    .append(indent).append(TAB).append(cData)
+                    .append(indent).append(TAB).append(characterData)
                     .append(newLine)
-                    .append(indent).append(CDataToken.TAIL)
+                    .append(indent).append(CharacterDataToken.TAIL)
                     .append(newLine);
         }
 
@@ -143,18 +116,7 @@ public final class XMLElement implements Serializable, JSONObjectConvertable, XM
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (!(object instanceof XMLElement element)) return false;
-        return Objects.equals(name, element.name)
-                && Objects.equals(attributes, element.attributes)
-                && Objects.equals(children, element.children)
-                && Objects.equals(text, element.text)
-                && Objects.equals(cData, element.cData);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, attributes, children, text, cData);
+    public void accept(XMLElementVisitor visitor) {
+        visitor.visit(this);
     }
 }

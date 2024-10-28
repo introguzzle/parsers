@@ -1,0 +1,17 @@
+#simple_value: "1111111"
+#
+#converter:
+#  factory:
+#    class: com.example.converters.CustomConverterFactory
+#
+#naming:
+#  xml_converter:
+#    class: com.example.naming.CustomCamelCaseConverter
+#  json_converter:
+#    class: com.example.naming.CustomSnakeCaseConverter
+#
+#xml:
+#  attribute_prefix: "@"
+#  default_root_name: "root"
+#  text_placeholder: "@text"
+#  character_data_placeholder: "@cdata"

@@ -11,7 +11,7 @@ public enum Type implements Serializable {
     TEXT,          // Текст между элементами
     COMMENT,       // Комментарий <!-- comment -->
     DECLARATION,    // XML-декларация <?xml version="1.0"?>
-    CDATA;
+    CHARACTER_DATA;
 
     @Serial
     private static final long serialVersionUID = -5055877539493038583L;

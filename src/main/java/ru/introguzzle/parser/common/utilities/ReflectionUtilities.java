@@ -1,12 +1,13 @@
 package ru.introguzzle.parser.common.utilities;
 
+import lombok.experimental.UtilityClass;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+@UtilityClass
 public final class ReflectionUtilities {
-    private ReflectionUtilities() {}
-
     /**
      * Retrieves all fields of the specified class, including fields from its superclasses,
      * regardless of the access modifier (private, protected, public).
