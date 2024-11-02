@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
+import ru.introguzzle.parser.json.entity.annotation.JSONEntity;
+import ru.introguzzle.parser.json.entity.annotation.JSONField;
+import ru.introguzzle.parser.json.mapping.type.JSONType;
 
 import java.util.*;
 
@@ -18,28 +21,54 @@ public final class Data {
 
     @AllArgsConstructor
     @Getter
+    public static class BaseWithAnnotations {
+        @JSONField(type = JSONType.STRING)
+        public final String originalString;
+
+        @JSONField(type = JSONType.NUMBER)
+        public final byte originalByte;
+    }
+
+    @Getter
+    public static class InheritingWithAnnotations extends BaseWithAnnotations {
+        @JSONField(type = JSONType.NUMBER)
+        public final double inheritingDouble;
+
+        public InheritingWithAnnotations(String originalString,
+                                         byte originalByte,
+                                         double inheritingDouble) {
+            super(originalString, originalByte);
+            this.inheritingDouble = inheritingDouble;
+        }
+    }
+
+    @AllArgsConstructor
+    @Getter
     public static class Base {
-        public final String string;
-        public final byte b;
+        public final String originalString;
+        public final byte originalByte;
     }
 
     @Getter
     public static class Inheriting extends Base {
-        public final double d;
+        public final double inheritingDouble;
 
-        public Inheriting(String string, byte b, double d) {
-            super(string, b);
-            this.d = d;
+        public Inheriting(String originalString,
+                          byte originalByte,
+                          double inheritingDouble) {
+            super(originalString, originalByte);
+            this.inheritingDouble = inheritingDouble;
         }
     }
 
     @RequiredArgsConstructor
     @Getter
-    public static final class RecursiveList {
+    public static final class Node {
         private final String name;
+        private final Integer boxedAge;
         private final int age;
         private final String email;
-        private final List<RecursiveList> list = new ArrayList<>();
+        private final Node next;
     }
 
     @lombok.Data
@@ -56,5 +85,25 @@ public final class Data {
         private final String name;
         private final Double salary;
         private final Boolean deleted;
+    }
+
+    @JSONEntity(excluded = {"object"})
+    @AllArgsConstructor
+    @Getter
+    public static class CollectionsData {
+        private final int[] intArray;
+        private final List<String> stringList;
+        private final Set<Gender> enumSet;
+        private final Map<String, Direction> stringToDirectionMap;
+        private final List<Date> datesOf;
+        private final Object object = null;
+    }
+
+    public enum Direction {
+        LEFT, RIGHT, DOWN, UP
+    }
+
+    public enum Gender {
+        MALE, FEMALE
     }
 }

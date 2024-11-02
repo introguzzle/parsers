@@ -1,4 +1,4 @@
-package ru.introguzzle.parser.json.mapping.context;
+package ru.introguzzle.parser.json.mapping.reference;
 
 import org.jetbrains.annotations.NotNull;
 

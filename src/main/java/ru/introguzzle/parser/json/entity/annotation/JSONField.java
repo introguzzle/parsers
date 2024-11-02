@@ -1,5 +1,6 @@
-package ru.introguzzle.parser.json.mapping;
+package ru.introguzzle.parser.json.entity.annotation;
 
+import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parser.json.mapping.type.JSONType;
 
 import java.lang.annotation.ElementType;
@@ -10,6 +11,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JSONField {
-    String name() default "";
-    JSONType type() default JSONType.OBJECT;
+    @NotNull String name() default "";
+    @NotNull JSONType type() default JSONType.UNSPECIFIED;
 }

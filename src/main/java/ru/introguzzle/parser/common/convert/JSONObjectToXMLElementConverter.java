@@ -57,7 +57,10 @@ public class JSONObjectToXMLElementConverter implements JSONObjectToXMLElementMa
                     }
                 } else {
                     XMLElement child = new XMLElement(converted);
-                    child.setText(value.toString());
+                    if (value != null) {
+                        child.setText(value.toString());
+                    }
+
                     element.addChild(child);
                 }
             }

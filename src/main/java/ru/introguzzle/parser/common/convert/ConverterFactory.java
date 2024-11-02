@@ -20,6 +20,7 @@ public abstract class ConverterFactory {
     }
 
     public record Property<T>(@NotNull String key, @NotNull T value) {
+        @FunctionalInterface
         private interface Function<T, R> {
             R apply(T t) throws Exception;
         }

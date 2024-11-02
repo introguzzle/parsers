@@ -2,9 +2,12 @@ package ru.introguzzle.parser.common.utilities;
 
 import lombok.experimental.UtilityClass;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @UtilityClass
 public final class ReflectionUtilities {
@@ -23,9 +26,22 @@ public final class ReflectionUtilities {
                 field.setAccessible(true);
                 fields.add(field);
             }
+
             type = type.getSuperclass();
         }
 
         return fields;
+    }
+
+    public static <T> Constructor<T> getDefaultConstructor(Class<T> type) {
+        try {
+            return type.getConstructor();
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T extends Annotation> Optional<T> getAnnotationAsOptional(Class<?> type, Class<T> annotationType) {
+        return Optional.ofNullable(type.getAnnotation(annotationType));
     }
 }

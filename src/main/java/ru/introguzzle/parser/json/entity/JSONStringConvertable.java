@@ -1,6 +1,6 @@
 package ru.introguzzle.parser.json.entity;
 
-import ru.introguzzle.parser.json.mapping.context.StandardCircularReferenceStrategies;
+import ru.introguzzle.parser.json.mapping.reference.StandardCircularReferenceStrategies;
 
 import java.util.Iterator;
 import java.util.Map;

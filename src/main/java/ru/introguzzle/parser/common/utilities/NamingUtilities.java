@@ -15,13 +15,12 @@ public final class NamingUtilities {
      * @param input the string to be converted to snake_case
      * @return the snake_case version of the input string, or the original input if it's null or empty
      */
-    public static String toSnakeCase(final String input) {
+    public static String toSnakeCase(String input) {
         if (input == null || input.isEmpty()) {
             return input;
         }
 
         StringBuilder result = new StringBuilder();
-
 
         char[] characters = input.toCharArray();
         char first = characters[0];
@@ -37,14 +36,46 @@ public final class NamingUtilities {
 
         for (int i = 1; i < characters.length; i++) {
             char c = characters[i];
+
+            if (Character.isDigit(c)) {
+                if (!result.isEmpty() && !containsOnlyDigits(result)) {
+                    result.append("_");
+                }
+
+                while (i < characters.length && Character.isDigit(characters[i])) {
+                    result.append(characters[i]);
+                    i++;
+                }
+
+                if (i != characters.length) {
+                    result.append("_");
+                    result.append(Character.toLowerCase(characters[i]));
+                }
+
+                continue;
+            }
+
             if (Character.isUpperCase(c) && !result.isEmpty()) {
-                result.append('_'); // Append an underscore before uppercase letters
+                if (characters[i - 1] != '_') {
+                    result.append('_'); // Append an underscore before uppercase letters
+                }
             }
 
             result.append(Character.toLowerCase(c)); // Append the lowercase version of the character
         }
 
         return result.toString();
+    }
+
+    private static boolean containsOnlyDigits(CharSequence input) {
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -3,12 +3,15 @@ package ru.introguzzle.parser.json.entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parser.common.UntypedArray;
+import ru.introguzzle.parser.common.UntypedMap;
 import ru.introguzzle.parser.json.visitor.JSONArrayVisitor;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -22,10 +25,14 @@ import java.util.function.Function;
  * </p>
  */
 public class JSONArray extends UntypedArray implements
-        JSONStringConvertable, Consumer<JSONArrayVisitor> {
+        JSONStringConvertable, Consumer<JSONArrayVisitor>, Serializable {
 
     @Serial
     private static final long serialVersionUID = -1731069894963023770L;
+
+    public static JSONArray of(Object... items) {
+        return new JSONArray(List.of(items));
+    }
 
     public JSONArray() {
         super();
@@ -33,6 +40,14 @@ public class JSONArray extends UntypedArray implements
 
     public JSONArray(@NotNull Collection<?> collection) {
         super(collection);
+    }
+
+    public JSONArray(@NotNull Object[] array) {
+        super(array);
+    }
+
+    public JSONArray(@NotNull List<?> l) {
+        super(l);
     }
 
     /**
@@ -86,5 +101,10 @@ public class JSONArray extends UntypedArray implements
     @Override
     public void accept(JSONArrayVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return toJSONStringCompact();
     }
 }

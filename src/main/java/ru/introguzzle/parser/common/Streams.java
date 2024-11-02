@@ -2,17 +2,12 @@ package ru.introguzzle.parser.common;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * Utility class providing extended methods for working with {@link Stream}.
@@ -313,5 +308,72 @@ public final class Streams {
 
     public static <T> Stream<T> append(Stream<? extends T> stream, T... elements) {
         return Stream.concat(stream, Stream.of(elements));
+    }
+
+    //
+    // array
+    //
+
+    public static IntStream stream(int[] array) {
+        return Arrays.stream(array);
+    }
+
+    public static IntStream stream(int[] array, int startInclusive, int endExclusive) {
+        return Arrays.stream(array, startInclusive, endExclusive);
+    }
+
+    public static LongStream stream(long[] array) {
+        return Arrays.stream(array);
+    }
+
+    public static LongStream stream(long[] array, int startInclusive, int endExclusive) {
+        return Arrays.stream(array, startInclusive, endExclusive);
+    }
+
+    public static DoubleStream stream(double[] array) {
+        return Arrays.stream(array);
+    }
+
+    public static DoubleStream stream(double[] array, int startInclusive, int endExclusive) {
+        return Arrays.stream(array, startInclusive, endExclusive);
+    }
+
+    public static Stream<Float> stream(float[] array) {
+        return stream(array, 0, array.length);
+    }
+
+    public static Stream<Float> stream(float[] array, int startInclusive, int endExclusive) {
+        List<Float> list = new ArrayList<>();
+        for (int i = startInclusive; i < endExclusive; i++) {
+            list.add(array[i]);
+        }
+
+        return list.stream();
+    }
+
+    public static Stream<Boolean> stream(boolean[] array) {
+        return stream(array, 0, array.length);
+    }
+
+    public static Stream<Boolean> stream(boolean[] array, int startInclusive, int endExclusive) {
+        List<Boolean> list = new ArrayList<>();
+        for (int i = startInclusive; i < endExclusive; i++) {
+            list.add(array[i]);
+        }
+
+        return list.stream();
+    }
+
+    public static Stream<Character> stream(char[] array) {
+        return stream(array, 0, array.length);
+    }
+
+    public static Stream<Character> stream(char[] array, int startInclusive, int endExclusive) {
+        List<Character> list = new ArrayList<>();
+        for (int i = startInclusive; i < endExclusive; i++) {
+            list.add(array[i]);
+        }
+
+        return list.stream();
     }
 }

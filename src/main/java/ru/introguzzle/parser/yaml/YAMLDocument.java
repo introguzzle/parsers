@@ -1,5 +1,6 @@
 package ru.introguzzle.parser.yaml;
 
+import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parser.common.UntypedMap;
 
 import java.util.Map;
@@ -57,7 +58,7 @@ public class YAMLDocument extends UntypedMap {
 
 
     @Override
-    public void putAll(Map<? extends String, ?> map) {
+    public void putAll(@NotNull Map<? extends String, ?> map) {
         if (map instanceof YAMLDocument) {
             putAllFromYMLDocument((YAMLDocument) map);
         } else {

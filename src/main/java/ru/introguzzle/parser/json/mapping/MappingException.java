@@ -16,6 +16,10 @@ public class MappingException extends RuntimeException {
         super(message, cause);
     }
 
+    public MappingException(Throwable cause) {
+        super(cause);
+    }
+
     public static MappingException of(Class<?> from, Class<?> to) {
         String message = String.format("Cannot convert %s to %s", from.getSimpleName(), to.getSimpleName());
 
