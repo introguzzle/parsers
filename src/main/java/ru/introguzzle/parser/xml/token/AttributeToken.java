@@ -1,9 +1,8 @@
 package ru.introguzzle.parser.xml.token;
 
 import lombok.Getter;
-import ru.introguzzle.parser.xml.Type;
-import ru.introguzzle.parser.xml.XMLAttribute;
-import ru.introguzzle.parser.xml.XMLParseException;
+import ru.introguzzle.parser.xml.entity.XMLAttribute;
+import ru.introguzzle.parser.xml.parse.XMLParseException;
 
 import java.io.Serial;
 

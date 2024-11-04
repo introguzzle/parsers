@@ -2,6 +2,11 @@ package ru.introguzzle.parser.xml;
 
 import org.junit.Test;
 import ru.introguzzle.parser.json.entity.JSONObject;
+import ru.introguzzle.parser.xml.entity.XMLDocument;
+import ru.introguzzle.parser.xml.entity.XMLElement;
+import ru.introguzzle.parser.xml.parse.Parser;
+import ru.introguzzle.parser.xml.parse.XMLParseException;
+import ru.introguzzle.parser.xml.parse.XMLParser;
 
 import static org.junit.Assert.*;
 

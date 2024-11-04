@@ -10,6 +10,10 @@ public class MappingInstantiationException extends MappingException {
         super(message);
     }
 
+    public MappingInstantiationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public MappingInstantiationException(Throwable cause) {
         super(cause);
     }

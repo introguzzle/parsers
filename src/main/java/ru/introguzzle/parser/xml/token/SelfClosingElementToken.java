@@ -1,7 +1,5 @@
 package ru.introguzzle.parser.xml.token;
 
-import ru.introguzzle.parser.xml.Type;
-
 import java.io.Serial;
 import java.util.List;
 

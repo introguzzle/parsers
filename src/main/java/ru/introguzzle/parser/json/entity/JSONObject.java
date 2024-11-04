@@ -5,15 +5,15 @@ import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parser.common.convert.ConverterFactory;
 import ru.introguzzle.parser.common.convert.Converter;
 import ru.introguzzle.parser.common.UntypedMap;
+import ru.introguzzle.parser.common.visit.Visitable;
+import ru.introguzzle.parser.common.visit.Visitor;
 import ru.introguzzle.parser.json.mapping.JSONObjectConvertable;
 import ru.introguzzle.parser.json.mapping.reference.StandardCircularReferenceStrategies.CircularReference;
-import ru.introguzzle.parser.json.visitor.JSONObjectVisitor;
-import ru.introguzzle.parser.xml.XMLDocument;
-import ru.introguzzle.parser.xml.XMLDocumentConvertable;
+import ru.introguzzle.parser.xml.entity.XMLDocument;
+import ru.introguzzle.parser.xml.entity.XMLDocumentConvertable;
 
 import java.io.Serial;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Represents a JSON object as a map of key-value pairs.
@@ -24,9 +24,14 @@ import java.util.function.Consumer;
 @Getter
 public class JSONObject extends UntypedMap implements
         JSONStringConvertable, JSONObjectConvertable,
-        XMLDocumentConvertable, Consumer<JSONObjectVisitor> {
-    public static final @NotNull ConverterFactory FACTORY = ConverterFactory.getFactory();
-    public static final Converter<JSONObject, XMLDocument> CONVERTER = FACTORY.getJSONDocumentToXMLConverter();
+        XMLDocumentConvertable, Visitable<JSONObject, Visitor<JSONObject>> {
+    public static final @NotNull ConverterFactory FACTORY;
+    public static final Converter<JSONObject, XMLDocument> CONVERTER;
+
+    static {
+        FACTORY = ConverterFactory.getFactory();
+        CONVERTER = FACTORY.getJSONDocumentToXMLConverter();
+    }
 
     @Serial
     private static final long serialVersionUID = -697931640108868641L;
@@ -144,10 +149,5 @@ public class JSONObject extends UntypedMap implements
     @Override
     public XMLDocument toXMLDocumentWithMetadata() {
         return CONVERTER.convertWithMetadata(this);
-    }
-
-    @Override
-    public void accept(JSONObjectVisitor visitor) {
-        visitor.visit(this);
     }
 }

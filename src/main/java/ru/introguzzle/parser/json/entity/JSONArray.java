@@ -3,8 +3,8 @@ package ru.introguzzle.parser.json.entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parser.common.UntypedArray;
-import ru.introguzzle.parser.common.UntypedMap;
-import ru.introguzzle.parser.json.visitor.JSONArrayVisitor;
+import ru.introguzzle.parser.common.visit.Visitable;
+import ru.introguzzle.parser.common.visit.Visitor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -24,8 +23,9 @@ import java.util.function.Function;
  * the {@link JSONStringConvertable} interface.
  * </p>
  */
+@SuppressWarnings("unused")
 public class JSONArray extends UntypedArray implements
-        JSONStringConvertable, Consumer<JSONArrayVisitor>, Serializable {
+        JSONStringConvertable, Visitable<JSONArray, Visitor<JSONArray>>, Serializable {
 
     @Serial
     private static final long serialVersionUID = -1731069894963023770L;
@@ -96,11 +96,6 @@ public class JSONArray extends UntypedArray implements
     @Override
     public String getClosingSymbol() {
         return "]";
-    }
-
-    @Override
-    public void accept(JSONArrayVisitor visitor) {
-        visitor.visit(this);
     }
 
     @Override

@@ -6,5 +6,5 @@ public enum JSONType {
     BOOLEAN,
     STRING,
     ARRAY,
-    OBJECT;
+    OBJECT
 }

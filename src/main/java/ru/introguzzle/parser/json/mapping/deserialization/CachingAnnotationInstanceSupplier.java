@@ -3,7 +3,6 @@ package ru.introguzzle.parser.json.mapping.deserialization;
 import lombok.AllArgsConstructor;
 import ru.introguzzle.parser.json.entity.JSONObject;
 import ru.introguzzle.parser.json.entity.annotation.JSONEntity;
-import ru.introguzzle.parser.json.mapping.Fields;
 import ru.introguzzle.parser.json.mapping.MappingException;
 import ru.introguzzle.parser.json.mapping.MappingInstantiationException;
 
@@ -22,8 +21,11 @@ import java.util.function.BiFunction;
  * Optimized version of {@link AnnotationInstanceSupplier}
  */
 public class CachingAnnotationInstanceSupplier implements InstanceSupplier {
+    private static final MethodHandles.Lookup LOOKUP;
     private static final MethodType EMPTY_CONSTRUCTOR_SHAPE;
+
     static {
+        LOOKUP = MethodHandles.publicLookup();
         EMPTY_CONSTRUCTOR_SHAPE = MethodType.methodType(void.class);
     }
 
@@ -31,24 +33,23 @@ public class CachingAnnotationInstanceSupplier implements InstanceSupplier {
         return MethodType.methodType(void.class, argumentTypes);
     }
 
-    private final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-    private final Map<Class<?>, ConstructorWrapper<?>> constructorCache = new ConcurrentHashMap<>();
-    private final Map<Class<?>, ConstructorData<?>> constructorDataCache = new ConcurrentHashMap<>();
-    private final Map<Class<?>, JSONEntity> annotationCache = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, ConstructorWrapper<?>> CONSTRUCTOR_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, ConstructorData<?>> CONSTRUCTOR_DATA_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, JSONEntity> ANNOTATION_CACHE = new ConcurrentHashMap<>();
 
     /**
      * Reference to parent mapper
      */
-    private final JSONToObjectMapper mapper;
+    private final ObjectMapper mapper;
 
     /**
      * Method reference for forwarding recursive calls
      */
     private final BiFunction<Object, Class<?>, Object> hook;
 
-    public CachingAnnotationInstanceSupplier(JSONToObjectMapper m) {
+    public CachingAnnotationInstanceSupplier(ObjectMapper m) {
         mapper = m;
-        hook = m.forwardCaller();
+        hook = m.getForwardCaller();
     }
 
     @SuppressWarnings("ALL")
@@ -88,33 +89,33 @@ public class CachingAnnotationInstanceSupplier implements InstanceSupplier {
 
     @SuppressWarnings("unchecked")
     private <T> ConstructorWrapper<T> getConstructorWrapper(Class<T> type) {
-        return (ConstructorWrapper<T>) constructorCache.get(type);
+        return (ConstructorWrapper<T>) CONSTRUCTOR_CACHE.get(type);
     }
 
     @SuppressWarnings("unchecked")
     private <T> ConstructorData<T> getConstructorData(Class<T> type, JSONEntity annotation) {
-        return (ConstructorData<T>) constructorDataCache.computeIfAbsent(type, t -> createConstructorData(t, annotation));
+        return (ConstructorData<T>) CONSTRUCTOR_DATA_CACHE.computeIfAbsent(type, t -> createConstructorData(t, annotation));
     }
 
     private <T> JSONEntity getAnnotation(Class<T> type) {
-        return annotationCache.computeIfAbsent(type, t -> t.getAnnotation(JSONEntity.class));
+        return ANNOTATION_CACHE.computeIfAbsent(type, t -> t.getAnnotation(JSONEntity.class));
     }
 
     @Override
     public <T> T get(JSONObject object, Class<T> type) {
         JSONEntity annotation = getAnnotation(type);
-        if (annotation == null || annotation.constructorArgs().length == 0) {
+        if (annotation == null || annotation.constructorArguments().length == 0) {
             ConstructorWrapper<T> cw = getConstructorWrapper(type);
             if (cw == null) {
                 MethodHandle constructorHandle;
                 try {
-                    constructorHandle = lookup.findConstructor(type, EMPTY_CONSTRUCTOR_SHAPE);
+                    constructorHandle = LOOKUP.findConstructor(type, EMPTY_CONSTRUCTOR_SHAPE);
                 } catch (NoSuchMethodException | IllegalAccessException e) {
                     throw new MappingInstantiationException(e);
                 }
 
                 cw = new ConstructorWrapper<>(constructorHandle, 0);
-                constructorCache.put(type, cw);
+                CONSTRUCTOR_CACHE.put(type, cw);
             }
 
             return cw.invoke();
@@ -136,8 +137,8 @@ public class CachingAnnotationInstanceSupplier implements InstanceSupplier {
     }
 
     private <T> ConstructorData<T> createConstructorData(Class<T> type, JSONEntity annotation) {
-        String[] constructorNames = annotation.constructorArgs();
-        List<Field> fields = Fields.getCached(type);
+        String[] constructorNames = annotation.constructorArguments();
+        List<Field> fields = mapper.getFieldAccessor().get(type);
 
         List<Field> matchedFields = new ArrayList<>();
         List<Class<?>> constructorTypes = new ArrayList<>();
@@ -161,13 +162,13 @@ public class CachingAnnotationInstanceSupplier implements InstanceSupplier {
             MethodHandle constructorHandle;
             try {
                 MethodType shape = shapeOf(constructorTypes);
-                constructorHandle = lookup.findConstructor(type, shape);
+                constructorHandle = LOOKUP.findConstructor(type, shape);
             } catch (NoSuchMethodException | IllegalAccessException e) {
                 throw new MappingInstantiationException(e);
             }
 
             cw = new ConstructorWrapper<>(constructorHandle, constructorTypes.size());
-            constructorCache.put(type, cw);
+            CONSTRUCTOR_CACHE.put(type, cw);
         }
 
         return new ConstructorData<>(cw, matchedFields);

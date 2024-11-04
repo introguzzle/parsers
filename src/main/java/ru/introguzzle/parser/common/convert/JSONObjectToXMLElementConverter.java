@@ -6,8 +6,8 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parser.json.entity.JSONArray;
 import ru.introguzzle.parser.json.entity.JSONObject;
-import ru.introguzzle.parser.xml.XMLAttribute;
-import ru.introguzzle.parser.xml.XMLElement;
+import ru.introguzzle.parser.xml.entity.XMLAttribute;
+import ru.introguzzle.parser.xml.entity.XMLElement;
 
 @Getter
 @Setter

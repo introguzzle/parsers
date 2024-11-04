@@ -3,12 +3,9 @@ package ru.introguzzle.parser.xml.token;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.parser.xml.Type;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
 @Getter
 @EqualsAndHashCode

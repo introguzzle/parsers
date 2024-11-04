@@ -6,7 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import ru.introguzzle.parser.json.entity.JSONObject;
-import ru.introguzzle.parser.xml.*;
+import ru.introguzzle.parser.xml.entity.XMLDocument;
+import ru.introguzzle.parser.xml.entity.XMLElement;
+import ru.introguzzle.parser.xml.meta.Encoding;
+import ru.introguzzle.parser.xml.meta.Version;
 
 import java.util.ArrayList;
 import java.util.List;

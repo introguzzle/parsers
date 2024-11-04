@@ -2,7 +2,6 @@ package ru.introguzzle.parser.xml.token;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.parser.xml.Type;
 
 import java.io.Serial;
 
