@@ -1,6 +1,0 @@
-FIRST_NAME="jjjj !!!!"
-FULL_NAME="${FIRST_NAME} ${LAST_NAME}"
-LAST_NAME="zzzzzzzz x last name"
-VARIABLE1="1337"
-
-CLOSE="${FULL_NAME} ${VARIABLE1}"

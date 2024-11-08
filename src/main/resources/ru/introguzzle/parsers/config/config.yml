@@ -1,0 +1,15 @@
+#converter:
+#  factory:
+#    class: ru.introguzzle.parser.common.convert.TestFactory
+#
+#naming:
+#  xml_converter:
+#    class: com.example.CamelCaseConverter
+#  json_converter:
+#    class: com.example.SnakeCaseConverter
+#
+#xml:
+#  attribute_prefix: "@"
+#  default_root_name: "root"
+#  text_placeholder: "@text"
+#  character_data_placeholder: "@cdata"
