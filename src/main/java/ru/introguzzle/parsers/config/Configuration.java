@@ -3,9 +3,11 @@ package ru.introguzzle.parsers.config;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.NameConverter;
 import ru.introguzzle.parsers.common.function.ThrowingFunction;
-import ru.introguzzle.parsers.common.io.resource.YAMLResourceLoader;
+import ru.introguzzle.parsers.common.io.resource.ClassResourceLoader;
 import ru.introguzzle.parsers.common.io.resource.ResourceLoader;
-import ru.introguzzle.parsers.common.utility.NamingUtilities;
+import ru.introguzzle.parsers.common.parse.BaseParser;
+import ru.introguzzle.parsers.common.util.NamingUtilities;
+import ru.introguzzle.parsers.yaml.SimpleYAMLParser;
 import ru.introguzzle.parsers.yaml.YAMLDocument;
 
 import java.util.Optional;
@@ -135,7 +137,14 @@ public final class Configuration {
         return base.cast(Class.forName(name).getConstructor().newInstance());
     }
 
-    static final ResourceLoader<YAMLDocument> FILE_LOADER = YAMLResourceLoader.getLoader();
+    static final BaseParser<YAMLDocument> PARSER = new SimpleYAMLParser(2);
+    static final ResourceLoader<YAMLDocument> FILE_LOADER = new ClassResourceLoader<>() {
+        @Override
+        public @NotNull BaseParser<YAMLDocument> getParser() {
+            return PARSER;
+        }
+    };
+
     static final YAMLDocument RESOURCE;
     static {
         Optional<YAMLDocument> optional = FILE_LOADER.tryLoad(CONFIG_PATH);

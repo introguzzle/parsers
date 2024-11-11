@@ -13,7 +13,7 @@ import java.util.List;
 public class FieldAccessorImpl extends AbstractFieldAccessor<JSONEntity> {
     private static final Cache<Class<?>, List<Field>> CACHE;
     static {
-        CACHE = CacheService.getInstance().newCache();
+        CACHE = CacheService.instance().newCache();
     }
 
     public FieldAccessorImpl() {
@@ -21,7 +21,7 @@ public class FieldAccessorImpl extends AbstractFieldAccessor<JSONEntity> {
     }
 
     @Override
-    public Cache<Class<?>, List<Field>> acquireCache() {
+    public Cache<Class<?>, List<Field>> getCache() {
         return CACHE;
     }
 

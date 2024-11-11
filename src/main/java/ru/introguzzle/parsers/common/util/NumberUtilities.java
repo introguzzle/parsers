@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.common.utility;
+package ru.introguzzle.parsers.common.util;
 
 import lombok.experimental.UtilityClass;
 

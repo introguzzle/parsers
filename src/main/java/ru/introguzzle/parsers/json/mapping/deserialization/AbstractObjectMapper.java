@@ -1,15 +1,18 @@
 package ru.introguzzle.parsers.json.mapping.deserialization;
 
-import lombok.experimental.ExtensionMethod;
-import ru.introguzzle.parsers.common.field.Extensions;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.field.FieldAccessor;
-import ru.introguzzle.parsers.common.utility.ReflectionUtilities;
+import ru.introguzzle.parsers.common.function.TriConsumer;
+import ru.introguzzle.parsers.common.mapping.ClassTraverser;
+import ru.introguzzle.parsers.common.mapping.MappingException;
+import ru.introguzzle.parsers.common.mapping.Traverser;
+import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
+import ru.introguzzle.parsers.common.mapping.deserialization.TypeHandler;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
-import ru.introguzzle.parsers.common.mapping.ClassHierarchyTraverseUtilities;
 import ru.introguzzle.parsers.json.mapping.FieldAccessorImpl;
-import ru.introguzzle.parsers.json.mapping.MappingException;
-import ru.introguzzle.parsers.json.mapping.MappingInstantiationException;
+import ru.introguzzle.parsers.json.mapping.JSONMappingException;
 import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceStrategies.CircularReference;
 
 import java.lang.reflect.Field;
@@ -26,12 +29,12 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-@ExtensionMethod({ReflectionUtilities.class, Extensions.class})
 public abstract class AbstractObjectMapper implements ObjectMapper {
     private static <T> Map.Entry<Class<T>, TypeHandler<? extends T>> entryOf(Class<T> type, TypeHandler<? extends T> typeHandler) {
         return Map.entry(type, typeHandler);
@@ -43,46 +46,46 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
                     return Date.from(Instant.parse(string));
                 }
 
-                throw new MappingInstantiationException(Date.class, o.getClass());
+                throw new JSONMappingException(Date.class, o.getClass());
             }),
             entryOf(BigDecimal.class, o -> {
                 if (o instanceof String string) {
                     return new BigDecimal(string);
                 }
 
-                throw new MappingInstantiationException(BigDecimal.class, o.getClass());
+                throw new JSONMappingException(BigDecimal.class, o.getClass());
             }),
             entryOf(BigInteger.class, o -> {
                 if (o instanceof String string) {
                     return new BigInteger(string);
                 }
 
-                throw new MappingInstantiationException(BigInteger.class, o.getClass());
+                throw new JSONMappingException(BigInteger.class, o.getClass());
             }),
             entryOf(URI.class, o -> {
                 if (o instanceof String string) {
                     return URI.create(string);
                 }
 
-                throw new MappingInstantiationException(URI.class, o.getClass());
+                throw new JSONMappingException(URI.class, o.getClass());
             }),
             entryOf(Throwable.class, o -> {
                 if (o instanceof String string) {
                     return new Throwable(string);
                 }
 
-                throw new MappingInstantiationException(Throwable.class, o.getClass());
+                throw new JSONMappingException(Throwable.class, o.getClass());
             }),
             entryOf(Class.class, o -> {
                 if (o instanceof String string) {
                     try {
                         return Class.forName(string);
                     } catch (ClassNotFoundException e) {
-                        throw new MappingException("Cannot instantiate Class", e);
+                        throw new JSONMappingException("Cannot instantiate Class", e);
                     }
                 }
 
-                throw new MappingInstantiationException(Class.class, o.getClass());
+                throw new JSONMappingException(Class.class, o.getClass());
             }),
             entryOf(List.class, o -> {
                 List<Object> list = new ArrayList<>();
@@ -105,79 +108,97 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
             })
     );
 
-    private static final FieldAccessor FIELD_ACCESSOR = new FieldAccessorImpl();
-
-    @Override
-    public FieldAccessor getFieldAccessor() {
-        return FIELD_ACCESSOR;
-    }
-
+    private final Traverser<Class<?>> traverser = new ClassTraverser();
+    private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
     private final Map<JSONObject, Object> referenceMap = new IdentityHashMap<>();
     private final Map<Class<?>, TypeHandler<?>> typeHandlers = new ConcurrentHashMap<>(defaultTypeHandlers);
 
-    protected abstract String getCircularPlaceholder();
-    protected abstract InstanceSupplier getInstanceSupplier();
-    protected abstract BiFunction<Class<?>, Integer, Object> getArraySupplier();
-
-    @FunctionalInterface
-    public interface TriConsumer<T, U, V> {
-        void accept(T t, U u, V v);
+    @Override
+    public @NotNull FieldAccessor getFieldAccessor() {
+        return fieldAccessor;
     }
 
-    protected abstract TriConsumer<Object, Integer, Object> getArraySetter();
-
     @Override
-    public <T> ObjectMapper withTypeHandler(Class<T> type, TypeHandler<? extends T> typeHandler) {
-        this.typeHandlers.put(type, typeHandler);
+    public @NotNull ObjectMapper bindTo(@NotNull Class<?> targetType) {
+        JSONObject.bindTo(targetType, this);
         return this;
     }
 
     @Override
-    public ObjectMapper withTypeHandlers(Map<Class<?>, TypeHandler<?>> typeHandlers) {
-        this.typeHandlers.putAll(typeHandlers);
+    public @NotNull ObjectMapper unbindAll() {
+        JSONObject.unbindAll();
         return this;
     }
 
     @Override
-    public ObjectMapper clearTypeHandlers() {
+    public @NotNull ObjectMapper unbind(@NotNull Class<?> targetType) {
+        JSONObject.unbind(targetType);
+        return this;
+    }
+
+    protected abstract @NotNull String getCircularPlaceholder();
+    protected abstract @NotNull InstanceSupplier<JSONObject> getInstanceSupplier();
+    protected abstract @NotNull BiFunction<Class<?>, Integer, Object> getArraySupplier();
+
+    protected abstract @NotNull TriConsumer<Object, Integer, Object> getArraySetter();
+
+    @Override
+    public @NotNull Traverser<Class<?>> getTraverser() {
+        return traverser;
+    }
+
+    @Override
+    public <T> @NotNull ObjectMapper withTypeHandler(@NotNull Class<T> type, @NotNull TypeHandler<? extends T> handler) {
+        this.typeHandlers.put(type, handler);
+        return this;
+    }
+
+    @Override
+    public @NotNull ObjectMapper withTypeHandlers(@NotNull Map<Class<?>, TypeHandler<?>> handlers) {
+        this.typeHandlers.putAll(handlers);
+        return this;
+    }
+
+    @Override
+    public @NotNull ObjectMapper clearTypeHandlers() {
         this.typeHandlers.clear();
         return this;
     }
 
-    @Override
-    public <T> TypeHandler<T> getTypeHandler(Class<T> type) {
-        synchronized (this) {
-            return findMostSpecificHandler(type);
-        }
+    private @Nullable <T> TypeHandler<T> getTypeHandler(@NotNull Class<T> type) {
+        return findMostSpecificHandler(type);
     }
 
     @SuppressWarnings("unchecked")
     protected <T> TypeHandler<T> findMostSpecificHandler(Class<T> type) {
-        return (TypeHandler<T>) ClassHierarchyTraverseUtilities.findMostSpecificMatch(typeHandlers, type).orElse(null);
+        return (TypeHandler<T>) getTraverser().findMostSpecificMatch(typeHandlers, type).orElse(null);
     }
 
     @Override
-    public BiFunction<Object, Class<?>, Object> getForwardCaller() {
+    public @NotNull BiFunction<Object, Class<?>, Object> getForwardCaller() {
         return this::match;
     }
 
     @Override
-    public <T> T toObject(JSONObject object, Class<T> type) {
+    public <T> @NotNull T toObject(@NotNull JSONObject object, @NotNull Class<T> type) {
         T result = map(object, type);
+        Objects.requireNonNull(object);
+        Objects.requireNonNull(type);
         referenceMap.clear();
+        Objects.requireNonNull(result);
         return result;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T[] toArray(JSONArray array, Class<T[]> type) {
+    public <T> @NotNull T[] toArray(@NotNull JSONArray array, @NotNull Class<T[]> type) {
         return (T[]) handleArray(array, type);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T, R extends Collection<T>> R toCollection(JSONArray array, Class<T> type, Supplier<R> supplier) {
-        R collection = supplier.get();
+    public <T, C extends Collection<T>> @NotNull C toCollection(@NotNull JSONArray array, @NotNull Class<T> type, @NotNull Supplier<C> supplier) {
+        C collection = supplier.get();
         for (Object item : array) {
             collection.add((T) getForwardCaller().apply(item, type));
         }
@@ -186,7 +207,7 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T map(JSONObject object, Class<T> type) {
+    public <T> @Nullable T map(@Nullable JSONObject object, @NotNull Class<T> type) {
         if (object == null) {
             return null;
         }
@@ -216,12 +237,13 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
 
             if (!Modifier.isFinal(field.getModifiers())) {
                 if (value instanceof CircularReference<?> reference) {
-                    field.setValue(instance, reference.getValue());
+                    getWritingInvoker().invoke(field, instance, reference.getValue());
                     continue;
                 }
 
                 if (value != null) {
-                    field.setValue(instance, getForwardCaller().apply(value, field.getType()));
+                    Object applied = getForwardCaller().apply(value, field.getType());
+                    getWritingInvoker().invoke(field, instance, applied);
                 }
             }
         }
@@ -229,7 +251,7 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
         return instance;
     }
 
-    protected Object match(Object value, Class<?> fieldType) {
+    protected @Nullable Object match(@Nullable Object value, @NotNull Class<?> fieldType) {
         return switch (value) {
             case null -> null;
             case JSONObject object -> {
@@ -249,7 +271,7 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
         };
     }
 
-    protected Object handleArray(JSONArray array, Class<?> fieldType) {
+    protected Object handleArray(JSONArray array, @NotNull Class<?> fieldType) {
         if (fieldType.isArray()) {
             int size = array.size();
             Class<?> componentType = fieldType.getComponentType();
@@ -265,16 +287,16 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
         return handleCollection(array, fieldType);
     }
 
-    protected Object handleCollection(JSONArray array, Class<?> fieldType) {
+    protected Object handleCollection(JSONArray array, @NotNull Class<?> fieldType) {
         TypeHandler<?> typeHandler = getTypeHandler(fieldType);
         if (typeHandler != null) {
             return typeHandler.apply(array);
         }
 
-        throw new MappingInstantiationException(fieldType, JSONArray.class);
+        throw new JSONMappingException(fieldType, JSONArray.class);
     }
 
-    protected Object handlePrimitiveType(Object value, Class<?> fieldType) {
+    protected Object handlePrimitiveType(Object value, @NotNull Class<?> fieldType) {
         Supplier<MappingException> e = () -> MappingException.of(value.getClass(), fieldType);
         return switch (fieldType.getSimpleName()) {
             case "boolean", "Boolean" -> {

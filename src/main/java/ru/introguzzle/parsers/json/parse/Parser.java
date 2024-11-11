@@ -3,7 +3,7 @@ package ru.introguzzle.parsers.json.parse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import ru.introguzzle.parsers.common.utility.NumberUtilities;
+import ru.introguzzle.parsers.common.util.NumberUtilities;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 

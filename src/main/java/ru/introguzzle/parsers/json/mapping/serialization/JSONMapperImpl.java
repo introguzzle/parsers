@@ -1,65 +1,54 @@
 package ru.introguzzle.parsers.json.mapping.serialization;
 
-import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.introguzzle.parsers.common.Maps;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.cache.CacheSupplier;
-import ru.introguzzle.parsers.common.field.Extensions;
 import ru.introguzzle.parsers.common.field.FieldAccessor;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
+import ru.introguzzle.parsers.common.field.MethodHandleInvoker;
+import ru.introguzzle.parsers.common.field.ReadingInvoker;
 import ru.introguzzle.parsers.common.inject.BindException;
 import ru.introguzzle.parsers.common.inject.Binder;
+import ru.introguzzle.parsers.common.mapping.ClassTraverser;
+import ru.introguzzle.parsers.common.mapping.Traverser;
+import ru.introguzzle.parsers.common.mapping.serialization.TypeHandler;
+import ru.introguzzle.parsers.common.mapping.serialization.TypeHandlers;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
-import ru.introguzzle.parsers.common.mapping.ClassHierarchyTraverseUtilities;
 import ru.introguzzle.parsers.json.mapping.FieldAccessorImpl;
 import ru.introguzzle.parsers.json.mapping.JSONFieldNameConverter;
 import ru.introguzzle.parsers.json.mapping.JSONObjectConvertable;
 import ru.introguzzle.parsers.json.mapping.MappingContext;
-import ru.introguzzle.parsers.json.mapping.MappingException;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceStrategies.CircularReference;
 import ru.introguzzle.parsers.json.mapping.type.JSONType;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
+import java.util.Optional;
 
-import static ru.introguzzle.parsers.json.mapping.serialization.TypeHandler.newEntry;
-
-@ExtensionMethod({Extensions.class})
 public class JSONMapperImpl implements JSONMapper {
-    private static final CacheSupplier CACHE_SUPPLIER = CacheService.getInstance();
-
-    private final Map<Class<?>, TypeHandler<?>> defaultTypeHandlers = Map.ofEntries(
-            newEntry(Number.class, this::handleNumber),
-            newEntry(Boolean.class, this::handleBoolean),
-            newEntry(String.class, this::handleString)
-    );
+    private static final CacheSupplier CACHE_SUPPLIER = CacheService.instance();
+    private static final Cache<Class<?>, TypeHandler<?>> TYPE_HANDLER_CACHE = CACHE_SUPPLIER.newCache();
 
     private final FieldNameConverter<JSONField> nameConverter;
-    private final Map<Class<?>, TypeHandler<?>> typeHandlers = new HashMap<>(DefaultTypeHandler.asMap());
+    private final Map<Class<?>, TypeHandler<?>> typeHandlers =
+            Maps.of(TypeHandlers.DEFAULT, Map.ofEntries(
+                    TypeHandler.newEntry(Number.class, this::handleNumber),
+                    TypeHandler.newEntry(Boolean.class, this::handleBoolean),
+                    TypeHandler.newEntry(String.class, this::handleString)
+            ));
 
-    {
-        typeHandlers.putAll(defaultTypeHandlers);
-    }
-
-    private final Map<Class<?>, TypeHandler<?>> typeHandlerCache = new ConcurrentHashMap<>();
-
-    private static final FieldAccessor FIELD_ACCESSOR = new FieldAccessorImpl();
-    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
-    private static final Cache<Field, MethodHandle> GETTER_CACHE;
-
-    static {
-        GETTER_CACHE = CACHE_SUPPLIER.newCache();
-    }
+    private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
+    private final Traverser<Class<?>> traverser = new ClassTraverser();
+    private final ReadingInvoker readingInvoker = new MethodHandleInvoker.Reading();
 
     public JSONMapperImpl() {
         this(new JSONFieldNameConverter());
@@ -74,58 +63,62 @@ public class JSONMapperImpl implements JSONMapper {
     }
 
     @Override
-    public JSONMapper bindTo(Class<? extends Bindable> type) throws BindException {
+    public @NotNull JSONMapper bindTo(@NotNull Class<? extends Bindable> type) throws BindException {
         createBinder(type).inject(type);
         return this;
     }
 
     @Override
-    public JSONMapper unbind(Class<? extends Bindable> type) throws BindException {
+    public @NotNull JSONMapper unbind(@NotNull Class<? extends Bindable> type) throws BindException {
         createBinder(type).uninject(type);
         return this;
     }
 
     @Override
-    public FieldAccessor getFieldAccessor() {
-        return FIELD_ACCESSOR;
+    public @NotNull FieldAccessor getFieldAccessor() {
+        return fieldAccessor;
     }
 
-    private static MethodHandle acquireGetter(Field field) {
-        return GETTER_CACHE.get(field, LOOKUP::unreflectGetter);
+    @Override
+    public @NotNull Traverser<Class<?>> getTraverser() {
+        return traverser;
+    }
+
+    @Override
+    public @NotNull ReadingInvoker getReadingInvoker() {
+        return readingInvoker;
     }
 
     private TypeHandler<?> findMostSpecificTypeHandler(Class<?> type) {
-        return ClassHierarchyTraverseUtilities.findMostSpecificMatch(typeHandlers, type).orElse(null);
+        return getTraverser().findMostSpecificMatch(typeHandlers, type).orElse(null);
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public <T> TypeHandler<T> findTypeHandler(Class<T> type) {
-        return (TypeHandler<T>) typeHandlerCache.computeIfAbsent(type, this::findMostSpecificTypeHandler);
+    public <T> TypeHandler<T> findTypeHandler(@NotNull Class<T> type) {
+        return (TypeHandler<T>) TYPE_HANDLER_CACHE.get(type, this::findMostSpecificTypeHandler);
     }
 
     @Override
-    public <T> JSONMapper withTypeHandler(Class<T> type, TypeHandler<? super T> typeHandler) {
+    public <T> @NotNull JSONMapper withTypeHandler(@NotNull Class<T> type, @NotNull TypeHandler<? super T> typeHandler) {
         this.typeHandlers.put(type, typeHandler);
         return this;
     }
 
     @Override
-    public JSONMapper withTypeHandlers(Map<Class<?>, TypeHandler<?>> typeHandlers) {
-        this.typeHandlers.putAll(typeHandlers);
+    public @NotNull JSONMapper withTypeHandlers(@NotNull Map<Class<?>, TypeHandler<?>> handlers) {
+        this.typeHandlers.putAll(handlers);
         return this;
     }
 
     @Override
-    public JSONMapper clearTypeHandlers() {
+    public @NotNull JSONMapper clearTypeHandlers() {
         this.typeHandlers.clear();
         return this;
     }
 
     @Override
-    public JSONObject toJSONObject(@Nullable Object object, MappingContext context) {
-        if (object == null) return null;
-
+    public @NotNull JSONObject toJSONObject(@NotNull Object object, @NotNull MappingContext context) {
+        Objects.requireNonNull(object);
         return (JSONObject) map(object, context);
     }
 
@@ -159,14 +152,14 @@ public class JSONMapperImpl implements JSONMapper {
             Object value;
 
             try {
-                value = acquireGetter(field).invokeWithArguments(object);
+                value = getReadingInvoker().invoke(field, object);
             } catch (Throwable e) {
                 throw new MappingException("Cannot retrieve value from property: " + field.getName(), e);
             }
 
             Object handled = handle(field, value, context);
             if (handled instanceof CircularReference<?>) {
-                result.getReferenceMap().put(result, result);
+                result.setApplier(this);
             }
 
             result.put(name, handled);
@@ -176,12 +169,12 @@ public class JSONMapperImpl implements JSONMapper {
     }
 
     @Override
-    public FieldNameConverter<JSONField> getNameConverter() {
+    public @NotNull FieldNameConverter<JSONField> getNameConverter() {
         return nameConverter;
     }
 
     @Override
-    public JSONArray toJSONArray(@NotNull Object iterable, MappingContext context) {
+    public @NotNull JSONArray toJSONArray(@NotNull Object iterable, @NotNull MappingContext context) {
         if (iterable.getClass().isArray() || iterable instanceof Iterable<?>) {
             return handleArray(iterable.getClass(), iterable, context);
         }
@@ -190,12 +183,12 @@ public class JSONMapperImpl implements JSONMapper {
     }
 
     @SuppressWarnings("unchecked")
-    private Object handle(@NotNull Field field, Object fieldValue, MappingContext context) {
+    private Object handle(@NotNull Field field, @Nullable Object fieldValue, @NotNull MappingContext context) {
         if (fieldValue == null) {
             return null;
         }
 
-        JSONType actualType = field.getAnnotationAsOptional(JSONField.class)
+        JSONType actualType = Optional.ofNullable(field.getAnnotation(JSONField.class))
                 .map(JSONField::type)
                 .orElse(JSONType.UNSPECIFIED);
 

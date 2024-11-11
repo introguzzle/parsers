@@ -1,45 +1,75 @@
 package ru.introguzzle.parsers.json.mapping.deserialization;
 
+import org.jetbrains.annotations.NotNull;
+import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
+import ru.introguzzle.parsers.common.field.ReflectionInvoker;
+import ru.introguzzle.parsers.common.field.WritingInvoker;
+import ru.introguzzle.parsers.common.function.TriConsumer;
+import ru.introguzzle.parsers.common.mapping.AnnotationData;
+import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
+import ru.introguzzle.parsers.common.mapping.deserialization.ReflectionAnnotationInstanceSupplier;
+import ru.introguzzle.parsers.json.entity.JSONObject;
+import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
-import ru.introguzzle.parsers.json.mapping.MappingInstantiationException;
 import ru.introguzzle.parsers.json.mapping.JSONFieldNameConverter;
+import ru.introguzzle.parsers.json.mapping.JSONMappingException;
 
 import java.lang.reflect.Array;
 import java.util.function.BiFunction;
 
 public class ReflectionObjectMapper extends AbstractObjectMapper {
-    private final InstanceSupplier instanceSupplier = new AnnotationInstanceSupplier(this);
     private final FieldNameConverter<JSONField> nameConverter = new JSONFieldNameConverter();
+    private final WritingInvoker writingInvoker = new ReflectionInvoker.Writing();
+    private final AnnotationData<JSONEntity, JSONField> annotationData = new AnnotationData<>(JSONEntity.class, JSONField.class);
+
+    private final InstanceSupplier<JSONObject> instanceSupplier
+            = new ReflectionAnnotationInstanceSupplier<>(annotationData, getFieldAccessor(), getNameConverter(), this::match) {
+
+        @Override
+        public ConstructorArgument[] retrieveConstructorArguments(JSONEntity annotation) {
+            return annotation.constructorArguments();
+        }
+
+        @Override
+        public Object retrieveValue(JSONObject object, String name) {
+            return object.get(name);
+        }
+    };
 
     @Override
-    protected String getCircularPlaceholder() {
+    protected @NotNull String getCircularPlaceholder() {
         return "<CIRCULAR_REFERENCE>";
     }
 
     @Override
-    protected InstanceSupplier getInstanceSupplier() {
+    protected @NotNull InstanceSupplier<JSONObject> getInstanceSupplier() {
         return instanceSupplier;
     }
 
     @Override
-    protected BiFunction<Class<?>, Integer, Object> getArraySupplier() {
+    protected @NotNull BiFunction<Class<?>, Integer, Object> getArraySupplier() {
         return (type, size) -> {
             try {
                 return Array.newInstance(type, size);
             } catch (NegativeArraySizeException e) {
-                throw new MappingInstantiationException("Can't instantiate array");
+                throw new JSONMappingException("Can't instantiate array");
             }
         };
     }
 
     @Override
-    protected TriConsumer<Object, Integer, Object> getArraySetter() {
+    protected @NotNull TriConsumer<Object, Integer, Object> getArraySetter() {
         return Array::set;
     }
 
     @Override
-    public FieldNameConverter<JSONField> getNameConverter() {
+    public @NotNull FieldNameConverter<JSONField> getNameConverter() {
         return nameConverter;
+    }
+
+    @Override
+    public @NotNull WritingInvoker getWritingInvoker() {
+        return writingInvoker;
     }
 }

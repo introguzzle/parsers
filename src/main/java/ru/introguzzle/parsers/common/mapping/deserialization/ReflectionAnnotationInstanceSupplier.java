@@ -1,14 +1,15 @@
-package ru.introguzzle.parsers.json.mapping.deserialization;
+package ru.introguzzle.parsers.common.mapping.deserialization;
 
 import lombok.experimental.ExtensionMethod;
-import ru.introguzzle.parsers.common.field.Extensions;
-import ru.introguzzle.parsers.common.utility.ReflectionUtilities;
-import ru.introguzzle.parsers.json.entity.JSONObject;
+import ru.introguzzle.parsers.common.field.FieldAccessor;
+import ru.introguzzle.parsers.common.field.FieldNameConverter;
+import ru.introguzzle.parsers.common.mapping.AnnotationData;
+import ru.introguzzle.parsers.common.mapping.MappingException;
+import ru.introguzzle.parsers.common.util.ClassExtensions;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
-import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
-import ru.introguzzle.parsers.json.mapping.MappingException;
-import ru.introguzzle.parsers.json.mapping.MappingInstantiationException;
+import ru.introguzzle.parsers.json.mapping.JSONMappingException;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -18,44 +19,36 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-@ExtensionMethod({Extensions.class, ReflectionUtilities.class})
-public class AnnotationInstanceSupplier implements InstanceSupplier {
-    /**
-     * Reference to parent mapper
-     */
-    private final ObjectMapper mapper;
+@ExtensionMethod({ClassExtensions.class})
+public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotation, F extends Annotation>
+        extends AnnotationInstanceSupplier<T, E, F> {
+    public ReflectionAnnotationInstanceSupplier(AnnotationData<E, F> annotationData, FieldAccessor fieldAccessor, FieldNameConverter<F> nameConverter, BiFunction<Object, Class<?>, Object> hook) {
+        super(annotationData, fieldAccessor, nameConverter, hook);
+    }
 
-    /**
-     * Method reference for forwarding recursive calls
-     */
-    private final BiFunction<Object, Class<?>, Object> hook;
-
-    public AnnotationInstanceSupplier(ObjectMapper m) {
-        mapper = m;
-        hook = m.getForwardCaller();
+    private String[] getConstructorNames(E annotation) {
+        return Arrays.stream(retrieveConstructorArguments(annotation))
+                .map(ConstructorArgument::value)
+                .toArray(String[]::new);
     }
 
     @Override
-    public <T> T get(JSONObject object, Class<T> type) {
-        Optional<JSONEntity> optional = type.getAnnotationAsOptional(JSONEntity.class);
-        if (optional.isEmpty() || optional.get().constructorArguments().length == 0) {
+    public <R> R get(T object, Class<R> type) {
+        Optional<E> optional = type.getAnnotationAsOptional(annotationData.entityAnnotationClass());
+        if (optional.isEmpty() || retrieveConstructorArguments(optional.get()).length == 0) {
             try {
                 return type.getDefaultConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new MappingInstantiationException(type);
+                throw new JSONMappingException(type);
             }
         }
 
-        return getWithArguments(type, object, optional.get());
+        return getWithArguments(object, type, optional.get());
     }
 
-
-    public <T> T getWithArguments(Class<T> type, JSONObject object, JSONEntity annotation) {
-        String[] constructorNames = Arrays.stream(annotation.constructorArguments())
-                .map(ConstructorArgument::value)
-                .toArray(String[]::new);
-
-        List<Field> fields = mapper.getFieldAccessor().acquire(type);
+    public <R> R getWithArguments(T object, Class<R> type, E annotation) {
+        String[] constructorNames = getConstructorNames(annotation);
+        List<Field> fields = fieldAccessor.acquire(type);
 
         Function<Field, Field> matcher = field -> {
             for (String constructorName : constructorNames) {
@@ -87,15 +80,15 @@ public class AnnotationInstanceSupplier implements InstanceSupplier {
 
         Object[] args = matchedFields.stream()
                 .map(field -> {
-                    String transformed = mapper.getNameConverter().apply(field);
-                    return hook.apply(object.get(transformed), field.getType());
+                    String transformed = nameConverter.apply(field);
+                    return hook.apply(retrieveValue(object, transformed), field.getType());
                 })
                 .toArray();
 
         try {
             return type.getConstructor(constructorTypes).newInstance(args);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new MappingInstantiationException("Can't instantiate: " + type, e);
+            throw new MappingException("Can't instantiate: " + type, e);
         }
     }
 }

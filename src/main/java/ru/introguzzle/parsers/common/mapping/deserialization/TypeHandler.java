@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.json.mapping.deserialization;
+package ru.introguzzle.parsers.common.mapping.deserialization;
 
 import java.util.Map;
 import java.util.function.Function;

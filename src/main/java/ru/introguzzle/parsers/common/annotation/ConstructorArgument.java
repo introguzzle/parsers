@@ -1,6 +1,6 @@
 package ru.introguzzle.parsers.common.annotation;
 
-import ru.introguzzle.parsers.json.mapping.deserialization.InstanceSupplier;
+import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

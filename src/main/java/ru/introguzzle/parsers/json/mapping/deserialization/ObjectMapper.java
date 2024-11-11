@@ -1,15 +1,13 @@
 package ru.introguzzle.parsers.json.mapping.deserialization;
 
+import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.NameConverter;
-import ru.introguzzle.parsers.common.field.FieldAccessor;
+import ru.introguzzle.parsers.common.mapping.WritingMapper;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
-import ru.introguzzle.parsers.common.field.FieldNameConverter;
-import ru.introguzzle.parsers.json.mapping.MappingException;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 
-import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -35,21 +33,7 @@ import java.util.function.Supplier;
  * @see JSONObject
  * @see NameConverter
  */
-public interface ObjectMapper {
-    FieldNameConverter<? extends Annotation> getNameConverter();
-    BiFunction<Object, Class<?>, Object> getForwardCaller();
-
-    FieldAccessor getFieldAccessor();
-
-    <T> ObjectMapper withTypeHandler(Class<T> type, TypeHandler<? extends T> typeHandler);
-    @SuppressWarnings("unused")
-    ObjectMapper withTypeHandlers(Map<Class<?>, TypeHandler<?>> typeHandlers);
-
-    @SuppressWarnings("unused")
-    ObjectMapper clearTypeHandlers();
-
-    <T> TypeHandler<T> getTypeHandler(Class<T> type);
-
+public interface ObjectMapper extends WritingMapper<ObjectMapper> {
     /**
      * Converts a {@link JSONObject} to an instance of the specified type.
      *
@@ -59,8 +43,8 @@ public interface ObjectMapper {
      * @return An instance of type T representing the converted JSON data.
      * @throws MappingException If an error occurs during the conversion process.
      */
-    <T> T toObject(JSONObject object, Class<T> type);
-
-    <T> T[] toArray(JSONArray array, Class<T[]> type);
-    <T, R extends Collection<T>> R toCollection(JSONArray array, Class<T> type, Supplier<R> supplier);
+    <T> @NotNull T toObject(@NotNull JSONObject object, @NotNull Class<T> type);
+    <T> @NotNull T[] toArray(@NotNull JSONArray array, @NotNull Class<T[]> type);
+    <T, C extends Collection<T>> @NotNull C toCollection(@NotNull JSONArray array, @NotNull Class<T> type, @NotNull Supplier<C> supplier);
+    @NotNull BiFunction<Object, Class<?>, Object> getForwardCaller();
 }

@@ -7,43 +7,48 @@ import ru.introguzzle.parsers.yaml.YAMLDocument;
 import java.util.Optional;
 
 /**
- * Interface for loading configuration files and parsing them into YAML documents.
- * The {@code ConfigLoader} interface provides methods for loading configuration
- * data from specified file paths and converting it to {@code YAMLDocument} objects.
- * It includes functionality for both guaranteed and optional loading with error handling.
+ * Interface for loading and parsing resource files into structured documents.
+ * The {@code ResourceLoader} interface provides methods for loading resource data from specified
+ * file paths and converting it into objects of type {@code R} using an associated parser.
+ * It supports both mandatory loading, which throws exceptions on failure, and optional loading,
+ * which gracefully handles errors by returning an empty result.
+ *
+ * @param <R> the type of the document resulting from parsing the resource (e.g., {@link YAMLDocument})
  */
-public interface ResourceLoader<T> {
+public interface ResourceLoader<R> {
 
     /**
-     * Retrieves the {@code Parser} instance used for parsing YAML configuration files.
+     * Retrieves the parser instance used for parsing resource files.
+     * The parser is responsible for converting raw resource data into structured documents.
      *
-     * @return the parser instance, which must not be null.
+     * @return a non-null {@link BaseParser} instance for parsing resources
      */
     @NotNull
-    BaseParser<YAMLDocument> getParser();
+    BaseParser<R> getParser();
 
     /**
-     * Loads and parses a configuration file from the given path.
-     * This method attempts to load the configuration file from the specified path
-     * and convert it into a {@code YAMLDocument} using the provided parser.
+     * Loads and parses a resource file from the specified path.
+     * This method attempts to load the resource file located at the given path and
+     * parses its contents into an object of type {@code R} using the associated parser.
      *
-     * @param path the path to the configuration file.
-     * @return a {@code YAMLDocument} representing the parsed configuration.
-     * @throws RuntimeException if the configuration file could not be loaded or parsed.
+     * @param path the file system path to the resource file
+     * @return a non-null instance of {@code R} representing the parsed resource
+     * @throws RuntimeException if the resource file cannot be loaded or parsed successfully
      */
     @NotNull
-    T load(String path);
+    R load(@NotNull String path);
 
     /**
-     * Attempts to load a configuration file from the given path without throwing an exception.
-     * This method tries to load and parse the configuration file from the specified path.
-     * If loading or parsing fails, it returns an empty {@code Optional} instead of throwing an exception.
+     * Attempts to load and parse a resource file from the specified path without throwing an exception.
+     * This method tries to load and parse the resource file located at the given path.
+     * If the loading or parsing process fails for any reason, it returns an empty {@code Optional}
+     * instead of propagating the exception.
      *
-     * @param path the path to the configuration file.
-     * @return an {@code Optional} containing the {@code YAMLDocument} if the file was successfully loaded,
-     *         or an empty {@code Optional} if an error occurred.
+     * @param path the file system path to the resource file
+     * @return an {@code Optional} containing the parsed resource of type {@code R} if successful,
+     *         or {@code Optional.empty()} if an error occurs during loading or parsing
      */
-    default @NotNull Optional<T> tryLoad(String path) {
+    default @NotNull Optional<R> tryLoad(@NotNull String path) {
         try {
             return Optional.of(load(path));
         } catch (Throwable e) {

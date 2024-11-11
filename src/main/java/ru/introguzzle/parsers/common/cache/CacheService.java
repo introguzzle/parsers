@@ -67,7 +67,7 @@ public final class CacheService implements ScheduledExecutorService, CacheSuppli
 
     private static final CacheService INSTANCE = new CacheService(Executors.newSingleThreadScheduledExecutor(THREAD_FACTORY));
 
-    public static CacheService getInstance() {
+    public static CacheService instance() {
         return INSTANCE;
     }
 

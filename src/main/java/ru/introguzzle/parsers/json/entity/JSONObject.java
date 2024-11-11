@@ -7,13 +7,20 @@ import ru.introguzzle.parsers.common.convert.ConverterFactory;
 import ru.introguzzle.parsers.common.convert.Converter;
 import ru.introguzzle.parsers.common.visit.Visitable;
 import ru.introguzzle.parsers.common.visit.Visitor;
+import ru.introguzzle.parsers.json.mapping.JSONMappingException;
 import ru.introguzzle.parsers.json.mapping.JSONObjectConvertable;
+import ru.introguzzle.parsers.json.mapping.deserialization.ObjectMapper;
 import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceStrategies.CircularReference;
+import ru.introguzzle.parsers.json.mapping.serialization.JSONMapper;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.xml.entity.XMLDocumentConvertable;
 
 import java.io.Serial;
-import java.util.*;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents a JSON object as a map of key-value pairs.
@@ -33,10 +40,11 @@ public class JSONObject extends UntypedMap implements
         CONVERTER = FACTORY.getJSONDocumentToXMLConverter();
     }
 
+    private static final Map<Class<?>, ObjectMapper> MAPPERS = new HashMap<>();
+    private transient WeakReference<JSONMapper> applier;
+
     @Serial
     private static final long serialVersionUID = -697931640108868641L;
-
-    private final Map<Object, Object> referenceMap = new IdentityHashMap<>();
 
     public JSONObject() {
         super();
@@ -61,7 +69,7 @@ public class JSONObject extends UntypedMap implements
     public JSONObject getObject(String key) {
         Object value = get(key);
         return value instanceof CircularReference<?> reference
-                ? (JSONObject) referenceMap.get(reference.getValue())
+                ? Objects.requireNonNull(applier.get()).toJSONObject(reference.getValue())
                 : (JSONObject) value;
     }
 
@@ -85,7 +93,7 @@ public class JSONObject extends UntypedMap implements
     }
 
     @Override
-    public JSONObject toJSONObject() {
+    public @NotNull JSONObject toJSONObject() {
         return this;
     }
 
@@ -144,6 +152,33 @@ public class JSONObject extends UntypedMap implements
         }
 
         return result;
+    }
+
+    public static void bindTo(Class<?> type, ObjectMapper mapper) {
+        MAPPERS.put(type, mapper);
+    }
+
+    public static void unbind(Class<?> type) {
+        MAPPERS.remove(type);
+    }
+
+    public static void unbindAll() {
+        MAPPERS.clear();
+    }
+
+    public <T> T toObject(Class<T> type) {
+        ObjectMapper associate = MAPPERS.get(type);
+        if (associate == null) {
+            throw new JSONMappingException("No mapper present for " + type);
+        }
+
+        return associate.toObject(this, type);
+    }
+
+    public void setApplier(JSONMapper mapper) {
+        if (applier == null) {
+            applier = new WeakReference<>(mapper);
+        }
     }
 
     @Override

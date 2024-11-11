@@ -1,9 +1,10 @@
-package ru.introguzzle.parsers.json.mapping.serialization;
+package ru.introguzzle.parsers.common.mapping.serialization;
 
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 
 /**
@@ -34,7 +35,7 @@ public interface TypeHandler<T> extends Function<T, Object> {
         return function::apply;
     }
 
-    static <T> Map.Entry<Class<T>, TypeHandler<T>> newEntry(Class<T> type, Function<? super T, Object> function) {
+    static <T> Entry<Class<T>, TypeHandler<T>> newEntry(Class<T> type, Function<? super T, Object> function) {
         return Map.entry(type, of(function));
     }
 }

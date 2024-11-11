@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.json.mapping.serialization;
+package ru.introguzzle.parsers.common.mapping.serialization;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
-import static ru.introguzzle.parsers.json.mapping.serialization.TypeHandler.newEntry;
+import static ru.introguzzle.parsers.common.mapping.serialization.TypeHandler.newEntry;
 
 public final class TypeHandlers {
     public static final Map<Class<?>, TypeHandler<?>> DEFAULT = Map.ofEntries(

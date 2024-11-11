@@ -1,19 +1,15 @@
 package ru.introguzzle.parsers.json.mapping.serialization;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.convert.NameConverter;
-import ru.introguzzle.parsers.common.field.FieldAccessor;
-import ru.introguzzle.parsers.common.inject.BindException;
+import ru.introguzzle.parsers.common.mapping.ReadingMapper;
+import ru.introguzzle.parsers.common.mapping.serialization.TypeHandler;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
-import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.json.mapping.MappingContext;
-import ru.introguzzle.parsers.json.mapping.MappingException;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 
-import java.lang.annotation.Annotation;
-import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 
 /**
  * Interface for mapping Plain Old Java Objects (POJOs) to {@link JSONObject} instances.
@@ -42,80 +38,9 @@ import java.util.Set;
  * @see NameConverter
  */
 @SuppressWarnings("unused")
-public interface JSONMapper {
-
-    @SuppressWarnings("ALL")
-    JSONMapper bindTo(Class<? extends Bindable> type) throws BindException;
-    JSONMapper unbind(Class<? extends Bindable> type) throws BindException;
-
-    @SuppressWarnings("ALL")
-    default JSONMapper bindTo(Class<? extends Bindable>[] types) throws BindException {
-        for (var type : types) {
-            bindTo(type);
-        }
-
-        return this;
-    }
-
-    @SuppressWarnings("ALL")
-    default JSONMapper bindTo(Set<Class<? extends Bindable>> types) throws BindException {
-        for (var type : types) {
-            bindTo(type);
-        }
-
-        return this;
-    }
-
-    FieldAccessor getFieldAccessor();
-
-    /**
-     * Retrieves the {@link TypeHandler} associated with the specified type.
-     *
-     * <p>If a handler for the given type has been registered, it returns that handler. Otherwise,
-     * it attempts to find the most specific handler based on the type hierarchy.</p>
-     *
-     * @param <T>  The type for which the handler is requested.
-     * @param type The class of the type to retrieve the handler for.
-     * @return The {@link TypeHandler} for the specified type, or {@code null} if no handler is found.
-     */
-    <T> TypeHandler<T> findTypeHandler(Class<T> type);
-
-    /**
-     * Registers a custom {@link TypeHandler} for the specified type.
-     *
-     * <p>This method allows defining how instances of a particular type should be serialized into JSON.
-     * Handlers registered using this method take precedence over default handlers.</p>
-     *
-     * @param <T>         The type for which the handler is being registered.
-     * @param type        The class of the type to register the handler for.
-     * @param typeHandler The {@link TypeHandler} that defines the serialization logic for the specified type.
-     * @return The current instance of {@code ObjectToJSONMapper} to allow method chaining.
-     */
-    <T> JSONMapper withTypeHandler(Class<T> type, TypeHandler<? super T> typeHandler);
-
-    /**
-     * Registers multiple {@link TypeHandler}s at once.
-     *
-     * <p>This method allows you to bulk register handlers for various types. Handlers registered using this
-     * method take precedence over default handlers.</p>
-     *
-     * @param typeHandlers A {@code Map} where keys are classes representing the types and values are their corresponding {@link TypeHandler}s.
-     * @return The current instance of {@code ObjectToJSONMapper} to allow method chaining.
-     */
-    JSONMapper withTypeHandlers(Map<Class<?>, TypeHandler<?>> typeHandlers);
-
-    /**
-     * Clears all registered {@link TypeHandler}s.
-     *
-     * <p>This method removes all custom type handlers that have been registered, reverting to the default serialization behavior.</p>
-     *
-     * @return The current instance of {@code ObjectToJSONMapper} to allow method chaining.
-     */
-    JSONMapper clearTypeHandlers();
-
-    default JSONObject toJSONObject(@Nullable Object object) {
-        if (object == null) return null;
-
+public interface JSONMapper extends ReadingMapper<JSONMapper, Bindable> {
+    default @NotNull JSONObject toJSONObject(@NotNull Object object) {
+        Objects.requireNonNull(object);
         return toJSONObject(object, MappingContext.getDefault());
     }
 
@@ -130,20 +55,15 @@ public interface JSONMapper {
      * @return A {@link JSONObject} representing the serialized form of the given POJO.
      * @throws MappingException If an error occurs during the serialization process.
      */
-    JSONObject toJSONObject(@NotNull Object object, MappingContext context);
-
-    FieldNameConverter<? extends Annotation> getNameConverter();
+    @NotNull JSONObject toJSONObject(@NotNull Object object, @NotNull MappingContext context);
 
     /**
      * Converts a {@link Iterable} or Java array of POJOs to a {@link JSONArray}.
      *
-     *
      * @param iterable The {@link Iterable} of POJOs or Java array of POJOs.
-     * @param context The {@link MappingContext} that provides context information for the serialization process, such as handling circular references.
+     * @param context  The {@link MappingContext} that provides context information for the serialization process, such as handling circular references.
      * @return A {@link JSONArray} representing the serialized form of the given POJOs.
-     * @throws MappingException If
-     * <br>
-     * Or if {@code iterable} is not instance either of {@link Iterable} or Java array.
+     * @throws MappingException if {@code iterable} is not instance either of {@link Iterable} or Java array.
      */
-    JSONArray toJSONArray(@NotNull Object iterable, MappingContext context);
+    @NotNull JSONArray toJSONArray(@NotNull Object iterable, @NotNull MappingContext context);
 }

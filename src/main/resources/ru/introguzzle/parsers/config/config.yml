@@ -1,15 +1,28 @@
+## Converter settings
 #converter:
 #  factory:
-#    class: ru.introguzzle.parser.common.convert.TestFactory
+#    class: ru.introguzzle.parser.common.convert.TestFactory  # Converter factory class
 #
+## Naming conventions
 #naming:
 #  xml_converter:
-#    class: com.example.CamelCaseConverter
+#    class: com.example.CamelCaseConverter                 # Name converter for XML
 #  json_converter:
-#    class: com.example.SnakeCaseConverter
+#    class: com.example.SnakeCaseConverter                # Name converter for JSON
 #
+## XML serialization settings
 #xml:
-#  attribute_prefix: "@"
-#  default_root_name: "root"
-#  text_placeholder: "@text"
-#  character_data_placeholder: "@cdata"
+#  attribute_prefix: "@"                                  # Prefix for XML attributes
+#  default_root_name: "root"                              # Default name for the root XML element
+#  text_placeholder: "@text"                              # Placeholder for text content in XML elements
+#  character_data_placeholder: "@cdata"                   # Placeholder for CDATA content in XML elements
+#
+## Cache configuration
+#cache:
+#  initial_capacity: 32                                   # Initial capacity of the cache
+#  load_factor: 0.6931472                                 # Load factor for cache resizing
+#  concurrency_level: 32                                  # Number of concurrent threads allowed to modify the cache
+#  maximal_capacity: 1000                                 # Maximum number of entries in the cache
+#  initial_delay: 1                                       # Delay before the first cache eviction (in time_unit)
+#  invalidate_period: 1                                   # Period between cache evictions (in time_unit)
+#  time_unit: DAYS                                        # Time unit for cache timings (e.g., SECONDS, MINUTES, HOURS, DAYS)

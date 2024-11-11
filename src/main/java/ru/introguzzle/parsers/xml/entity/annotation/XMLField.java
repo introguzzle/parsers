@@ -12,5 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface XMLField {
     String name() default "";
+    String element() default "";
     @NotNull XMLType type();
 }

@@ -1,8 +1,8 @@
-package ru.introguzzle.parsers.common.utility;
+package ru.introguzzle.parsers.common.util;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static ru.introguzzle.parsers.common.utility.NamingUtilities.toSnakeCase;
+import static ru.introguzzle.parsers.common.util.NamingUtilities.toSnakeCase;
 
 public class NamingUtilitiesTest {
 

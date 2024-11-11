@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import org.junit.Test;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
-import ru.introguzzle.parsers.xml.entity.XMLElement;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLRoot;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLValue;
 import ru.introguzzle.parsers.xml.entity.type.XMLType;
+
+import java.util.List;
 
 public class XMLMapperTest {
     private final XMLMapper mapper = new XMLMapperImpl();
@@ -65,6 +66,67 @@ public class XMLMapperTest {
     public void test_inject() {
         Person person = new Person(1.11, 1337, "NAME", new Salary(9999, Type.TYPE_1));
         mapper.bindTo(Person.class);
-        System.out.println(person.toXMLDocument());
+        System.out.println(person.toXMLDocument().toXMLString());
+    }
+
+    @AllArgsConstructor
+    @XMLEntity
+    @XMLRoot("Node")
+    static class Node {
+        @XMLValue
+        int intValue;
+
+        @XMLField(type = XMLType.ELEMENT, name = "__renamed__")
+        String stringValue;
+
+        @XMLField(type = XMLType.ELEMENT, name = "Node")
+        Node next;
+    }
+
+    @Test
+    public void test_node() {
+        Node node = new Node(-1, "-1", new Node(0, "0", new Node(1,  "1", null)));
+        XMLDocument document = mapper.toXMLDocument(node);
+        System.out.println(document.toXMLString());
+    }
+
+    @AllArgsConstructor
+    @XMLEntity
+    @XMLRoot("company")
+    static class Company {
+        @XMLField(type = XMLType.ELEMENT, name = "EmployeeList")
+        List<Employee> employeeList;
+
+        @XMLField(type = XMLType.ELEMENT, name = "EmployeeArray")
+        Employee[] employeeArray;
+    }
+
+    @AllArgsConstructor
+    @XMLEntity
+    @XMLRoot("employee")
+    static class Employee {
+        @XMLField(type = XMLType.ELEMENT, name = "id")
+        int id;
+
+        @XMLField(type = XMLType.ELEMENT, name = "name")
+        String name;
+    }
+
+    @Test
+    public void test_iterable_and_array() {
+        List<Employee> employeeList = List.of(
+            new Employee(1, "111"),
+            new Employee(2, "222"),
+            new Employee(3, "333")
+        );
+
+        Employee[] employeeArray = {
+                new Employee(4, "444"),
+                new Employee(5, "555"),
+        };
+
+        Company company = new Company(employeeList, employeeArray);
+        XMLDocument document = mapper.toXMLDocument(company);
+        System.out.println(document.toXMLString());
     }
 }

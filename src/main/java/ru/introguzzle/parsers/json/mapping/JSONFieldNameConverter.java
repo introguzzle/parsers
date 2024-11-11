@@ -1,7 +1,7 @@
 package ru.introguzzle.parsers.json.mapping;
 
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
-import ru.introguzzle.parsers.common.utility.NamingUtilities;
+import ru.introguzzle.parsers.common.util.NamingUtilities;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 
 public class JSONFieldNameConverter extends FieldNameConverter<JSONField> {

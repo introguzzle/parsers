@@ -2,6 +2,7 @@ package ru.introguzzle.parsers.json.mapping.serialization;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import ru.introguzzle.parsers.foreign.Foreign;
 import ru.introguzzle.parsers.foreign.Other;
@@ -12,7 +13,7 @@ import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 import ru.introguzzle.parsers.json.mapping.Data;
 import ru.introguzzle.parsers.json.mapping.JSONObjectConvertable;
 import ru.introguzzle.parsers.json.mapping.MappingContext;
-import ru.introguzzle.parsers.json.mapping.MappingException;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.json.mapping.type.JSONType;
 
 import java.io.IOException;
@@ -295,16 +296,18 @@ public class JSONMapperTest {
 
     @AllArgsConstructor
     public static final class Implements implements JSONObjectConvertable {
+        static final JSONObject OBJECT = new JSONObject();
+
         @Override
-        public JSONObject toJSONObject() {
-            return null;
+        public @NotNull JSONObject toJSONObject() {
+            return OBJECT;
         }
     }
 
     @Test
     public void test_interface() {
         JSONObject object = mapper.toJSONObject(new Implements(), MappingContext.getDefault());
-        assertNull(object);
+        assertEquals(object, Implements.OBJECT);
     }
 
     @Test

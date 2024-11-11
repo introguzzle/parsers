@@ -15,10 +15,7 @@ import ru.introguzzle.parsers.xml.token.CharacterDataToken;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @EqualsAndHashCode
@@ -40,8 +37,8 @@ public class XMLElement implements Serializable, JSONObjectConvertable,
     public static final String TAB = "\t";
 
     private final String name;
-    private final Map<String, XMLAttribute> attributes = new LinkedHashMap<>();
-    private final Map<String, XMLElement> children = new LinkedHashMap<>();
+    private final List<XMLAttribute> attributes = new ArrayList<>();
+    private final List<XMLElement> children = new ArrayList<>();
 
     @Setter
     private String text;
@@ -49,7 +46,7 @@ public class XMLElement implements Serializable, JSONObjectConvertable,
     private String characterData;
 
     public void addAttribute(XMLAttribute attribute) {
-        this.attributes.put(attribute.name(), attribute);
+        attributes.add(attribute);
     }
 
     public void addAttributes(List<XMLAttribute> attributes) {
@@ -57,11 +54,29 @@ public class XMLElement implements Serializable, JSONObjectConvertable,
     }
 
     public void addChild(XMLElement child) {
-        children.put(child.getName(), child);
+        children.add(child);
+    }
+
+    public XMLElement getChild(String name, int index) {
+        int size = children.size();
+        for (int i = 0; i < size; i++) {
+            XMLElement child = children.get(i);
+            if (child.getName().equals(name) && index == i) {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     public XMLElement getChild(String name) {
-        return children.get(name);
+        for (XMLElement child : children) {
+            if (child.getName().equals(name)) {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -123,16 +138,8 @@ public class XMLElement implements Serializable, JSONObjectConvertable,
         return xml.toString();
     }
 
-    public Collection<XMLAttribute> getAttributes() {
-        return attributes.values();
-    }
-
-    public Collection<XMLElement> getChildren() {
-        return children.values();
-    }
-
     @Override
-    public JSONObject toJSONObject() {
+    public @NotNull JSONObject toJSONObject() {
         return CONVERTER.convert(this);
     }
 

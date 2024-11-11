@@ -5,14 +5,14 @@ import lombok.experimental.ExtensionMethod;
 import ru.introguzzle.parsers.common.AccessLevel;
 import ru.introguzzle.parsers.common.Streams;
 import ru.introguzzle.parsers.common.cache.Cache;
-import ru.introguzzle.parsers.common.utility.ReflectionUtilities;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-@ExtensionMethod({ReflectionUtilities.class, Streams.class})
+@ExtensionMethod({Streams.class})
 @AllArgsConstructor
 public abstract class AbstractFieldAccessor<A extends Annotation> implements FieldAccessor {
     static final int DEFAULT = AccessLevel.DEFAULT;
@@ -24,10 +24,10 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
 
     @Override
     public List<Field> acquire(Class<?> type) {
-        return acquireCache().get(type, this::cache);
+        return getCache().get(type, this::cache);
     }
 
-    public abstract Cache<Class<?>, List<Field>> acquireCache();
+    public abstract Cache<Class<?>, List<Field>> getCache();
 
     public abstract List<String> retrieveExcluded(A annotation);
     public abstract int retrieveAccessLevel(A annotation);
@@ -35,7 +35,7 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
     public List<Field> cache(Class<?> type) {
         A annotation = type.getAnnotation(annotationType);
 
-        List<Field> fields = type.getAllFields();
+        List<Field> fields = acquireThroughHierarchy(type);
         Stream<Field> stream = fields.stream();
 
         int accessLevel = DEFAULT;
@@ -58,5 +58,27 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
             stream = stream.reject(Extensions::isVolatile);
 
         return stream.toList();
+    }
+
+    /**
+     * Retrieves all fields of the specified class, including fields from its superclasses,
+     * regardless of the access modifier (private, protected, public).
+     *
+     * @param type the class from which to retrieve all fields
+     * @return a list of all fields in the hierarchy of the class
+     */
+    public List<Field> acquireThroughHierarchy(Class<?> type) {
+        List<Field> fields = new ArrayList<>();
+        while (type != null && type != Object.class) {
+            Field[] declaredFields = type.getDeclaredFields();
+            for (Field field : declaredFields) {
+                field.setAccessible(true);
+                fields.add(field);
+            }
+
+            type = type.getSuperclass();
+        }
+
+        return fields;
     }
 }

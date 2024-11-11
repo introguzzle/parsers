@@ -1,16 +1,19 @@
 package ru.introguzzle.parsers.json.mapping;
 
 import org.junit.Test;
+import ru.introguzzle.parsers.common.mapping.ClassTraverser;
+import ru.introguzzle.parsers.common.mapping.MappingException;
+import ru.introguzzle.parsers.common.mapping.Traverser;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-import static ru.introguzzle.parsers.common.mapping.ClassHierarchyTraverseUtilities.findMostGeneralMatch;
-import static ru.introguzzle.parsers.common.mapping.ClassHierarchyTraverseUtilities.findMostSpecificMatch;
+import static junit.framework.TestCase.assertEquals;
 
 @SuppressWarnings("ALL")
-public class ClassHierarchyTraverseUtilitiesTest {
+public class TraverserTest {
+    private final Traverser<Class<?>> traverser = new ClassTraverser();
+
     public static class Parent extends MappingException {}
     public static class Child extends Parent {}
     public static class Grand extends Child {}
@@ -23,7 +26,7 @@ public class ClassHierarchyTraverseUtilitiesTest {
         map.put(Parent.class, 2);
         map.put(MappingException.class, 3);
 
-        assertEquals((Integer) 3, findMostSpecificMatch(map, MappingException.class).get());
+        assertEquals((Integer) 3, traverser.findMostSpecificMatch(map, MappingException.class).get());
     }
 
     @Test
@@ -35,6 +38,6 @@ public class ClassHierarchyTraverseUtilitiesTest {
         map.put(MappingException.class, 3);
         map.put(Throwable.class, 4);
 
-        assertEquals((Integer) 4, findMostGeneralMatch(map, MappingException.class).get());
+        assertEquals((Integer) 4, traverser.findMostGeneralMatch(map, MappingException.class).get());
     }
 }
