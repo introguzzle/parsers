@@ -37,17 +37,17 @@ import ru.introguzzle.parsers.json.parse.JSONParser;
 
 public class Example {
     public static void main(String[] args) {
-        String data = "{\"name\": \"name\", \"age\": 17, \"double\": 333.3}";
+        String data = "{\"name\": \"name\", \"age\": 17, \"double_value\": 333.3}";
         JSONParser parser = new JSONParser();
         JSONObject object = parser.parse(data, JSONObject.class);
         
-        System.out.println(object.getString("name"));
-        System.out.println(object.get("age", Number.class).intValue());
-        System.out.println(object.get("float", Number.class).doubleValue());
+        String name = object.getString("name");
+        Number age = object.get("age", Number.class);
+        Number doubleValue = object.get("double_value", Number.class);
     }
 }
 ```
-### Mapping a JSONObject to a POJO
+### Mapping a JSONObject to a Java object and vice versa
 
 ```java
 import lombok.AllArgsConstructor;
@@ -57,6 +57,10 @@ import ru.introguzzle.parsers.json.JSONMapperImpl;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
+import ru.introguzzle.parsers.json.mapping.deserialization.InvokeObjectMapper;
+import ru.introguzzle.parsers.json.mapping.deserialization.ObjectMapper;
+import ru.introguzzle.parsers.json.mapping.deserialization.ReflectionObjectMapper;
+import ru.introguzzle.parsers.json.mapping.serialization.JSONMapperImpl;
 import ru.introguzzle.parsers.json.parse.JSONParser;
 
 public class Example {
@@ -68,7 +72,7 @@ public class Example {
     public static class Person {
         @JSONField(name = "renamed_1")
         String name;
-        
+
         @JSONField(name = "renamed_2")
         int age;
     }
@@ -78,10 +82,12 @@ public class Example {
         JSONParser parser = new JSONParser();
         JSONObject object = parser.parse(data, JSONObject.class);
 
-        JSONMapper mapper = new JSONMapperImpl();
-        Person person = mapper.toObject(object, Person.class);
+        ObjectMapper objectMapper = new InvokeObjectMapper();
+        // or use reflection based mapper
+        // ObjectMapper objectMapper = new ReflectionObjectMapper();
 
-        System.out.println(person.name); 
+        Person person = objectMapper.toObject(object, Person.class);
+        JSONObject after = new JSONMapperImpl().toJSONObject(person);
     }
 }
 ```
