@@ -4,10 +4,10 @@
 parsers is a lightweight and flexible Java library for parsing JSON strings into Java objects. It supports various data types, including JSONObject, JSONArray, and primitive types. With a simple interface for validation and conversion, it streamlines the process of working with JSON data in Java applications.
 
 # Features
-- 
-- Flexible Parsing: Parse JSON strings into various Java types, including custom objects.
-- POJO Mapping: Seamlessly map between JSONObject and Plain Old Java Objects (POJOs), enabling easy conversion between JSON data and Java objects.- Extensible Conversion: Customize conversion logic through the Converter interface.
-- Lightweight: Minimal dependencies and a small footprint, making it ideal for inclusion in a wide range of projects.
+- Flexible Parsing: Parse JSON and XML strings into various Java types, including custom objects
+- POJO Mapping: Seamlessly map between JSONObject/XMLDocument and Java objects
+- Extensible Conversion: Customize conversion logic through the Converter interface
+- Lightweight: Minimal dependencies and a small footprint, making it ideal for inclusion in a wide range of projects
 
 # Installation
 Add the following dependency to your pom.xml file (for Maven users):
@@ -81,7 +81,7 @@ public class Example {
         JSONMapper mapper = new JSONMapperImpl();
         Person person = mapper.toObject(object, Person.class);
 
-        System.out.println(person.name); // Output: Jane Smith
+        System.out.println(person.name); 
     }
 }
 ```
