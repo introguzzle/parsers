@@ -6,6 +6,7 @@ import ru.introguzzle.parsers.common.field.ReflectionInvoker;
 import ru.introguzzle.parsers.common.field.WritingInvoker;
 import ru.introguzzle.parsers.common.function.TriConsumer;
 import ru.introguzzle.parsers.common.mapping.AnnotationData;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
 import ru.introguzzle.parsers.common.mapping.deserialization.ReflectionAnnotationInstanceSupplier;
 import ru.introguzzle.parsers.json.entity.JSONObject;
@@ -13,7 +14,6 @@ import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.json.mapping.JSONFieldNameConverter;
-import ru.introguzzle.parsers.json.mapping.JSONMappingException;
 
 import java.lang.reflect.Array;
 import java.util.function.BiFunction;
@@ -53,7 +53,7 @@ public class ReflectionObjectMapper extends AbstractObjectMapper {
             try {
                 return Array.newInstance(type, size);
             } catch (NegativeArraySizeException e) {
-                throw new JSONMappingException("Can't instantiate array");
+                throw new MappingException("Can't instantiate array");
             }
         };
     }

@@ -17,13 +17,39 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * An abstract base class that provides reflection-based instance creation using annotations.
+ * This class extends {@link AnnotationInstanceSupplier} and utilizes reflection to instantiate
+ * objects based on constructor arguments specified via annotations.
+ *
+ * <p>It leverages entity-level and field-level annotations to determine the constructor to use
+ * and the values to pass as arguments during instantiation. If no constructor arguments are specified,
+ * it attempts to use the default constructor.</p>
+ *
+ * @param <T> the type of the source object used during instance acquisition (e.g., {@code XMLDocument})
+ * @param <E> the type of the entity-level annotation providing metadata for constructor argument mapping
+ * @param <F> the type of the field-level annotation
+ */
 @ExtensionMethod({Classes.class})
 public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotation, F extends Annotation>
         extends AnnotationInstanceSupplier<T, E, F> {
+
+    /**
+     * Constructs a new instance of {@code ReflectionAnnotationInstanceSupplier} with the specified mapper and annotation data.
+     *
+     * @param mapper         the writing mapper used for accessing field and type information
+     * @param annotationData the annotation data containing entity-level and field-level annotation classes
+     */
     public ReflectionAnnotationInstanceSupplier(WritingMapper<?> mapper, AnnotationData<E, F> annotationData) {
         super(mapper, annotationData);
     }
 
+    /**
+     * Retrieves the names of the constructor arguments specified in the entity annotation.
+     *
+     * @param annotation the entity-level annotation containing constructor argument metadata
+     * @return an array of constructor argument names
+     */
     private String[] getConstructorNames(E annotation) {
         return Arrays.stream(retrieveConstructorArguments(annotation))
                 .map(ConstructorArgument::value)
@@ -38,13 +64,24 @@ public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotati
             try {
                 return type.getDefaultConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new MappingException(type);
+                throw MappingException.ofInstantiation(type, e);
             }
         }
 
         return getWithArguments(object, type, optional.get());
     }
 
+    /**
+     * Creates an instance of the specified type using constructor arguments specified in the entity annotation.
+     * It matches the constructor argument names to the class fields and retrieves the corresponding values.
+     *
+     * @param object     the source object used during instance acquisition
+     * @param type       the class of the object to be instantiated
+     * @param annotation the entity-level annotation containing constructor argument metadata
+     * @param <R>        the type of the object to be instantiated
+     * @return a new instance of the specified type
+     * @throws MappingException if instantiation fails due to reflection errors or invalid constructor arguments
+     */
     private <R> R getWithArguments(T object, Class<R> type, E annotation) {
         String[] constructorNames = getConstructorNames(annotation);
         List<Field> fields = fieldAccessor.acquire(type);
@@ -55,7 +92,6 @@ public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotati
                     return field;
                 }
             }
-
             return null;
         };
 

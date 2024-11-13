@@ -9,7 +9,7 @@ public interface ThrowingFunction<T, R> {
     R apply(T t) throws Throwable;
 
     default Function<T, R> toFunction() {
-        return toFunction(() -> (R) null);
+        return toFunction(() -> null);
     }
 
     default Function<T, R> toFunction(R defaultValue) {

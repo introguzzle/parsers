@@ -2,7 +2,6 @@ package ru.introguzzle.parsers.json.mapping;
 
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.cache.Cache;
-import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.field.AbstractFieldAccessor;
 import ru.introguzzle.parsers.common.annotation.Excluded;
 import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;

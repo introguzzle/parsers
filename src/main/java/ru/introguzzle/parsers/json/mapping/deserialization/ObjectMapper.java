@@ -2,7 +2,6 @@ package ru.introguzzle.parsers.json.mapping.deserialization;
 
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.NameConverter;
-import ru.introguzzle.parsers.common.function.TriFunction;
 import ru.introguzzle.parsers.common.mapping.WritingMapper;
 import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
 import ru.introguzzle.parsers.json.entity.JSONArray;
@@ -10,7 +9,6 @@ import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Supplier;
 
 /**

@@ -2,12 +2,12 @@ package ru.introguzzle.parsers.json.entity;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.util.UntypedMap;
 import ru.introguzzle.parsers.common.convert.ConverterFactory;
 import ru.introguzzle.parsers.common.convert.Converter;
 import ru.introguzzle.parsers.common.visit.Visitable;
 import ru.introguzzle.parsers.common.visit.Visitor;
-import ru.introguzzle.parsers.json.mapping.JSONMappingException;
 import ru.introguzzle.parsers.json.mapping.JSONObjectConvertable;
 import ru.introguzzle.parsers.json.mapping.deserialization.ObjectMapper;
 import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceStrategies.CircularReference;
@@ -169,7 +169,7 @@ public class JSONObject extends UntypedMap implements
     public <T> T toObject(Class<T> type) {
         ObjectMapper associate = MAPPERS.get(type);
         if (associate == null) {
-            throw new JSONMappingException("No mapper present for " + type);
+            throw new MappingException("No mapper present for " + type);
         }
 
         return associate.toObject(this, type);

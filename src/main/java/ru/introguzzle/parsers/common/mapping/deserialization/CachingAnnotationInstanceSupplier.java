@@ -21,6 +21,13 @@ import java.util.List;
 
 /**
  * Optimized version of {@link ReflectionAnnotationInstanceSupplier}
+ *
+ * @param <T> the type of the source object used during instance acquisition (e.g., {@code XMLDocument})
+ * @param <E> the type of the entity-level annotation providing metadata for constructor argument mapping
+ * @param <F> the type of the field-level annotation
+ *
+ * @see AnnotationInstanceSupplier
+ * @see ReflectionAnnotationInstanceSupplier
  */
 public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation, F extends Annotation>
         extends AnnotationInstanceSupplier<T, E, F> {
@@ -32,10 +39,21 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
         EMPTY_CONSTRUCTOR_SHAPE = MethodType.methodType(void.class);
     }
 
+    /**
+     * Constructs a new instance of {@code CachingAnnotationInstanceSupplier} with the specified mapper and annotation data.
+     *
+     * @param mapper         the writing mapper used for accessing field and type information
+     * @param annotationData the annotation data containing entity-level and field-level annotation classes
+     */
     public CachingAnnotationInstanceSupplier(WritingMapper<?> mapper, AnnotationData<E, F> annotationData) {
         super(mapper, annotationData);
     }
 
+    /**
+     * Creates a new {@code MethodType} for constructor with specified {@code argumentTypes}
+     * @param argumentTypes constructor argument types
+     * @return shape of constructor with specified {@code argumentTypes}
+     */
     private static MethodType shapeOf(List<Class<?>> argumentTypes) {
         return MethodType.methodType(void.class, argumentTypes);
     }
@@ -50,6 +68,10 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
         CONSTRUCTOR_DATA_CACHE = supplier.newCache();
     }
 
+    /**
+     * Wrapper that associate {@code ConstructorWrapper} with matched fields
+     * @param <R> type of constructor that belongs to
+     */
     @SuppressWarnings("ALL")
     private static final class ConstructorData<R> {
         final ConstructorWrapper<R> wrapper;
@@ -65,6 +87,10 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
         }
     }
 
+    /**
+     * Wrapper that associate {@code MethodHandle} of constructor with its count of arguments
+     * @param <R> type of constructor that belongs to
+     */
     @AllArgsConstructor
     @SuppressWarnings("ALL")
     private static final class ConstructorWrapper<R> {

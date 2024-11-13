@@ -16,9 +16,9 @@ import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
 import ru.introguzzle.parsers.common.mapping.deserialization.TypeHandler;
 import ru.introguzzle.parsers.xml.entity.XMLAttribute;
 import ru.introguzzle.parsers.xml.entity.XMLElement;
-import ru.introguzzle.parsers.xml.mapping.XMLMappingException;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -103,6 +103,14 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
             return handler.apply(object, genericTypes);
         }
 
+        if (fieldType.isArray()) {
+            if (!(object instanceof XMLElement element)) {
+                throw new MappingException("Cannot map an array element to an object of type " + fieldType.getName());
+            }
+
+            return handleArray(element, fieldType, genericTypes);
+        }
+
         boolean primitive = Primitives.isPrimitive(fieldType);
 
         return switch (object) {
@@ -133,6 +141,20 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
 
             default -> throw new AssertionError("Impossible to get here");
         };
+    }
+
+    private Object handleArray(XMLElement iterable, Class<?> fieldType, List<Class<?>> genericTypes) {
+        Class<?> componentType = fieldType.getComponentType();
+        int length = iterable.getChildren().size();
+        Object array = Array.newInstance(componentType, length);
+
+        for (int i = 0; i < length; i++) {
+            XMLElement item = iterable.getChildren().get(i);
+            Object element = getForwardCaller().apply(item, componentType, genericTypes);
+            Array.set(array, i, element);
+        }
+
+        return array;
     }
 
     private Object handlePrimitiveType(@Nullable String value, @NotNull Class<?> fieldType) {
@@ -173,14 +195,14 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
 
             if (ft == char.class || ft == Character.class) {
                 if (value.length() != 1) {
-                    throw new XMLMappingException("Cannot convert text to char: " + value);
+                    throw new MappingException("Cannot convert text to char: " + value);
                 }
 
                 return value.charAt(0);
             }
 
         } catch (NumberFormatException e) {
-            throw new XMLMappingException("Failed to parse element text '" + value + "' to type " + ft.getName(), e);
+            throw new MappingException("Failed to parse element text '" + value + "' to type " + ft.getName(), e);
         }
 
         return null;

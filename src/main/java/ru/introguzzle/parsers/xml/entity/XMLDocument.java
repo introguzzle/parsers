@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.ConverterFactory;
 import ru.introguzzle.parsers.common.convert.Converter;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.visit.Visitable;
 import ru.introguzzle.parsers.common.visit.Visitor;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.json.mapping.JSONObjectConvertable;
-import ru.introguzzle.parsers.xml.mapping.XMLMappingException;
 import ru.introguzzle.parsers.xml.mapping.deserialization.ObjectMapper;
 import ru.introguzzle.parsers.xml.meta.Encoding;
 import ru.introguzzle.parsers.xml.meta.Version;
@@ -59,7 +59,7 @@ import java.util.Set;
  *
  * <p><strong>Exception Handling:</strong></p>
  * <ul>
- *     <li><b>{@link XMLMappingException}</b>: Thrown when deserialization fails due to issues like missing mappers,
+ *     <li><b>{@link MappingException}</b>: Thrown when deserialization fails due to issues like missing mappers,
  *     type mismatches, or other mapping-related errors.</li>
  * </ul>
  *
@@ -70,7 +70,7 @@ import java.util.Set;
  *
  * @see JSONObject
  * @see ObjectMapper
- * @see XMLMappingException
+ * @see MappingException
  * @see ConverterFactory
  * @see Converter
  * @see Visitable
@@ -287,7 +287,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * Convenient method for deserializing this XML document into an instance of the specified Java class type.
      *
      * <p>This method utilizes the {@code ObjectMapper} bound to the specified class to perform the
-     * deserialization. If no mapper is bound to the class, an {@link XMLMappingException} is thrown.</p>
+     * deserialization. If no mapper is bound to the class, an {@link MappingException} is thrown.</p>
      *
      * <p><strong>Example:</strong></p>
      * <pre>{@code
@@ -297,13 +297,13 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @param type The Java class type to deserialize the XML document into.
      * @param <T>  The type of the resulting object.
      * @return An instance of type {@code T} representing the deserialized XML data.
-     * @throws XMLMappingException If no mapper is bound to the specified class or if deserialization fails.
+     * @throws MappingException If no mapper is bound to the specified class or if deserialization fails.
      * @throws NullPointerException If {@code type} is null
      */
     public <T> @NotNull T toObject(@NotNull Class<T> type) {
         ObjectMapper mapper = MAPPERS.get(type);
         if (mapper == null) {
-            throw new XMLMappingException("No mapper present for " + type.getName());
+            throw new MappingException("No mapper present for " + type.getName());
         }
         return mapper.toObject(this, type);
     }

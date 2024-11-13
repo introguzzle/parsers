@@ -1,0 +1,24 @@
+-classpath
+'C:/Users/666/.m2/repository/org/jetbrains/annotations/24.1.0/annotations-24.1.0.jar;C:/Users/666/.m2/repository/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar;C:/Users/666/.m2/repository/net/bytebuddy/byte-buddy-maven-plugin/1.15.8/byte-buddy-maven-plugin-1.15.8.jar;C:/Users/666/.m2/repository/net/bytebuddy/byte-buddy/1.15.8/byte-buddy-1.15.8.jar;C:/Users/666/.m2/repository/org/eclipse/aether/aether-api/1.1.0/aether-api-1.1.0.jar;C:/Users/666/.m2/repository/org/eclipse/aether/aether-util/1.1.0/aether-util-1.1.0.jar;C:/Users/666/.m2/repository/org/sonatype/plexus/plexus-build-api/0.0.7/plexus-build-api-0.0.7.jar;C:/Users/666/.m2/repository/org/codehaus/plexus/plexus-utils/1.5.8/plexus-utils-1.5.8.jar;C:/Users/666/.m2/repository/net/bytebuddy/byte-buddy-agent/1.15.9/byte-buddy-agent-1.15.9.jar'
+-encoding
+'UTF-8'
+-protected
+-source
+'22'
+-sourcepath
+'C:/Users/666/IdeaProjects/parsers/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2024. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'C:/Users/666/IdeaProjects/parsers/target/reports/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'parsers 1.0-SNAPSHOT API'
+-use
+-version
+-windowtitle
+'parsers 1.0-SNAPSHOT API'

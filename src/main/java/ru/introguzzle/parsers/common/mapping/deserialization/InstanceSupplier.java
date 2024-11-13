@@ -7,7 +7,7 @@ import java.util.Objects;
 
 /**
  * A functional interface responsible for supplying instances of objects during the deserialization process.
- *
+ * <p>
  * The {@code InstanceSupplier} interface abstracts the creation of object instances, allowing for flexible
  * instantiation strategies. This can be particularly useful when deserializing XML or JSON data into Java objects,
  * where the instantiation logic may vary based on specific requirements or configurations.
@@ -84,7 +84,13 @@ public interface InstanceSupplier<T> {
      */
     <R> @NotNull R acquire(@NotNull T object, @NotNull Class<R> type);
 
-    default <R> @NotNull T requireNonNull(T object, Class<R> type) {
+    /**
+     * Convenient method for checking arguments for {@code acquire} method
+     * @param object object
+     * @param type class
+     * @return {@code} object
+     */
+    default @NotNull T requireNonNull(T object, Class<?> type) {
         Objects.requireNonNull(type, "Type must not be null");
         return Objects.requireNonNull(object, "Object to deserialize must be not null");
     }

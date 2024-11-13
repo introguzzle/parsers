@@ -3,8 +3,6 @@ package ru.introguzzle.parsers.xml.mapping;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.annotation.Excluded;
 import ru.introguzzle.parsers.common.cache.Cache;
-import ru.introguzzle.parsers.common.cache.CacheService;
-import ru.introguzzle.parsers.common.cache.CacheSupplier;
 import ru.introguzzle.parsers.common.field.AbstractFieldAccessor;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
 

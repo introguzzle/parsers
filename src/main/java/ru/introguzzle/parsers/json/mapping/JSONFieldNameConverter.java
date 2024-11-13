@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.field.CachingFieldNameConverter;
-import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.common.util.NamingUtilities;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 

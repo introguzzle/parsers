@@ -15,7 +15,6 @@ import ru.introguzzle.parsers.common.mapping.deserialization.TypeHandler;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.json.mapping.FieldAccessorImpl;
-import ru.introguzzle.parsers.json.mapping.JSONMappingException;
 import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceStrategies.CircularReference;
 
 import java.lang.reflect.Field;
@@ -235,7 +234,7 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
             Class<?> componentType = fieldType.getComponentType();
             Object resultArray = getArraySupplier().apply(componentType, size);
             for (int i = 0; i < size; i++) {
-                Object element = getForwardCaller().apply(array.get(i), fieldType.getComponentType(), genericTypes);
+                Object element = getForwardCaller().apply(array.get(i), componentType, genericTypes);
                 getArraySetter().accept(resultArray, i, element);
             }
 
@@ -251,11 +250,11 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
             return typeHandler.apply(array, genericTypes);
         }
 
-        throw new JSONMappingException(fieldType, JSONArray.class);
+        throw MappingException.ofConversion(fieldType, JSONArray.class);
     }
 
     protected Object handlePrimitiveType(Object value, @NotNull Class<?> fieldType) {
-        Supplier<MappingException> e = () -> MappingException.of(value.getClass(), fieldType);
+        Supplier<MappingException> e = () -> MappingException.ofConversion(value.getClass(), fieldType);
         return switch (fieldType.getSimpleName()) {
             case "boolean", "Boolean" -> {
                 if (value instanceof Boolean b) yield b;

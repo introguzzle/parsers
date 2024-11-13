@@ -5,7 +5,6 @@ import ru.introguzzle.parsers.config.Configuration;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.xml.entity.XMLElement;
-import ru.introguzzle.parsers.xml.mapping.XMLMappingException;
 
 import java.lang.reflect.InvocationTargetException;
 

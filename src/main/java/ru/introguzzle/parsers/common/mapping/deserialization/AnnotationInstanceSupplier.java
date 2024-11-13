@@ -12,16 +12,16 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**
+ * Basic skeleton for implementation classes
  *
  * @param <T> the type of the source object used during instance acquisition (e.g., {@code XMLDocument})
- * @param <E> the type of the primary annotation providing metadata for constructor argument mapping
- * @param <F> the type of the secondary annotation used for field-level mapping or additional configurations
+ * @param <E> the type of the entity-level annotation providing metadata for constructor argument mapping
+ * @param <F> the type of the field-level annotation
  */
 public abstract class AnnotationInstanceSupplier<T, E extends Annotation, F extends Annotation>
         implements InstanceSupplier<T> {
-
     /**
-     * Annotation data
+     * Annotation data that provides actual information about {@code E} and {@code F}
      */
     protected final AnnotationData<E, F> annotationData;
 
@@ -40,6 +40,10 @@ public abstract class AnnotationInstanceSupplier<T, E extends Annotation, F exte
      * @see WritingMapper
      */
     protected final TriFunction<Object, Class<?>, List<Class<?>>, Object> hook;
+
+    /**
+     * Accessor that retrieves generic types
+     */
     protected final GenericTypeAccessor genericTypeAccessor;
 
     @SuppressWarnings("unchecked")
@@ -51,6 +55,18 @@ public abstract class AnnotationInstanceSupplier<T, E extends Annotation, F exte
         this.genericTypeAccessor = mapper.getGenericTypeAccessor();
     }
 
+    /**
+     * Retrieves array of {@code ConstructorArgument} from entity-level annotation
+     * @param annotation entity-level annotation
+     * @return array of {@code ConstructorArgument}
+     */
     public abstract ConstructorArgument[] retrieveConstructorArguments(E annotation);
+
+    /**
+     * Retrieves value from {@code object} by name
+     * @param object object
+     * @param name name
+     * @return value from {@code object}
+     */
     public abstract Object retrieveValue(T object, String name);
 }

@@ -3,6 +3,7 @@ package ru.introguzzle.parsers.xml.mapping.serialization;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.util.Maps;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
@@ -18,7 +19,6 @@ import ru.introguzzle.parsers.xml.entity.XMLElement;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLValue;
 import ru.introguzzle.parsers.xml.entity.type.XMLType;
-import ru.introguzzle.parsers.xml.mapping.XMLMappingException;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -118,14 +118,14 @@ public class XMLElementMapperImpl implements XMLElementMapper {
             try {
                 value = getReadingInvoker().invoke(field, object);
             } catch (Throwable e) {
-                throw new XMLMappingException("Cannot retrieve value from property: " + field.getName(), e);
+                throw new MappingException("Cannot retrieve value from property: " + field.getName(), e);
             }
 
             XMLValue annotationValue = field.getAnnotation(XMLValue.class);
             if (annotationValue != null) {
                 valueCount++;
                 if (valueCount > 1) {
-                    throw new XMLMappingException("Ambiguous fields found for: " + object.getClass());
+                    throw new MappingException("Ambiguous fields found for: " + object.getClass());
                 }
 
                 root.setText(value.toString());

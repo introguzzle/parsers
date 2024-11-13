@@ -1,8 +1,8 @@
 package ru.introguzzle.parsers.json.mapping.deserialization;
 
 import lombok.experimental.UtilityClass;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.mapping.deserialization.TypeHandler;
-import ru.introguzzle.parsers.json.mapping.JSONMappingException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -19,7 +19,7 @@ public final class TypeHandlers {
                     return Date.from(Instant.parse(string));
                 }
 
-                throw new JSONMappingException(Date.class, o.getClass());
+                throw MappingException.ofConversion(Date.class, o.getClass());
             }),
 
             TypeHandler.newEntry(BigDecimal.class, (o, genericTypes) -> {
@@ -27,7 +27,7 @@ public final class TypeHandlers {
                     return new BigDecimal(string);
                 }
 
-                throw new JSONMappingException(BigDecimal.class, o.getClass());
+                throw MappingException.ofConversion(BigDecimal.class, o.getClass());
             }),
 
             TypeHandler.newEntry(BigInteger.class, (o, genericTypes) -> {
@@ -35,7 +35,7 @@ public final class TypeHandlers {
                     return new BigInteger(string);
                 }
 
-                throw new JSONMappingException(BigInteger.class, o.getClass());
+                throw MappingException.ofConversion(BigInteger.class, o.getClass());
             }),
 
             TypeHandler.newEntry(URI.class, (o, genericTypes) -> {
@@ -43,7 +43,7 @@ public final class TypeHandlers {
                     return URI.create(string);
                 }
 
-                throw new JSONMappingException(URI.class, o.getClass());
+                throw MappingException.ofConversion(URI.class, o.getClass());
             }),
 
             TypeHandler.newEntry(Throwable.class, (o, genericTypes) -> {
@@ -51,7 +51,7 @@ public final class TypeHandlers {
                     return new Throwable(string);
                 }
 
-                throw new JSONMappingException(Throwable.class, o.getClass());
+                throw MappingException.ofConversion(Throwable.class, o.getClass());
             }),
 
             TypeHandler.newEntry(Class.class, (o, genericTypes) -> {
@@ -59,11 +59,11 @@ public final class TypeHandlers {
                     try {
                         return Class.forName(string);
                     } catch (ClassNotFoundException e) {
-                        throw new JSONMappingException("Cannot instantiate Class", e);
+                        throw MappingException.ofInstantiation(Class.class, e);
                     }
                 }
 
-                throw new JSONMappingException(Class.class, o.getClass());
+                throw MappingException.ofConversion(Class.class, o.getClass());
             })
     );
 }

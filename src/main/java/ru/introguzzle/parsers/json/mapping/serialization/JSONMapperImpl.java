@@ -302,7 +302,7 @@ public class JSONMapperImpl implements JSONMapper {
             return Boolean.parseBoolean(string);
         }
 
-        throw MappingException.of(fieldValue.getClass(), Boolean.class);
+        throw MappingException.ofConversion(fieldValue.getClass(), Boolean.class);
     }
 
     private Number handleNumber(Object fieldValue) {
@@ -314,6 +314,6 @@ public class JSONMapperImpl implements JSONMapper {
             return Double.parseDouble(string);
         }
 
-        throw MappingException.of(fieldValue.getClass(), Number.class);
+        throw MappingException.ofConversion(fieldValue.getClass(), Number.class);
     }
 }
