@@ -10,7 +10,7 @@ import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.common.mapping.ClassTraverser;
 import ru.introguzzle.parsers.common.mapping.Traverser;
 import ru.introguzzle.parsers.common.mapping.serialization.TypeHandler;
-import ru.introguzzle.parsers.common.util.ClassExtensions;
+import ru.introguzzle.parsers.common.type.Classes;
 import ru.introguzzle.parsers.config.Configuration;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.xml.entity.XMLDocumentConvertable;
@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-@ExtensionMethod(ClassExtensions.class)
+@ExtensionMethod(Classes.class)
 public class XMLMapperImpl implements XMLMapper {
     private static final Configuration CONFIGURATION = Configuration.instance();
 

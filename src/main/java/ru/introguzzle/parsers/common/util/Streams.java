@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.common;
+package ru.introguzzle.parsers.common.util;
 
 import lombok.experimental.UtilityClass;
 import ru.introguzzle.parsers.common.function.*;
@@ -59,7 +59,7 @@ public final class Streams {
         return stream.filter(type::isInstance);
     }
 
-    public static <T> Stream<? extends T> downcast(Stream<T> stream, Class<? extends T> type) {
+    public static <T, R extends T> Stream<R> downcast(Stream<T> stream, Class<R> type) {
         return stream.filter(type::isInstance).map(type::cast);
     }
 

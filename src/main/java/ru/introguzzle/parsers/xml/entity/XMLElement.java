@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.ConverterFactory;
 import ru.introguzzle.parsers.common.convert.Converter;
+import ru.introguzzle.parsers.common.util.Nullability;
 import ru.introguzzle.parsers.common.visit.Visitable;
 import ru.introguzzle.parsers.common.visit.Visitor;
 import ru.introguzzle.parsers.json.entity.JSONObject;
@@ -57,11 +58,27 @@ public class XMLElement implements Serializable, JSONObjectConvertable,
         children.add(child);
     }
 
+    public boolean isIterable() {
+        if (getChildren().isEmpty()) {
+            return false;
+        }
+
+        XMLElement first = getChildren().getFirst();
+
+        return getChildren()
+                .stream()
+                .anyMatch(e -> e.name.equals(first.name));
+    }
+
+    public Object get(String name) {
+        return Nullability.selectAny(getChild(name), getAttribute(name), getCharacterData());
+    }
+
     public XMLElement getChild(String name, int index) {
         int size = children.size();
         for (int i = 0; i < size; i++) {
             XMLElement child = children.get(i);
-            if (child.getName().equals(name) && index == i) {
+            if (index == i && child.name.equals(name)) {
                 return child;
             }
         }
@@ -70,9 +87,17 @@ public class XMLElement implements Serializable, JSONObjectConvertable,
     }
 
     public XMLElement getChild(String name) {
-        for (XMLElement child : children) {
-            if (child.getName().equals(name)) {
-                return child;
+        return getChildren()
+                .stream()
+                .filter(e -> e.name.equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public XMLAttribute getAttribute(String name) {
+        for (XMLAttribute attribute : attributes) {
+            if (attribute.name().equals(name)) {
+                return attribute;
             }
         }
 

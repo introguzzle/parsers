@@ -2,9 +2,12 @@ package ru.introguzzle.parsers.common.field;
 
 import lombok.AllArgsConstructor;
 import lombok.experimental.ExtensionMethod;
-import ru.introguzzle.parsers.common.AccessLevel;
-import ru.introguzzle.parsers.common.Streams;
+import org.jetbrains.annotations.NotNull;
+import ru.introguzzle.parsers.common.mapping.AccessLevel;
+import ru.introguzzle.parsers.common.util.Streams;
 import ru.introguzzle.parsers.common.cache.Cache;
+import ru.introguzzle.parsers.common.cache.CacheService;
+import ru.introguzzle.parsers.common.cache.CacheSupplier;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -15,6 +18,7 @@ import java.util.stream.Stream;
 @ExtensionMethod({Streams.class})
 @AllArgsConstructor
 public abstract class AbstractFieldAccessor<A extends Annotation> implements FieldAccessor {
+    public static final CacheSupplier CACHE_SUPPLIER = CacheService.instance();
     static final int DEFAULT = AccessLevel.DEFAULT;
     static final int EXCLUDE_TRANSIENT = AccessLevel.EXCLUDE_TRANSIENT;
     static final int EXCLUDE_STATIC = AccessLevel.EXCLUDE_STATIC;
@@ -23,16 +27,16 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
     private final Class<A> annotationType;
 
     @Override
-    public List<Field> acquire(Class<?> type) {
+    public @NotNull List<Field> acquire(@NotNull Class<?> type) {
         return getCache().get(type, this::cache);
     }
 
-    public abstract Cache<Class<?>, List<Field>> getCache();
+    public abstract @NotNull Cache<Class<?>, List<Field>> getCache();
 
     public abstract List<String> retrieveExcluded(A annotation);
     public abstract int retrieveAccessLevel(A annotation);
 
-    public List<Field> cache(Class<?> type) {
+    public @NotNull List<Field> cache(@NotNull Class<?> type) {
         A annotation = type.getAnnotation(annotationType);
 
         List<Field> fields = acquireThroughHierarchy(type);
@@ -49,13 +53,13 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
         }
 
         if ((accessLevel & EXCLUDE_TRANSIENT) == EXCLUDE_TRANSIENT)
-            stream = stream.reject(Extensions::isTransient);
+            stream = stream.reject(Fields::isTransient);
 
         if ((accessLevel & EXCLUDE_STATIC) == EXCLUDE_STATIC)
-            stream = stream.reject(Extensions::isStatic);
+            stream = stream.reject(Fields::isStatic);
 
         if ((accessLevel & EXCLUDE_VOLATILE) == EXCLUDE_VOLATILE)
-            stream = stream.reject(Extensions::isVolatile);
+            stream = stream.reject(Fields::isVolatile);
 
         return stream.toList();
     }

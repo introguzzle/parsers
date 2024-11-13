@@ -1,5 +1,6 @@
 package ru.introguzzle.parsers.json.mapping;
 
+import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.field.AbstractFieldAccessor;
@@ -13,7 +14,7 @@ import java.util.List;
 public class FieldAccessorImpl extends AbstractFieldAccessor<JSONEntity> {
     private static final Cache<Class<?>, List<Field>> CACHE;
     static {
-        CACHE = CacheService.instance().newCache();
+        CACHE = CACHE_SUPPLIER.newCache();
     }
 
     public FieldAccessorImpl() {
@@ -21,7 +22,7 @@ public class FieldAccessorImpl extends AbstractFieldAccessor<JSONEntity> {
     }
 
     @Override
-    public Cache<Class<?>, List<Field>> getCache() {
+    public @NotNull Cache<Class<?>, List<Field>> getCache() {
         return CACHE;
     }
 

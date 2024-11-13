@@ -1,8 +1,8 @@
 package ru.introguzzle.parsers.yaml;
 
 import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.parsers.common.DelegatingMap;
-import ru.introguzzle.parsers.common.UntypedMap;
+import ru.introguzzle.parsers.common.util.DelegatingMap;
+import ru.introguzzle.parsers.common.util.UntypedMap;
 
 import java.util.Map;
 import java.util.function.BiFunction;

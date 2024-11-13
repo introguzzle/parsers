@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.*;
 
 public class ObjectMapperTest {
-    private final ObjectMapper mapper = new InvokeObjectMapper();
+    private final ObjectMapper objectMapper = new InvokeObjectMapper();
+    private final JSONMapper jsonMapper = new JSONMapperImpl();
 
     @AllArgsConstructor
     @NoArgsConstructor
@@ -84,7 +85,7 @@ public class ObjectMapperTest {
         object.put("long_field", 33333L);
         object.put("next_field", next);
 
-        Primitive instance = mapper.toObject(object, Primitive.class);
+        Primitive instance = objectMapper.toObject(object, Primitive.class);
         System.out.println(instance);
     }
 
@@ -113,7 +114,7 @@ public class ObjectMapperTest {
         object.put("long_field", 33333L);
         object.put("next_field", next);
 
-        Boxed instance = mapper.toObject(object, Boxed.class);
+        Boxed instance = objectMapper.toObject(object, Boxed.class);
         System.out.println(instance);
     }
 
@@ -131,18 +132,17 @@ public class ObjectMapperTest {
         JSONObject object = new JSONObject();
         object.put("circular", object);
 
-        Circular instance = mapper.toObject(object, Circular.class);
+        Circular instance = objectMapper.toObject(object, Circular.class);
         assertEquals(instance.circular, instance);
         System.out.println(instance);
 
-        JSONMapper JSONMapper = new JSONMapperImpl();
-        JSONObject json = JSONMapper.toJSONObject(instance, new MappingContext(
+        JSONObject json = jsonMapper.toJSONObject(instance, new MappingContext(
                 StandardCircularReferenceStrategies.USE_SPECIAL_OBJECT
         ));
 
         System.out.println(json.toJSONString());
 
-        Circular after = mapper.toObject(json, Circular.class);
+        Circular after = objectMapper.toObject(json, Circular.class);
         System.out.println(after);
         assertEquals(after.circular.circular, after.circular);
     }
@@ -150,6 +150,7 @@ public class ObjectMapperTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
+    @ToString
     public static class Person {
         int ageAge;
         String nameName;
@@ -159,22 +160,26 @@ public class ObjectMapperTest {
     @Test
     @SuppressWarnings("ALL")
     public void test_list() {
-        JSONMapper JSONMapper = new JSONMapperImpl();
         Person initial = new Person(
                 10, "SUPPRESS ALL", List.of(
                         new Person(33, "AAGREGREGREGREGFJEIWJOEFIW", List.of()),
                         new Person(20, "ZZZZZ", List.of()))
         );
 
-        JSONObject initialToJson = JSONMapper.toJSONObject(initial, new MappingContext(
+        JSONObject initialToJson = jsonMapper.toJSONObject(initial, new MappingContext(
                 StandardCircularReferenceStrategies.USE_SPECIAL_OBJECT
         ));
 
         System.out.println(initialToJson.toJSONString() + "\n");
 
-        Person initialToJsonToPerson = mapper.toObject(initialToJson, Person.class);
+        Person initialToJsonToPerson = objectMapper.toObject(initialToJson, Person.class);
+        Person first = initialToJsonToPerson.personList.getFirst();
 
-        JSONObject initialToJsonToPersonToJson = JSONMapper.toJSONObject(initialToJsonToPerson, new MappingContext(
+        System.out.println("\n\nPERSON");
+        System.out.println(initialToJsonToPerson);
+        System.out.println("\n\nPERSON");
+
+        JSONObject initialToJsonToPersonToJson = jsonMapper.toJSONObject(initialToJsonToPerson, new MappingContext(
                 StandardCircularReferenceStrategies.USE_SPECIAL_OBJECT
         ));
 
@@ -200,15 +205,14 @@ public class ObjectMapperTest {
             new POJO(200, "FIRST", "LAST", "ADDRESS 2")
         };
 
-        JSONMapper JSONMapper = new JSONMapperImpl();
-        JSONArray array = JSONMapper.toJSONArray(pojos, MappingContext.getDefault());
+        JSONArray array = jsonMapper.toJSONArray(pojos, MappingContext.getDefault());
 
         System.out.println(array.toJSONString());
 
-        POJO[] after = mapper.toArray(array, POJO[].class);
+        POJO[] after = objectMapper.toArray(array, POJO[].class);
         System.out.println(Arrays.toString(after));
 
-        List<POJO> afterList = mapper.toCollection(array, POJO.class, LinkedList::new);
+        List<POJO> afterList = objectMapper.toCollection(array, POJO.class, LinkedList::new);
         System.out.println(afterList);
     }
 
@@ -234,13 +238,12 @@ public class ObjectMapperTest {
 
         Q instance = new Q(queue, list);
 
-        JSONMapper JSONMapper = new JSONMapperImpl();
-        JSONObject object = JSONMapper.toJSONObject(instance, MappingContext.getDefault());
+        JSONObject object = jsonMapper.toJSONObject(instance, MappingContext.getDefault());
 
         System.out.println(object.toJSONString());
 
-        Q after = mapper.withTypeHandler(Queue.class, o -> new LinkedList<>((JSONArray) o))
-                .withTypeHandler(LinkedList.class, _ -> null)
+        Q after = objectMapper.withTypeHandler(Queue.class, (o, _) -> new LinkedList<>((JSONArray) o))
+                .withTypeHandler(LinkedList.class, (_, _) -> null)
                 .toObject(object, Q.class);
 
         System.out.println(after);
@@ -268,10 +271,9 @@ public class ObjectMapperTest {
 
         System.out.println("instance : " + instance);
 
-        JSONMapper JSONMapper = new JSONMapperImpl();
-        JSONObject object = JSONMapper.toJSONObject(instance, MappingContext.getDefault());
+        JSONObject object = jsonMapper.toJSONObject(instance, MappingContext.getDefault());
 
-        Final1 after = mapper.toObject(object, Final1.class);
+        Final1 after = objectMapper.toObject(object, Final1.class);
         System.out.println("after : " + after);
     }
 
@@ -296,14 +298,13 @@ public class ObjectMapperTest {
         ComplexConstructor instance = new ComplexConstructor(10, "NAMEEEEEEE", next);
         System.out.println("instance : " + instance);
 
-        JSONMapper JSONMapper = new JSONMapperImpl();
-        JSONObject object = JSONMapper.toJSONObject(instance, MappingContext.getDefault());
+        JSONObject object = jsonMapper.toJSONObject(instance, MappingContext.getDefault());
         System.out.println(object.toJSONString());
 
         XMLDocument document = object.toXMLDocument();
         System.out.println(document.toXMLString());
 
-        ComplexConstructor after = mapper.toObject(object, ComplexConstructor.class);
+        ComplexConstructor after = objectMapper.toObject(object, ComplexConstructor.class);
         System.out.println("after : " + after);
     }
 
@@ -324,10 +325,9 @@ public class ObjectMapperTest {
         Final3 instance = new Final3(10, "NAMEEEEEEE");
         System.out.println("instance : " + instance);
 
-        JSONMapper JSONMapper = new JSONMapperImpl();
-        JSONObject object = JSONMapper.toJSONObject(instance, MappingContext.getDefault());
+        JSONObject object = jsonMapper.toJSONObject(instance, MappingContext.getDefault());
 
-        assertThrows(Exception.class, () -> mapper.toObject(object, Final3.class));
+        assertThrows(Exception.class, () -> objectMapper.toObject(object, Final3.class));
     }
     @AllArgsConstructor
     @Getter
@@ -387,23 +387,23 @@ public class ObjectMapperTest {
         System.out.println("\nBEFORE\n");
         System.out.println(Arrays.toString(instances));
 
-        JSONMapper JSONMapper = new JSONMapperImpl()
+        JSONMapper jsonMapper = new JSONMapperImpl()
                 .withTypeHandler(char[].class, String::new)
                 .withTypeHandler(int[].class, ints -> Arrays.stream(ints)
                         .boxed()
                         .map(Object::toString)
                         .collect(Collectors.joining()));
 
-        JSONArray object = JSONMapper.toJSONArray(instances, MappingContext.getDefault());
+        JSONArray object = jsonMapper.toJSONArray(instances, MappingContext.getDefault());
 
         System.out.println("\nJSON\n");
         System.out.println(object.toJSONString());
-        InheritingFromChar[] after = mapper
-                .withTypeHandler(char[].class, o -> {
+        InheritingFromChar[] after = objectMapper
+                .withTypeHandler(char[].class, (o, _) -> {
                     String s = (String) o;
                     return s.toCharArray();
                 })
-                .withTypeHandler(int[].class, o -> {
+                .withTypeHandler(int[].class, (o, _) -> {
                     String s = (String) o;
                     int[] integers = new int[s.length()];
                     for (int i = 0; i < integers.length; i++) {
@@ -422,10 +422,9 @@ public class ObjectMapperTest {
     @Test
     public void test_other_package() {
         Other before = new Other("1337");
-        JSONMapper JSONMapper = new JSONMapperImpl();
-        JSONObject object = JSONMapper.toJSONObject(before, MappingContext.getDefault());
+        JSONObject object = jsonMapper.toJSONObject(before, MappingContext.getDefault());
 
-        Other after = mapper.toObject(object, Other.class);
+        Other after = objectMapper.toObject(object, Other.class);
         assertEquals(before, after);
     }
 }

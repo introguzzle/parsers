@@ -1,7 +1,7 @@
 package ru.introguzzle.parsers.json.entity.annotation;
 
 import org.intellij.lang.annotations.MagicConstant;
-import ru.introguzzle.parsers.common.AccessLevel;
+import ru.introguzzle.parsers.common.mapping.AccessLevel;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.common.annotation.Excluded;
 

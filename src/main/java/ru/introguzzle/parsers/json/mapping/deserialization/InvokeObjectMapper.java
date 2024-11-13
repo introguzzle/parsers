@@ -29,7 +29,7 @@ public class InvokeObjectMapper extends AbstractObjectMapper {
     private final AnnotationData<JSONEntity, JSONField> annotationData = new AnnotationData<>(JSONEntity.class, JSONField.class);
 
     private final InstanceSupplier<JSONObject> instanceSupplier
-            = new CachingAnnotationInstanceSupplier<>(annotationData, getFieldAccessor(), getNameConverter(), this::match) {
+            = new CachingAnnotationInstanceSupplier<>(this, annotationData) {
         private static final Cache<Class<?>, JSONEntity> ANNOTATION_CACHE;
 
         static {
@@ -85,7 +85,7 @@ public class InvokeObjectMapper extends AbstractObjectMapper {
     }
 
     @Override
-    protected @NotNull InstanceSupplier getInstanceSupplier() {
+    public @NotNull InstanceSupplier<JSONObject> getInstanceSupplier() {
         return instanceSupplier;
     }
 

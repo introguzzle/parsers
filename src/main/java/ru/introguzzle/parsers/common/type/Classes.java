@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.common.util;
+package ru.introguzzle.parsers.common.type;
 
 import lombok.experimental.UtilityClass;
 
@@ -7,7 +7,7 @@ import java.lang.reflect.Constructor;
 import java.util.Optional;
 
 @UtilityClass
-public final class ClassExtensions {
+public final class Classes {
     public static <T> Constructor<T> getDefaultConstructor(Class<T> type) {
         try {
             return type.getConstructor();

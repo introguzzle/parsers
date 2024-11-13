@@ -1,6 +1,7 @@
 package ru.introguzzle.parsers.common.field;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.convert.NameConverter;
 
 import java.lang.annotation.Annotation;
@@ -17,10 +18,14 @@ public abstract class FieldNameConverter<A extends Annotation> implements NameCo
     }
 
     public String apply(Field field) {
-        return Optional.ofNullable(field.getAnnotation(getAnnotationType()))
+        return Optional.ofNullable(retrieveAnnotation(field))
                 .map(this::retrieveDefaultValue)
                 .filter(s -> !s.isEmpty())
                 .orElse(apply(field.getName()));
+    }
+
+    public @Nullable A retrieveAnnotation(Field field) {
+        return field.getAnnotation(getAnnotationType());
     }
 
     public abstract Class<A> getAnnotationType();

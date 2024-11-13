@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.common;
+package ru.introguzzle.parsers.common.mapping;
 
 public final class AccessLevel {
     public static final int EXCLUDE_TRANSIENT = 1 << 1;

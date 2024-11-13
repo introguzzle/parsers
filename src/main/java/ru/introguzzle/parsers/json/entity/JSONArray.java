@@ -2,7 +2,7 @@ package ru.introguzzle.parsers.json.entity;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.introguzzle.parsers.common.UntypedArray;
+import ru.introguzzle.parsers.common.util.UntypedArray;
 import ru.introguzzle.parsers.common.visit.Visitable;
 import ru.introguzzle.parsers.common.visit.Visitor;
 

@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 @UtilityClass
-public final class Extensions {
+public final class Fields {
     public static boolean isTransient(Field field) {
         return Modifier.isTransient(field.getModifiers());
     }

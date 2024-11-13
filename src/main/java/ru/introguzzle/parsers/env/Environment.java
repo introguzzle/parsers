@@ -1,6 +1,6 @@
 package ru.introguzzle.parsers.env;
 
-import ru.introguzzle.parsers.common.DelegatingMap;
+import ru.introguzzle.parsers.common.util.DelegatingMap;
 import java.util.Map;
 
 public final class Environment extends DelegatingMap<String, String> {

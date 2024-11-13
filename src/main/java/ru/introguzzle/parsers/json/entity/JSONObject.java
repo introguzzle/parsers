@@ -2,7 +2,7 @@ package ru.introguzzle.parsers.json.entity;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.parsers.common.UntypedMap;
+import ru.introguzzle.parsers.common.util.UntypedMap;
 import ru.introguzzle.parsers.common.convert.ConverterFactory;
 import ru.introguzzle.parsers.common.convert.Converter;
 import ru.introguzzle.parsers.common.visit.Visitable;

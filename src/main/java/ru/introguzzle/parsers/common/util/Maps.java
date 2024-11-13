@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.common;
+package ru.introguzzle.parsers.common.util;
 
 import lombok.experimental.UtilityClass;
 
@@ -14,7 +14,7 @@ public final class Maps {
     @SafeVarargs
     public static <K, V> Map<K, V> of(Map<? extends K, ? extends V>... maps) {
         Map<K, V> map = new HashMap<>();
-        for (var m : maps) {
+        for (Map<? extends K, ? extends V> m : maps) {
             map.putAll(m);
         }
 

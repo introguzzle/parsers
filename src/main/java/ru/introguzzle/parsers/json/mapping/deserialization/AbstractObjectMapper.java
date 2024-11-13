@@ -2,12 +2,15 @@ package ru.introguzzle.parsers.json.mapping.deserialization;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.introguzzle.parsers.common.field.GenericTypeAccessor;
+import ru.introguzzle.parsers.common.field.GenericTypeAccessorImpl;
+import ru.introguzzle.parsers.common.function.TriFunction;
+import ru.introguzzle.parsers.common.util.Maps;
 import ru.introguzzle.parsers.common.field.FieldAccessor;
 import ru.introguzzle.parsers.common.function.TriConsumer;
 import ru.introguzzle.parsers.common.mapping.ClassTraverser;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.mapping.Traverser;
-import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
 import ru.introguzzle.parsers.common.mapping.deserialization.TypeHandler;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
@@ -17,13 +20,8 @@ import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceSt
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -36,86 +34,47 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public abstract class AbstractObjectMapper implements ObjectMapper {
-    private static <T> Map.Entry<Class<T>, TypeHandler<? extends T>> entryOf(Class<T> type, TypeHandler<? extends T> typeHandler) {
-        return Map.entry(type, typeHandler);
-    }
-
-    private final Map<Class<?>, TypeHandler<?>> defaultTypeHandlers = Map.ofEntries(
-            entryOf(Date.class, o -> {
-                if (o instanceof String string) {
-                    return Date.from(Instant.parse(string));
-                }
-
-                throw new JSONMappingException(Date.class, o.getClass());
-            }),
-            entryOf(BigDecimal.class, o -> {
-                if (o instanceof String string) {
-                    return new BigDecimal(string);
-                }
-
-                throw new JSONMappingException(BigDecimal.class, o.getClass());
-            }),
-            entryOf(BigInteger.class, o -> {
-                if (o instanceof String string) {
-                    return new BigInteger(string);
-                }
-
-                throw new JSONMappingException(BigInteger.class, o.getClass());
-            }),
-            entryOf(URI.class, o -> {
-                if (o instanceof String string) {
-                    return URI.create(string);
-                }
-
-                throw new JSONMappingException(URI.class, o.getClass());
-            }),
-            entryOf(Throwable.class, o -> {
-                if (o instanceof String string) {
-                    return new Throwable(string);
-                }
-
-                throw new JSONMappingException(Throwable.class, o.getClass());
-            }),
-            entryOf(Class.class, o -> {
-                if (o instanceof String string) {
-                    try {
-                        return Class.forName(string);
-                    } catch (ClassNotFoundException e) {
-                        throw new JSONMappingException("Cannot instantiate Class", e);
-                    }
-                }
-
-                throw new JSONMappingException(Class.class, o.getClass());
-            }),
-            entryOf(List.class, o -> {
+    private final Map<Class<?>, TypeHandler<?>> defaultTypeHandlers = Maps.of(TypeHandlers.DEFAULT, Map.ofEntries(
+            TypeHandler.newEntry(List.class, (o, genericTypes) -> {
                 List<Object> list = new ArrayList<>();
-                if (o instanceof Collection<?> collection) {
-                    for (Object object : collection) {
-                        list.add(getForwardCaller().apply(object, object.getClass()));
+                Class<?> genericType = genericTypes.getFirst();
+
+                if (o instanceof Iterable<?> iterable) {
+                    for (Object object : iterable) {
+                        list.add(getForwardCaller().apply(object, genericType, List.of()));
                     }
                 }
 
                 return list;
             }),
-            entryOf(Set.class, o -> {
+
+            TypeHandler.newEntry(Set.class, (o, genericTypes) -> {
                 Set<Object> set = new HashSet<>();
-                if (o instanceof Collection<?> collection) {
-                    for (Object object : collection) {
-                        set.add(getForwardCaller().apply(object, object.getClass()));
+                Class<?> genericType = genericTypes.getFirst();
+
+                if (o instanceof Iterable<?> iterable) {
+                    for (Object object : iterable) {
+                        set.add(getForwardCaller().apply(object, genericType, List.of()));
                     }
                 }
                 return set;
             })
-    );
+    ));
 
     private final Traverser<Class<?>> traverser = new ClassTraverser();
     private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
+    private final GenericTypeAccessor genericTypeAccessor = new GenericTypeAccessorImpl();
     private final Map<JSONObject, Object> referenceMap = new IdentityHashMap<>();
     private final Map<Class<?>, TypeHandler<?>> typeHandlers = new ConcurrentHashMap<>(defaultTypeHandlers);
 
     @Override
     public @NotNull FieldAccessor getFieldAccessor() {
         return fieldAccessor;
+    }
+
+    @Override
+    public @NotNull GenericTypeAccessor getGenericTypeAccessor() {
+        return genericTypeAccessor;
     }
 
     @Override
@@ -137,7 +96,6 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
     }
 
     protected abstract @NotNull String getCircularPlaceholder();
-    protected abstract @NotNull InstanceSupplier<JSONObject> getInstanceSupplier();
     protected abstract @NotNull BiFunction<Class<?>, Integer, Object> getArraySupplier();
 
     protected abstract @NotNull TriConsumer<Object, Integer, Object> getArraySetter();
@@ -175,7 +133,7 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
     }
 
     @Override
-    public @NotNull BiFunction<Object, Class<?>, Object> getForwardCaller() {
+    public @NotNull TriFunction<Object, Class<?>, List<Class<?>>, Object> getForwardCaller() {
         return this::match;
     }
 
@@ -192,7 +150,7 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
     @Override
     @SuppressWarnings("unchecked")
     public <T> @NotNull T[] toArray(@NotNull JSONArray array, @NotNull Class<T[]> type) {
-        return (T[]) handleArray(array, type);
+        return (T[]) handleArray(array, type, List.of());
     }
 
     @Override
@@ -200,7 +158,7 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
     public <T, C extends Collection<T>> @NotNull C toCollection(@NotNull JSONArray array, @NotNull Class<T> type, @NotNull Supplier<C> supplier) {
         C collection = supplier.get();
         for (Object item : array) {
-            collection.add((T) getForwardCaller().apply(item, type));
+            collection.add((T) getForwardCaller().apply(item, type, List.of()));
         }
 
         return collection;
@@ -217,20 +175,20 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
                 return (T) new HashMap<>(object);
             }
 
-            Map<String, Object> map = (Map<String, Object>) getInstanceSupplier().get(object, type);
+            Map<String, Object> map = (Map<String, Object>) getInstanceSupplier().acquire(object, type);
             map.putAll(object);
             return (T) map;
         }
 
-        T instance = getInstanceSupplier().get(object, type);
+        T instance = getInstanceSupplier().acquire(object, type);
         referenceMap.put(object, instance);
 
         List<Field> fields = getFieldAccessor().acquire(type);
         for (Field field : fields) {
-            field.setAccessible(true);
-
             String name = getNameConverter().apply(field);
             Object value = object.get(name);
+
+            List<Class<?>> genericTypes = getGenericTypeAccessor().acquire(field);
             if (getCircularPlaceholder().equals(value)) {
                 value = referenceMap.get(object);
             }
@@ -242,7 +200,7 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
                 }
 
                 if (value != null) {
-                    Object applied = getForwardCaller().apply(value, field.getType());
+                    Object applied = getForwardCaller().apply(value, field.getType(), genericTypes);
                     getWritingInvoker().invoke(field, instance, applied);
                 }
             }
@@ -251,7 +209,7 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
         return instance;
     }
 
-    protected @Nullable Object match(@Nullable Object value, @NotNull Class<?> fieldType) {
+    protected @Nullable Object match(@Nullable Object value, @NotNull Class<?> fieldType, @NotNull List<Class<?>> genericTypes) {
         return switch (value) {
             case null -> null;
             case JSONObject object -> {
@@ -261,36 +219,36 @@ public abstract class AbstractObjectMapper implements ObjectMapper {
 
                 yield map(object, fieldType);
             }
-            case JSONArray array -> handleArray(array, fieldType);
+            case JSONArray array -> handleArray(array, fieldType, genericTypes);
             default -> {
                 TypeHandler<?> typeHandler = getTypeHandler(fieldType);
                 yield typeHandler == null
                         ? handlePrimitiveType(value, fieldType)
-                        : typeHandler.apply(value);
+                        : typeHandler.apply(value, genericTypes);
             }
         };
     }
 
-    protected Object handleArray(JSONArray array, @NotNull Class<?> fieldType) {
+    protected Object handleArray(JSONArray array, @NotNull Class<?> fieldType, @NotNull List<Class<?>> genericTypes) {
         if (fieldType.isArray()) {
             int size = array.size();
             Class<?> componentType = fieldType.getComponentType();
             Object resultArray = getArraySupplier().apply(componentType, size);
             for (int i = 0; i < size; i++) {
-                Object element = getForwardCaller().apply(array.get(i), fieldType.getComponentType());
+                Object element = getForwardCaller().apply(array.get(i), fieldType.getComponentType(), genericTypes);
                 getArraySetter().accept(resultArray, i, element);
             }
 
             return resultArray;
         }
 
-        return handleCollection(array, fieldType);
+        return handleCollection(array, fieldType, genericTypes);
     }
 
-    protected Object handleCollection(JSONArray array, @NotNull Class<?> fieldType) {
+    protected Object handleCollection(JSONArray array, @NotNull Class<?> fieldType, @NotNull List<Class<?>> genericTypes) {
         TypeHandler<?> typeHandler = getTypeHandler(fieldType);
         if (typeHandler != null) {
-            return typeHandler.apply(array);
+            return typeHandler.apply(array, genericTypes);
         }
 
         throw new JSONMappingException(fieldType, JSONArray.class);

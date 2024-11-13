@@ -14,11 +14,11 @@ import java.util.Set;
  * enabling flexible and extensible serialization logic.
  *
  * @param <M> the concrete type of the mapper extending this interface, enabling fluent method chaining
- * @param <B> the base type of objects that this mapper can bind to and serialize
+ * @param <B> the base interface type of objects that this mapper can bind to and serialize
  */
 public interface ReadingMapper<M extends ReadingMapper<M, B>, B> extends Mapper {
     /**
-     * Retrieves the {@link ReadingInvoker} responsible for invoking read operations during serialization.
+     * Retrieves the {@link ReadingInvoker} responsible for reading fields during serialization.
      *
      * @return a non-null {@link ReadingInvoker} instance
      */

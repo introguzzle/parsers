@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.common;
+package ru.introguzzle.parsers.common.util;
 
 import java.util.Map;
 

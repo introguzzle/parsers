@@ -3,7 +3,7 @@ package ru.introguzzle.parsers.xml.mapping.serialization;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.introguzzle.parsers.common.Maps;
+import ru.introguzzle.parsers.common.util.Maps;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.cache.CacheSupplier;

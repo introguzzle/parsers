@@ -1,6 +1,10 @@
 package ru.introguzzle.parsers.common.mapping.deserialization;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -18,21 +22,22 @@ import java.util.function.Function;
  *
  * @param <T> the target field type for conversion
  */
-public interface TypeHandler<T> extends Function<Object, T> {
+public interface TypeHandler<T> extends BiFunction<Object, List<Class<?>>, T> {
     /**
      * Applies the conversion to the provided object.
      *
-     * @param object The input object to convert.
-     * @return The converted object of type T.
+     * @param object the input object to convert
+     * @param genericTypes actual generic types of returned object with type {@code T}, if {@code T} is parameterized class
+     * @return the converted object of type {@code T}
      */
     @Override
-    T apply(Object object);
+    T apply(Object object, @NotNull List<Class<?>> genericTypes);
 
-    static <T> TypeHandler<T> of(Function<Object, ? extends T> function) {
+    static <T> TypeHandler<T> of(BiFunction<Object, List<Class<?>>, ? extends T> function) {
         return function::apply;
     }
 
-    static <T> Map.Entry<Class<T>, TypeHandler<T>> newEntry(Class<T> type, Function<Object, ? extends T> function) {
+    static <T> Map.Entry<Class<T>, TypeHandler<T>> newEntry(Class<T> type, BiFunction<Object, List<Class<?>>, ? extends T> function) {
         return Map.entry(type, of(function));
     }
 }

@@ -24,7 +24,7 @@ public class ReflectionObjectMapper extends AbstractObjectMapper {
     private final AnnotationData<JSONEntity, JSONField> annotationData = new AnnotationData<>(JSONEntity.class, JSONField.class);
 
     private final InstanceSupplier<JSONObject> instanceSupplier
-            = new ReflectionAnnotationInstanceSupplier<>(annotationData, getFieldAccessor(), getNameConverter(), this::match) {
+            = new ReflectionAnnotationInstanceSupplier<>(this, annotationData) {
 
         @Override
         public ConstructorArgument[] retrieveConstructorArguments(JSONEntity annotation) {
@@ -43,7 +43,7 @@ public class ReflectionObjectMapper extends AbstractObjectMapper {
     }
 
     @Override
-    protected @NotNull InstanceSupplier<JSONObject> getInstanceSupplier() {
+    public @NotNull InstanceSupplier<JSONObject> getInstanceSupplier() {
         return instanceSupplier;
     }
 

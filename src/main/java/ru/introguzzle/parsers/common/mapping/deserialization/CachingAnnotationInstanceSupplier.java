@@ -1,15 +1,14 @@
 package ru.introguzzle.parsers.common.mapping.deserialization;
 
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.cache.CacheSupplier;
-import ru.introguzzle.parsers.common.field.FieldAccessor;
-import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.common.mapping.AnnotationData;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.common.mapping.MappingException;
-import ru.introguzzle.parsers.json.mapping.JSONMappingException;
+import ru.introguzzle.parsers.common.mapping.WritingMapper;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
@@ -19,7 +18,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
 
 /**
  * Optimized version of {@link ReflectionAnnotationInstanceSupplier}
@@ -34,8 +32,8 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
         EMPTY_CONSTRUCTOR_SHAPE = MethodType.methodType(void.class);
     }
 
-    public CachingAnnotationInstanceSupplier(AnnotationData<E, F> annotationData, FieldAccessor fieldAccessor, FieldNameConverter<F> nameConverter, BiFunction<Object, Class<?>, Object> hook) {
-        super(annotationData, fieldAccessor, nameConverter, hook);
+    public CachingAnnotationInstanceSupplier(WritingMapper<?> mapper, AnnotationData<E, F> annotationData) {
+        super(mapper, annotationData);
     }
 
     private static MethodType shapeOf(List<Class<?>> argumentTypes) {
@@ -82,7 +80,7 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
             try {
                 return (R) constructorHandle.invokeWithArguments(arguments);
             } catch (Throwable e) {
-                throw new JSONMappingException(e);
+                throw new MappingException(e);
             }
         }
     }
@@ -104,7 +102,8 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
     }
 
     @Override
-    public <R> R get(T object, Class<R> type) {
+    public <R> @NotNull R acquire(@NotNull T object, @NotNull Class<R> type) {
+        requireNonNull(object, type);
         E annotation = getAnnotation(type);
         if (annotation == null || retrieveConstructorArguments(annotation).length == 0) {
             ConstructorWrapper<R> cw = getConstructorWrapper(type);
@@ -114,7 +113,7 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
                 try {
                     constructorHandle = LOOKUP.findConstructor(type, EMPTY_CONSTRUCTOR_SHAPE);
                 } catch (NoSuchMethodException | IllegalAccessException e) {
-                    throw new JSONMappingException(e);
+                    throw new MappingException(e);
                 }
 
                 cw = new ConstructorWrapper<>(constructorHandle, 0);
@@ -132,7 +131,7 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
         Object[] args = constructorData.fields.stream()
                 .map(field -> {
                     String transformed = nameConverter.apply(field);
-                    return hook.apply(retrieveValue(object, transformed), field.getType());
+                    return hook.apply(retrieveValue(object, transformed), field.getType(), genericTypeAccessor.acquire(field));
                 })
                 .toArray();
 
@@ -170,7 +169,7 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
                 MethodType shape = shapeOf(constructorTypes);
                 constructorHandle = LOOKUP.findConstructor(type, shape);
             } catch (NoSuchMethodException | IllegalAccessException e) {
-                throw new JSONMappingException(e);
+                throw new MappingException(e);
             }
 
             cw = new ConstructorWrapper<>(constructorHandle, constructorTypes.size());

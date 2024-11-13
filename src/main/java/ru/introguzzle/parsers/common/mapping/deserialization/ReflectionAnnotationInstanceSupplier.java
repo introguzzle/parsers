@@ -1,13 +1,12 @@
 package ru.introguzzle.parsers.common.mapping.deserialization;
 
 import lombok.experimental.ExtensionMethod;
-import ru.introguzzle.parsers.common.field.FieldAccessor;
-import ru.introguzzle.parsers.common.field.FieldNameConverter;
+import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.mapping.AnnotationData;
 import ru.introguzzle.parsers.common.mapping.MappingException;
-import ru.introguzzle.parsers.common.util.ClassExtensions;
+import ru.introguzzle.parsers.common.mapping.WritingMapper;
+import ru.introguzzle.parsers.common.type.Classes;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
-import ru.introguzzle.parsers.json.mapping.JSONMappingException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -16,14 +15,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
-@ExtensionMethod({ClassExtensions.class})
+@ExtensionMethod({Classes.class})
 public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotation, F extends Annotation>
         extends AnnotationInstanceSupplier<T, E, F> {
-    public ReflectionAnnotationInstanceSupplier(AnnotationData<E, F> annotationData, FieldAccessor fieldAccessor, FieldNameConverter<F> nameConverter, BiFunction<Object, Class<?>, Object> hook) {
-        super(annotationData, fieldAccessor, nameConverter, hook);
+    public ReflectionAnnotationInstanceSupplier(WritingMapper<?> mapper, AnnotationData<E, F> annotationData) {
+        super(mapper, annotationData);
     }
 
     private String[] getConstructorNames(E annotation) {
@@ -33,20 +31,21 @@ public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotati
     }
 
     @Override
-    public <R> R get(T object, Class<R> type) {
+    public <R> @NotNull R acquire(@NotNull T object, @NotNull Class<R> type) {
+        requireNonNull(object, type);
         Optional<E> optional = type.getAnnotationAsOptional(annotationData.entityAnnotationClass());
         if (optional.isEmpty() || retrieveConstructorArguments(optional.get()).length == 0) {
             try {
                 return type.getDefaultConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new JSONMappingException(type);
+                throw new MappingException(type);
             }
         }
 
         return getWithArguments(object, type, optional.get());
     }
 
-    public <R> R getWithArguments(T object, Class<R> type, E annotation) {
+    private <R> R getWithArguments(T object, Class<R> type, E annotation) {
         String[] constructorNames = getConstructorNames(annotation);
         List<Field> fields = fieldAccessor.acquire(type);
 
@@ -81,7 +80,7 @@ public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotati
         Object[] args = matchedFields.stream()
                 .map(field -> {
                     String transformed = nameConverter.apply(field);
-                    return hook.apply(retrieveValue(object, transformed), field.getType());
+                    return hook.apply(retrieveValue(object, transformed), field.getType(), genericTypeAccessor.acquire(field));
                 })
                 .toArray();
 

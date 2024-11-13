@@ -1,5 +1,7 @@
 package ru.introguzzle.parsers.common.field;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -45,5 +47,5 @@ public interface FieldAccessor {
      * @return a {@code List} of {@link Field} instances that are relevant for processing
      * @throws NullPointerException if the {@code type} parameter is {@code null}
      */
-    List<Field> acquire(Class<?> type);
+    @NotNull List<Field> acquire(@NotNull Class<?> type);
 }

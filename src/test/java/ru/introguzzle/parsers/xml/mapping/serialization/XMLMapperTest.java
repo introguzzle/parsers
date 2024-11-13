@@ -94,10 +94,10 @@ public class XMLMapperTest {
     @XMLEntity
     @XMLRoot("company")
     static class Company {
-        @XMLField(type = XMLType.ELEMENT, name = "EmployeeList")
+        @XMLField(type = XMLType.ELEMENT, name = "EmployeeList", element = "employee")
         List<Employee> employeeList;
 
-        @XMLField(type = XMLType.ELEMENT, name = "EmployeeArray")
+        @XMLField(type = XMLType.ELEMENT, name = "EmployeeArray", element = "employee")
         Employee[] employeeArray;
     }
 
@@ -110,19 +110,22 @@ public class XMLMapperTest {
 
         @XMLField(type = XMLType.ELEMENT, name = "name")
         String name;
+
+        @XMLValue
+        Throwable throwable;
     }
 
     @Test
     public void test_iterable_and_array() {
         List<Employee> employeeList = List.of(
-            new Employee(1, "111"),
-            new Employee(2, "222"),
-            new Employee(3, "333")
+            new Employee(1, "111", new Throwable("1T")),
+            new Employee(2, "222", new Throwable("2T")),
+            new Employee(3, "333", new Throwable("3T"))
         );
 
         Employee[] employeeArray = {
-                new Employee(4, "444"),
-                new Employee(5, "555"),
+                new Employee(4, "444", new Throwable("4T")),
+                new Employee(5, "555", new Throwable("5T")),
         };
 
         Company company = new Company(employeeList, employeeArray);
