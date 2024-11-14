@@ -26,9 +26,7 @@ class ReflectionObjectMapper extends AbstractObjectMapper {
     private final WritingInvoker writingInvoker = new ReflectionInvoker.Writing();
     private final AnnotationData<JSONEntity, JSONField> annotationData = new AnnotationData<>(JSONEntity.class, JSONField.class);
 
-    private final InstanceSupplier<JSONObject> instanceSupplier
-            = new ReflectionAnnotationInstanceSupplier<>(this, annotationData) {
-
+    private final InstanceSupplier<JSONObject> instanceSupplier = new ReflectionAnnotationInstanceSupplier<>(this, annotationData) {
         @Override
         public ConstructorArgument[] retrieveConstructorArguments(JSONEntity annotation) {
             return annotation.constructorArguments();

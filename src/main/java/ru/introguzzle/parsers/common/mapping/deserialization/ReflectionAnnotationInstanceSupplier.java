@@ -84,7 +84,7 @@ public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotati
      */
     private <R> R getWithArguments(T object, Class<R> type, E annotation) {
         String[] constructorNames = getConstructorNames(annotation);
-        List<Field> fields = fieldAccessor.acquire(type);
+        List<Field> fields = mapper.getFieldAccessor().acquire(type);
 
         Function<Field, Field> matcher = field -> {
             for (String constructorName : constructorNames) {
@@ -115,8 +115,9 @@ public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotati
 
         Object[] args = matchedFields.stream()
                 .map(field -> {
-                    String transformed = nameConverter.apply(field);
-                    return hook.apply(retrieveValue(object, transformed), field.getType(), genericTypeAccessor.acquire(field));
+                    String transformed = getFieldNameConverter().apply(field);
+                    List<Class<?>> genericTypes = mapper.getGenericTypeAccessor().acquire(field);
+                    return mapper.getForwardCaller().apply(retrieveValue(object, transformed), field.getType(), genericTypes);
                 })
                 .toArray();
 

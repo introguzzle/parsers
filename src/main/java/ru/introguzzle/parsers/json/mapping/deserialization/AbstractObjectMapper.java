@@ -21,42 +21,82 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 abstract class AbstractObjectMapper implements ObjectMapper {
+    private <T extends Collection<Object>>
+    Map.Entry<Class<T>, TypeHandler<T>> newEntryOfIterable(Class<T> type,
+                                                           Supplier<? extends T> supplier) {
+        return TypeHandler.newEntry(type, (source, genericTypes) -> {
+            T collection = supplier.get();
+            if (genericTypes.isEmpty()) {
+                throw new MappingException("Untyped collection is not supported");
+            }
+
+            Class<?> genericType = genericTypes.getFirst();
+
+            // Actually, instanceof JSONArray
+            if (source instanceof Iterable<?> iterable) {
+                for (Object object : iterable) {
+                    collection.add(getForwardCaller().apply(object, genericType, List.of()));
+                }
+            }
+
+            return collection;
+        });
+    }
+
+    @SuppressWarnings("unchecked")
     private final Map<Class<?>, TypeHandler<?>> defaultTypeHandlers = Maps.of(TypeHandlers.DEFAULT, Map.ofEntries(
-            TypeHandler.newEntry(List.class, (o, genericTypes) -> {
-                List<Object> list = new ArrayList<>();
-                Class<?> genericType = genericTypes.getFirst();
-
-                if (o instanceof Iterable<?> iterable) {
-                    for (Object object : iterable) {
-                        list.add(getForwardCaller().apply(object, genericType, List.of()));
-                    }
+            newEntryOfIterable(List.class, ArrayList::new),
+            newEntryOfIterable(Set.class, HashSet::new),
+            newEntryOfIterable(Queue.class, LinkedList::new),
+            newEntryOfIterable(Deque.class, LinkedList::new),
+            TypeHandler.newEntry(Map.class, (source, genericTypes) -> {
+                if (!(source instanceof JSONObject object)) {
+                    throw new MappingException("Expected JSONObject for Map type, but got: " + source.getClass().getSimpleName());
                 }
 
-                return list;
-            }),
-
-            TypeHandler.newEntry(Set.class, (o, genericTypes) -> {
-                Set<Object> set = new HashSet<>();
-                Class<?> genericType = genericTypes.getFirst();
-
-                if (o instanceof Iterable<?> iterable) {
-                    for (Object object : iterable) {
-                        set.add(getForwardCaller().apply(object, genericType, List.of()));
-                    }
+                // Ensure genericTypes has exactly two elements: key type and value type
+                if (genericTypes.size() != 2) {
+                    throw new MappingException("Map requires exactly two generic types: key and value");
                 }
-                return set;
+
+                Map<Object, Object> map = new HashMap<>();
+
+                Class<?> keyType = genericTypes.get(0);
+                Class<?> valueType = genericTypes.get(1);
+
+                for (Map.Entry<String, Object> entry : object.entrySet()) {
+                    Object key = keyType == String.class
+                            ? entry.getKey()
+                            : getForwardCaller().apply(entry.getKey(), keyType, List.of());
+                    if (key == null) {
+                        throw new MappingException("Failed to convert key: " + entry.getKey() + " to type: " + keyType.getName());
+                    }
+
+                    // Handle Value Conversion
+                    Object value = getForwardCaller().apply(entry.getValue(), valueType, List.of());
+                    if (value == null && entry.getValue() != null) {
+                        throw new MappingException("Failed to convert value for key: " + entry.getKey() + " to type: " + valueType.getName());
+                    }
+
+                    map.put(key, value);
+                }
+
+                return map;
             })
     ));
 
@@ -122,7 +162,8 @@ abstract class AbstractObjectMapper implements ObjectMapper {
         return this;
     }
 
-    private @Nullable <T> TypeHandler<T> getTypeHandler(@NotNull Class<T> type) {
+    @Override
+    public @Nullable <T> TypeHandler<T> getTypeHandler(@NotNull Class<T> type) {
         return findMostSpecificHandler(type);
     }
 
@@ -163,20 +204,9 @@ abstract class AbstractObjectMapper implements ObjectMapper {
         return collection;
     }
 
-    @SuppressWarnings("unchecked")
     public <T> @Nullable T map(@Nullable JSONObject object, @NotNull Class<T> type) {
         if (object == null) {
             return null;
-        }
-
-        if (Map.class.isAssignableFrom(type)) {
-            if (type == Map.class) {
-                return (T) new HashMap<>(object);
-            }
-
-            Map<String, Object> map = (Map<String, Object>) getInstanceSupplier().acquire(object, type);
-            map.putAll(object);
-            return (T) map;
         }
 
         T instance = getInstanceSupplier().acquire(object, type);
@@ -216,6 +246,11 @@ abstract class AbstractObjectMapper implements ObjectMapper {
                     yield referenceMap.get(object);
                 }
 
+                TypeHandler<?> th = getTypeHandler(fieldType);
+                if (th != null) {
+                    yield th.apply(value, genericTypes);
+                }
+
                 yield map(object, fieldType);
             }
             case JSONArray array -> handleArray(array, fieldType, genericTypes);
@@ -253,51 +288,54 @@ abstract class AbstractObjectMapper implements ObjectMapper {
         throw MappingException.ofConversion(fieldType, JSONArray.class);
     }
 
+    private MappingException conversionException(Object value, @NotNull Class<?> fieldType) {
+        return MappingException.ofConversion(value.getClass(), fieldType);
+    }
+
     protected Object handlePrimitiveType(Object value, @NotNull Class<?> fieldType) {
-        Supplier<MappingException> e = () -> MappingException.ofConversion(value.getClass(), fieldType);
         return switch (fieldType.getSimpleName()) {
             case "boolean", "Boolean" -> {
                 if (value instanceof Boolean b) yield b;
                 if (value instanceof String s) yield Boolean.parseBoolean(s);
-                throw e.get();
+                throw conversionException(value, fieldType);
             }
             case "byte", "Byte" -> {
                 if (value instanceof Byte b) yield b;
                 if (value instanceof String s) yield Byte.parseByte(s);
-                throw e.get();
+                throw conversionException(value, fieldType);
             }
             case "short", "Short" -> {
                 if (value instanceof Short s) yield s;
                 if (value instanceof String s) yield Short.parseShort(s);
-                throw e.get();
+                throw conversionException(value, fieldType);
             }
             case "int", "Integer" -> {
                 if (value instanceof Integer i) yield i;
                 if (value instanceof String s) yield Integer.parseInt(s);
-                throw e.get();
+                throw conversionException(value, fieldType);
             }
             case "long", "Long" -> {
                 if (value instanceof Long l) yield l;
                 if (value instanceof String s) yield Long.parseLong(s);
-                throw e.get();
+                throw conversionException(value, fieldType);
             }
             case "float", "Float" -> {
                 if (value instanceof Float f) yield f;
                 if (value instanceof String s) yield Float.parseFloat(s);
-                throw e.get();
+                throw conversionException(value, fieldType);
             }
             case "double", "Double" -> {
                 if (value instanceof Double d) yield d;
                 if (value instanceof String s) yield Double.parseDouble(s);
-                throw e.get();
+                throw conversionException(value, fieldType);
             }
             case "char", "Character" -> {
                 if (value instanceof String s) yield s.charAt(0);
-                throw e.get();
+                throw conversionException(value, fieldType);
             }
             case "String" -> {
                 if (value instanceof String s) yield s;
-                throw e.get();
+                throw conversionException(value, fieldType);
             }
 
             default -> throw new IllegalStateException("Unexpected value: " + fieldType.getSimpleName());

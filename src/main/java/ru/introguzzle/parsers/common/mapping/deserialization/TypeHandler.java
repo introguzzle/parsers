@@ -24,14 +24,14 @@ import java.util.function.Function;
  */
 public interface TypeHandler<T> extends BiFunction<Object, List<Class<?>>, T> {
     /**
-     * Applies the conversion to the provided object.
+     * Applies the conversion to the provided source.
      *
-     * @param object the input object to convert
-     * @param genericTypes actual generic types of returned object with type {@code T}, if {@code T} is parameterized class
-     * @return the converted object of type {@code T}
+     * @param source the input source to convert
+     * @param genericTypes actual generic types of returned source with type {@code T}, if {@code T} is parameterized class
+     * @return the converted source of type {@code T}
      */
     @Override
-    T apply(Object object, @NotNull List<Class<?>> genericTypes);
+    T apply(Object source, @NotNull List<Class<?>> genericTypes);
 
     static <T> TypeHandler<T> of(BiFunction<Object, List<Class<?>>, ? extends T> function) {
         return function::apply;

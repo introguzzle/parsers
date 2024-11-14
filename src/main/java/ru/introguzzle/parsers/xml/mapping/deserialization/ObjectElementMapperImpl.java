@@ -6,7 +6,10 @@ import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.cache.CacheSupplier;
-import ru.introguzzle.parsers.common.field.*;
+import ru.introguzzle.parsers.common.field.FieldAccessor;
+import ru.introguzzle.parsers.common.field.FieldNameConverter;
+import ru.introguzzle.parsers.common.field.GenericTypeAccessor;
+import ru.introguzzle.parsers.common.field.WritingInvoker;
 import ru.introguzzle.parsers.common.function.TriFunction;
 import ru.introguzzle.parsers.common.type.Primitives;
 import ru.introguzzle.parsers.common.util.Maps;
@@ -20,13 +23,9 @@ import ru.introguzzle.parsers.xml.entity.XMLElement;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class ObjectElementMapperImpl implements ObjectElementMapper {
@@ -35,31 +34,32 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
 
     private final ObjectMapper parent;
 
+    private <T extends Collection<Object>>
+    Map.Entry<Class<T>, TypeHandler<T>> newEntryOfIterable(Class<T> type,
+                                                           Supplier<? extends T> supplier) {
+        return TypeHandler.newEntry(type, (source, genericTypes) -> {
+            T collection = supplier.get();
+            if (genericTypes.isEmpty()) {
+                throw new MappingException("Untyped collection is not supported");
+            }
+
+            Class<?> genericType = genericTypes.getFirst();
+            if (source instanceof XMLElement element && element.isIterable()) {
+                for (Object object : element.getChildren()) {
+                    collection.add(getForwardCaller().apply(object, genericType, List.of()));
+                }
+            }
+
+            return collection;
+        });
+    }
+
+    @SuppressWarnings("unchecked")
     private final Map<Class<?>, TypeHandler<?>> defaultTypeHandlers = Maps.of(TypeHandlers.DEFAULT, Map.ofEntries(
-            TypeHandler.newEntry(List.class, (o, genericTypes) -> {
-                List<Object> list = new ArrayList<>();
-                Class<?> genericType = genericTypes.getFirst();
-
-                if (o instanceof XMLElement element && element.isIterable()) {
-                    for (XMLElement child : element.getChildren()) {
-                        list.add(match(child, genericType, List.of()));
-                    }
-                }
-
-                return list;
-            }),
-
-            TypeHandler.newEntry(Set.class, (o, genericTypes) -> {
-                Set<Object> set = new HashSet<>();
-                Class<?> genericType = genericTypes.getFirst();
-
-                if (o instanceof XMLElement element && element.isIterable()) {
-                    for (XMLElement child : element.getChildren()) {
-                        set.add(match(child, genericType, List.of()));
-                    }
-                }
-                return set;
-            })
+            newEntryOfIterable(List.class, ArrayList::new),
+            newEntryOfIterable(Set.class, HashSet::new),
+            newEntryOfIterable(Queue.class, LinkedList::new),
+            newEntryOfIterable(Deque.class, LinkedList::new)
     ));
 
     private final Map<Class<?>, TypeHandler<?>> typeHandlers = new ConcurrentHashMap<>(defaultTypeHandlers);
@@ -166,33 +166,15 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
         Class<?> ft = fieldType;
 
         try {
-            if (ft == String.class)
-                return value;
-
-            if (value.isEmpty())
-                return null;
-
-            if (ft == int.class || ft == Integer.class)
-                return Integer.parseInt(value);
-
-            if (ft == long.class || ft == Long.class)
-                return Long.parseLong(value);
-
-            if (ft == double.class || ft == Double.class)
-                return Double.parseDouble(value);
-
-            if (ft == float.class || ft == Float.class)
-                return Float.parseFloat(value);
-
-            if (ft == boolean.class || ft == Boolean.class)
-                return Boolean.parseBoolean(value);
-
-            if (ft == short.class || ft == Short.class)
-                return Short.parseShort(value);
-
-            if (ft == byte.class || ft == Byte.class)
-                return Byte.parseByte(value);
-
+            if (ft == String.class) return value;
+            if (value.isEmpty()) return null;
+            if (ft == int.class || ft == Integer.class) return Integer.parseInt(value);
+            if (ft == long.class || ft == Long.class) return Long.parseLong(value);
+            if (ft == double.class || ft == Double.class) return Double.parseDouble(value);
+            if (ft == float.class || ft == Float.class) return Float.parseFloat(value);
+            if (ft == boolean.class || ft == Boolean.class) return Boolean.parseBoolean(value);
+            if (ft == short.class || ft == Short.class) return Short.parseShort(value);
+            if (ft == byte.class || ft == Byte.class) return Byte.parseByte(value);
             if (ft == char.class || ft == Character.class) {
                 if (value.length() != 1) {
                     throw new MappingException("Cannot convert text to char: " + value);
@@ -208,8 +190,9 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
         return null;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    private <T> TypeHandler<T> getTypeHandler(Class<T> fieldType) {
+    public <T> @Nullable TypeHandler<T> getTypeHandler(@NotNull Class<T> fieldType) {
         return (TypeHandler<T>) HANDLER_CACHE.get(fieldType, this::findMostSpecificHandler);
     }
 

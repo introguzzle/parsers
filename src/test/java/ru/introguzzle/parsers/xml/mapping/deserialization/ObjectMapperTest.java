@@ -117,4 +117,18 @@ public class ObjectMapperTest {
         SomeClass2 after = objectMapper.toObject(document, SomeClass2.class);
         System.out.println(after);
     }
+
+    @AllArgsConstructor
+    @XMLEntity(constructorArguments = {
+            @ConstructorArgument("age"),
+            @ConstructorArgument("name")
+    })
+    @ToString
+    public static class Employee {
+        @XMLField(type = XMLType.ATTRIBUTE)
+        private final int age;
+
+        @XMLField(type = XMLType.ATTRIBUTE)
+        private final String name;
+    }
 }

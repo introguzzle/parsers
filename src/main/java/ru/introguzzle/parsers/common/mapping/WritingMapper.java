@@ -1,6 +1,7 @@
 package ru.introguzzle.parsers.common.mapping;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.field.GenericTypeAccessor;
 import ru.introguzzle.parsers.common.field.WritingInvoker;
 import ru.introguzzle.parsers.common.function.TriFunction;
@@ -46,6 +47,7 @@ public interface WritingMapper<M extends WritingMapper<M>> extends Mapper {
      */
     @NotNull TriFunction<Object, Class<?>, List<Class<?>>, Object> getForwardCaller();
 
+    <T> @Nullable TypeHandler<T> getTypeHandler(@NotNull Class<T> type);
     <T> @NotNull M withTypeHandler(@NotNull Class<T> type, @NotNull TypeHandler<? extends T> handler);
     @NotNull M withTypeHandlers(@NotNull Map<Class<?>, @NotNull TypeHandler<?>> handlers);
     @NotNull M clearTypeHandlers();

@@ -17,7 +17,6 @@ import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
-import ru.introguzzle.parsers.json.mapping.JSONFieldNameConverter;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -31,8 +30,7 @@ class InvokeObjectMapper extends AbstractObjectMapper {
     private final WritingInvoker writingInvoker = new MethodHandleInvoker.Writing();
     private final AnnotationData<JSONEntity, JSONField> annotationData = new AnnotationData<>(JSONEntity.class, JSONField.class);
 
-    private final InstanceSupplier<JSONObject> instanceSupplier
-            = new CachingAnnotationInstanceSupplier<>(this, annotationData) {
+    private final InstanceSupplier<JSONObject> instanceSupplier = new CachingAnnotationInstanceSupplier<>(this, annotationData) {
         private static final Cache<Class<?>, JSONEntity> ANNOTATION_CACHE;
 
         static {

@@ -1,7 +1,7 @@
 package ru.introguzzle.parsers.xml.mapping.deserialization;
 
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
@@ -28,7 +28,6 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
 class ObjectMapperImpl implements ObjectMapper {
     private final FieldNameConverter<XMLField> nameConverter;
 
@@ -41,6 +40,7 @@ class ObjectMapperImpl implements ObjectMapper {
     private final AnnotationData<XMLEntity, XMLField> annotationData = new AnnotationData<>(XMLEntity.class, XMLField.class);
     private final InstanceSupplier<XMLElement> instanceSupplier = new CachingAnnotationInstanceSupplier<>(this, annotationData) {
         private static final Cache<Class<?>, XMLEntity> ANNOTATION_CACHE;
+
         static {
             ANNOTATION_CACHE = CacheService.instance().newCache();
         }
@@ -61,8 +61,17 @@ class ObjectMapperImpl implements ObjectMapper {
         }
     };
 
+    public ObjectMapperImpl(FieldNameConverter<XMLField> nameConverter) {
+        this.nameConverter = nameConverter;
+    }
+
     public @NotNull TriFunction<Object, Class<?>, List<Class<?>>, Object> getForwardCaller() {
         return elementMapper.getForwardCaller();
+    }
+
+    @Override
+    public @Nullable <T> TypeHandler<T> getTypeHandler(@NotNull Class<T> type) {
+        return elementMapper.getTypeHandler(type);
     }
 
     @Override

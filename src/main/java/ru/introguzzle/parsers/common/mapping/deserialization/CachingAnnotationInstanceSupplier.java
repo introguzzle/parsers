@@ -156,8 +156,9 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
         ConstructorData<R> constructorData = getConstructorData(type, annotation);
         Object[] args = constructorData.fields.stream()
                 .map(field -> {
-                    String transformed = nameConverter.apply(field);
-                    return hook.apply(retrieveValue(object, transformed), field.getType(), genericTypeAccessor.acquire(field));
+                    String transformed = getFieldNameConverter().apply(field);
+                    List<Class<?>> genericTypes = mapper.getGenericTypeAccessor().acquire(field);
+                    return mapper.getForwardCaller().apply(retrieveValue(object, transformed), field.getType(), genericTypes);
                 })
                 .toArray();
 
@@ -169,7 +170,7 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
                 .map(ConstructorArgument::value)
                 .toArray(String[]::new);
 
-        List<Field> fields = fieldAccessor.acquire(type);
+        List<Field> fields = mapper.getFieldAccessor().acquire(type);
 
         List<Field> matchedFields = new ArrayList<>();
         List<Class<?>> constructorTypes = new ArrayList<>();

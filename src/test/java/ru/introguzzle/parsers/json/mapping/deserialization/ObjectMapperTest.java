@@ -18,10 +18,7 @@ import ru.introguzzle.parsers.json.mapping.type.JSONType;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.foreign.Other;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -172,6 +169,8 @@ public class ObjectMapperTest {
         System.out.println(initialToJson.toJSONString() + "\n");
 
         Person initialToJsonToPerson = objectMapper.toObject(initialToJson, Person.class);
+        initialToJsonToPerson = objectMapper.toObject(initialToJson, Person.class);
+
         Person first = initialToJsonToPerson.personList.getFirst();
 
         System.out.println("\n\nPERSON");
@@ -425,5 +424,38 @@ public class ObjectMapperTest {
 
         Other after = objectMapper.toObject(object, Other.class);
         assertEquals(before, after);
+    }
+
+    @AllArgsConstructor
+    @JSONEntity(constructorArguments = {
+            @ConstructorArgument("age"),
+            @ConstructorArgument("name")
+    })
+    @ToString
+    public static class Employee {
+        private final int age;
+        private final String name;
+    }
+
+    @AllArgsConstructor
+    @JSONEntity(constructorArguments = {
+            @ConstructorArgument("map")
+    })
+    @ToString
+    public static class Ex {
+        private final Map<String, Employee> map;
+    }
+
+    @Test
+    public void test_map() {
+        Ex ex = new Ex(Map.of(
+                "1", new Employee(10, "NAME 10"),
+                "2", new Employee(20, "NAME 20")
+        ));
+        System.out.println(ex);
+        JSONObject jsonObject = jsonMapper.toJSONObject(ex);
+
+        Ex after = objectMapper.toObject(jsonObject, Ex.class);
+        System.out.println(after);
     }
 }
