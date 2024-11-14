@@ -4,8 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.NameConverter;
 import ru.introguzzle.parsers.common.mapping.ReadingMapper;
 import ru.introguzzle.parsers.common.mapping.serialization.TypeHandler;
+import ru.introguzzle.parsers.common.util.NamingUtilities;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
+import ru.introguzzle.parsers.json.mapping.JSONFieldNameConverter;
 import ru.introguzzle.parsers.json.mapping.MappingContext;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 
@@ -39,6 +41,14 @@ import java.util.Objects;
  */
 @SuppressWarnings("unused")
 public interface JSONMapper extends ReadingMapper<JSONMapper, Bindable> {
+    static JSONMapper newMapper() {
+        return newMapper(NamingUtilities::toSnakeCase);
+    }
+
+    static JSONMapper newMapper(NameConverter nameConverter) {
+        return new JSONMapperImpl(new JSONFieldNameConverter(nameConverter));
+    }
+
     default @NotNull JSONObject toJSONObject(@NotNull Object object) {
         Objects.requireNonNull(object);
         return toJSONObject(object, MappingContext.getDefault());

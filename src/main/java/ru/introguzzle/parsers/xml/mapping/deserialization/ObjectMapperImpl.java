@@ -1,5 +1,6 @@
 package ru.introguzzle.parsers.xml.mapping.deserialization;
 
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.common.cache.Cache;
@@ -22,14 +23,15 @@ import ru.introguzzle.parsers.xml.entity.XMLElement;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.mapping.FieldAccessorImpl;
-import ru.introguzzle.parsers.xml.mapping.XMLFieldNameConverter;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
-public class ObjectMapperImpl implements ObjectMapper {
-    private final FieldNameConverter<XMLField> nameConverter = new XMLFieldNameConverter();
+@RequiredArgsConstructor
+class ObjectMapperImpl implements ObjectMapper {
+    private final FieldNameConverter<XMLField> nameConverter;
+
     private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
     private final Traverser<Class<?>> traverser = new ClassTraverser();
     private final WritingInvoker writingInvoker = new MethodHandleInvoker.Writing();

@@ -14,7 +14,6 @@ import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 import ru.introguzzle.parsers.json.mapping.MappingContext;
 import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceStrategies;
 import ru.introguzzle.parsers.json.mapping.serialization.JSONMapper;
-import ru.introguzzle.parsers.json.mapping.serialization.JSONMapperImpl;
 import ru.introguzzle.parsers.json.mapping.type.JSONType;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.foreign.Other;
@@ -28,8 +27,8 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.*;
 
 public class ObjectMapperTest {
-    private final ObjectMapper objectMapper = new InvokeObjectMapper();
-    private final JSONMapper jsonMapper = new JSONMapperImpl();
+    private final ObjectMapper objectMapper = ObjectMapper.newMethodHandleMapper();
+    private final JSONMapper jsonMapper = JSONMapper.newMapper();
 
     @AllArgsConstructor
     @NoArgsConstructor
@@ -387,7 +386,7 @@ public class ObjectMapperTest {
         System.out.println("\nBEFORE\n");
         System.out.println(Arrays.toString(instances));
 
-        JSONMapper jsonMapper = new JSONMapperImpl()
+        JSONMapper jsonMapper = JSONMapper.newMapper()
                 .withTypeHandler(char[].class, String::new)
                 .withTypeHandler(int[].class, ints -> Arrays.stream(ints)
                         .boxed()

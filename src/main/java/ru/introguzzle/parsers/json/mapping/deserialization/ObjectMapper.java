@@ -4,9 +4,11 @@ import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.NameConverter;
 import ru.introguzzle.parsers.common.mapping.WritingMapper;
 import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
+import ru.introguzzle.parsers.common.util.NamingUtilities;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.common.mapping.MappingException;
+import ru.introguzzle.parsers.json.mapping.JSONFieldNameConverter;
 
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -77,6 +79,23 @@ import java.util.function.Supplier;
  * @see MappingException
  */
 public interface ObjectMapper extends WritingMapper<ObjectMapper> {
+    NameConverter DEFAULT_CONVERTER = NamingUtilities::toSnakeCase;
+
+    static ObjectMapper newMethodHandleMapper() {
+        return newMethodHandleMapper(DEFAULT_CONVERTER);
+    }
+
+    static ObjectMapper newMethodHandleMapper(NameConverter nameConverter) {
+        return new InvokeObjectMapper(new JSONFieldNameConverter(nameConverter));
+    }
+
+    static ObjectMapper newReflectionMapper() {
+        return newReflectionMapper(DEFAULT_CONVERTER);
+    }
+
+    static ObjectMapper newReflectionMapper(NameConverter nameConverter) {
+        return new ReflectionObjectMapper(new JSONFieldNameConverter(nameConverter));
+    }
 
     /**
      * Converts a {@link JSONObject} to an instance of the specified type.

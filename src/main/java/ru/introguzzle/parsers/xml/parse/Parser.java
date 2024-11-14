@@ -75,7 +75,7 @@ public abstract class Parser implements Serializable, BaseParser<XMLDocument> {
      * @return an {@link XMLDocument} representing the parsed XML, or {@code null} if parsing fails.
      */
     @Override
-    public abstract @Nullable XMLDocument parse(@NotNull String data);
+    public abstract @NotNull XMLDocument parse(@NotNull String data);
 
     /**
      * Asynchronously parses the given XML data into an {@link XMLDocument}.

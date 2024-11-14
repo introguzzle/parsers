@@ -60,6 +60,7 @@ import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 import ru.introguzzle.parsers.json.mapping.deserialization.InvokeObjectMapper;
 import ru.introguzzle.parsers.json.mapping.deserialization.ObjectMapper;
 import ru.introguzzle.parsers.json.mapping.deserialization.ReflectionObjectMapper;
+import ru.introguzzle.parsers.json.mapping.serialization.JSONMapper;
 import ru.introguzzle.parsers.json.mapping.serialization.JSONMapperImpl;
 import ru.introguzzle.parsers.json.parse.JSONParser;
 
@@ -82,18 +83,18 @@ public class Example {
         JSONParser parser = new JSONParser();
         JSONObject object = parser.parse(data, JSONObject.class);
 
-        ObjectMapper objectMapper = new InvokeObjectMapper();
+        ObjectMapper objectMapper = ObjectMapper.newMethodHandleMapper();
         // or use reflection based mapper
-        // ObjectMapper objectMapper = new ReflectionObjectMapper();
+        // ObjectMapper objectMapper = ObjectMapper.newReflectionMapper();
 
         Person person = objectMapper.toObject(object, Person.class);
-        JSONObject after = new JSONMapperImpl().toJSONObject(person);
+        JSONObject after = JSONMapper.newMapper().toJSONObject(person);
     }
 }
 ```
 ### Complex example
 ```java
-package ru.introguzzle.parsers.xml.mapping;
+package ru.introguzzle.parsers.example;
 
 import lombok.AllArgsConstructor;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
@@ -103,10 +104,8 @@ import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLRoot;
 import ru.introguzzle.parsers.xml.entity.type.XMLType;
 import ru.introguzzle.parsers.xml.mapping.deserialization.ObjectMapper;
-import ru.introguzzle.parsers.xml.mapping.deserialization.ObjectMapperImpl;
 import ru.introguzzle.parsers.xml.mapping.serialization.Bindable;
 import ru.introguzzle.parsers.xml.mapping.serialization.XMLMapper;
-import ru.introguzzle.parsers.xml.mapping.serialization.XMLMapperImpl;
 import ru.introguzzle.parsers.xml.parse.XMLParser;
 
 import java.util.List;
@@ -206,20 +205,22 @@ public class Example {
         XMLParser parser = new XMLParser();
         XMLDocument document = parser.parse(data);
 
-        // Obtain mappers
-        ObjectMapper objectMapper = new ObjectMapperImpl();
-        XMLMapper mapper = new XMLMapperImpl();
+        // Obtain XMLDocument to object mapper
+        ObjectMapper objectMapper = ObjectMapper.newMapper();
+
+        // Obtain object to XMLDocument mapper
+        XMLMapper mapper = XMLMapper.newMapper();
 
         // Bind mappers to class
         mapper.bindTo(Company.class);
         objectMapper.bindTo(Company.class);
-        
+
+        // Use methods of mappers directly on objects
         Company company = document.toObject(Company.class);
         XMLDocument after = company.toXMLDocument();
-
-        System.out.println();
     }
 }
+
 ```
 ## Documentation
 For detailed information on how to use the library, refer to the API Documentation.

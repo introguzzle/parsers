@@ -3,6 +3,7 @@ package ru.introguzzle.parsers.json.mapping;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
+import ru.introguzzle.parsers.common.convert.NameConverter;
 import ru.introguzzle.parsers.common.field.CachingFieldNameConverter;
 import ru.introguzzle.parsers.common.util.NamingUtilities;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
@@ -14,6 +15,10 @@ public class JSONFieldNameConverter extends CachingFieldNameConverter<JSONField>
 
     public JSONFieldNameConverter() {
         super(NamingUtilities::toSnakeCase);
+    }
+
+    public JSONFieldNameConverter(NameConverter converter) {
+        super(converter);
     }
 
     @Override

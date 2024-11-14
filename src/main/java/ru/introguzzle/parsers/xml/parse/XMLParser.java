@@ -15,7 +15,7 @@ public class XMLParser extends Parser {
     private static final long serialVersionUID = 7848273065459808396L;
 
     @Override
-    public @Nullable XMLDocument parse(@NotNull String data) throws XMLParseException {
+    public @NotNull XMLDocument parse(@NotNull String data) throws XMLParseException {
         List<Token> tokens = getTokenizer().tokenize(data);
 
         Token token = tokens.getFirst();

@@ -13,7 +13,7 @@ import ru.introguzzle.parsers.xml.entity.type.XMLType;
 import java.util.List;
 
 public class XMLMapperTest {
-    private final XMLMapper mapper = new XMLMapperImpl();
+    private final XMLMapper mapper = XMLMapper.newMapper();
 
     @AllArgsConstructor
     @XMLEntity(constructorArguments = {

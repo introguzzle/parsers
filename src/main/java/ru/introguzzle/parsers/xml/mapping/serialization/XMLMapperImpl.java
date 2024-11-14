@@ -1,5 +1,6 @@
 package ru.introguzzle.parsers.xml.mapping.serialization;
 
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.field.FieldAccessor;
@@ -29,13 +30,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 @ExtensionMethod(Classes.class)
-public class XMLMapperImpl implements XMLMapper {
+@RequiredArgsConstructor
+class XMLMapperImpl implements XMLMapper {
     private static final Configuration CONFIGURATION = Configuration.instance();
+
+    private final FieldNameConverter<XMLField> nameConverter;
 
     private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
     private final Traverser<Class<?>> traverser = new ClassTraverser();
     private final ReadingInvoker readingInvoker = new MethodHandleInvoker.Reading();
-    private final FieldNameConverter<XMLField> nameConverter = new XMLFieldNameConverter();
 
     private final XMLElementMapper elementMapper = new XMLElementMapperImpl(this);
 

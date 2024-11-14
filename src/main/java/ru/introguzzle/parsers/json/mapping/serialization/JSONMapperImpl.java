@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public class JSONMapperImpl implements JSONMapper {
+class JSONMapperImpl implements JSONMapper {
     private static final CacheSupplier CACHE_SUPPLIER = CacheService.instance();
     private static final Cache<Class<?>, TypeHandler<?>> TYPE_HANDLER_CACHE = CACHE_SUPPLIER.newCache();
 

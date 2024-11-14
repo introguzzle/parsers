@@ -10,13 +10,12 @@ import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLRoot;
 import ru.introguzzle.parsers.xml.entity.type.XMLType;
 import ru.introguzzle.parsers.xml.mapping.serialization.XMLMapper;
-import ru.introguzzle.parsers.xml.mapping.serialization.XMLMapperImpl;
 
 import java.util.List;
 
 public class ObjectMapperTest {
-    private final XMLMapper xmlMapper = new XMLMapperImpl();
-    private final ObjectMapper objectMapper = new ObjectMapperImpl();
+    private final XMLMapper xmlMapper = XMLMapper.newMapper();
+    private final ObjectMapper objectMapper = ObjectMapper.newMapper();
 
     @XMLEntity(constructorArguments = {
             @ConstructorArgument("id"),

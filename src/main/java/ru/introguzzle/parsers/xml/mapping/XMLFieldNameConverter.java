@@ -3,6 +3,7 @@ package ru.introguzzle.parsers.xml.mapping;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
+import ru.introguzzle.parsers.common.convert.NameConverter;
 import ru.introguzzle.parsers.common.field.CachingFieldNameConverter;
 import ru.introguzzle.parsers.common.util.NamingUtilities;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
@@ -14,6 +15,10 @@ public class XMLFieldNameConverter extends CachingFieldNameConverter<XMLField> {
 
     public XMLFieldNameConverter() {
         super(NamingUtilities::toCamelCase);
+    }
+
+    public XMLFieldNameConverter(NameConverter converter) {
+        super(converter);
     }
 
     @Override

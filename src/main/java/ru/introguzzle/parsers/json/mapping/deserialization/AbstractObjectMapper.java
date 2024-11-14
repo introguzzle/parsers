@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-public abstract class AbstractObjectMapper implements ObjectMapper {
+abstract class AbstractObjectMapper implements ObjectMapper {
     private final Map<Class<?>, TypeHandler<?>> defaultTypeHandlers = Maps.of(TypeHandlers.DEFAULT, Map.ofEntries(
             TypeHandler.newEntry(List.class, (o, genericTypes) -> {
                 List<Object> list = new ArrayList<>();

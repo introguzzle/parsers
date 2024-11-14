@@ -1,5 +1,6 @@
 package ru.introguzzle.parsers.json.mapping.deserialization;
 
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.common.cache.Cache;
@@ -23,8 +24,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.util.function.BiFunction;
 
-public class InvokeObjectMapper extends AbstractObjectMapper {
-    private final FieldNameConverter<JSONField> nameConverter = new JSONFieldNameConverter();
+@RequiredArgsConstructor
+class InvokeObjectMapper extends AbstractObjectMapper {
+    private final FieldNameConverter<JSONField> nameConverter;
+
     private final WritingInvoker writingInvoker = new MethodHandleInvoker.Writing();
     private final AnnotationData<JSONEntity, JSONField> annotationData = new AnnotationData<>(JSONEntity.class, JSONField.class);
 
