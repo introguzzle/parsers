@@ -1,7 +1,5 @@
 package ru.introguzzle.parsers.common.util;
 
-import lombok.experimental.UtilityClass;
-
 /**
  * <p>
  * This implementation has been taken from the Apache Commons Lang library,
@@ -12,7 +10,6 @@ import lombok.experimental.UtilityClass;
  * <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/math/NumberUtils.java?ysclid=m1l56zcwo6647001885">Apache Commons Lang - NumberUtils</a>.
  * </p>
  */
-@UtilityClass
 public final class NumberUtilities {
     /**
      * Checks whether the String is a valid Java number.
@@ -146,5 +143,12 @@ public final class NumberUtilities {
         // allowSigns is true iff the val ends in 'E'
         // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
         return !allowSigns && foundDigit;
+    }
+
+    /**
+     * Private constructor. Always throws {@code AssertionError}
+     */
+    private NumberUtilities() {
+        throw Meta.newInstantiationError(NumberUtilities.class);
     }
 }

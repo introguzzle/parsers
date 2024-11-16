@@ -7,6 +7,7 @@ import ru.introguzzle.parsers.common.mapping.AnnotationData;
 import ru.introguzzle.parsers.common.mapping.WritingMapper;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 /**
  * Basic skeleton for implementation classes
@@ -19,7 +20,7 @@ import java.lang.annotation.Annotation;
 public abstract class AnnotationInstanceSupplier<T, E extends Annotation, F extends Annotation>
         implements InstanceSupplier<T> {
     /**
-     * Parent mapper that uses this instance supplier
+     * Parent mapper that uses this supplier
      */
     protected final WritingMapper<?> mapper;
 
@@ -47,4 +48,9 @@ public abstract class AnnotationInstanceSupplier<T, E extends Annotation, F exte
      * @return value from {@code object}
      */
     public abstract Object retrieveValue(T object, String name);
+
+    @SuppressWarnings("unchecked")
+    protected <R> Class<R> getRawType(Type type) {
+        return (Class<R>) mapper.getTypeResolver().getRawType(type);
+    }
 }

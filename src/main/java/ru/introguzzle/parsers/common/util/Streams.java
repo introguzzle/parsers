@@ -3,6 +3,7 @@ package ru.introguzzle.parsers.common.util;
 import lombok.experimental.UtilityClass;
 import ru.introguzzle.parsers.common.function.*;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,8 +49,6 @@ import java.util.stream.StreamSupport;
  * @see lombok.experimental.ExtensionMethod
  */
 
-@SuppressWarnings("unused")
-@UtilityClass
 public final class Streams {
     //
     // casting
@@ -180,7 +179,6 @@ public final class Streams {
     // flatMap
     //
 
-
     public static <T, R>
     Stream<R> flatMapThrowing(Stream<T> stream,
                               ThrowingFunction<? super T, ? extends Stream<R>> mapper) {
@@ -206,7 +204,15 @@ public final class Streams {
         return Stream.concat(stream, StreamSupport.stream(iterable.spliterator(), stream.isParallel()));
     }
 
+    @SafeVarargs
     public static <T> Stream<T> append(Stream<? extends T> stream, T... elements) {
         return Stream.concat(stream, Stream.of(elements));
+    }
+
+    /**
+     * Private constructor. Always throws {@code AssertionError}
+     */
+    private Streams() {
+        throw Meta.newInstantiationError(MethodHandles.lookup().lookupClass());
     }
 }

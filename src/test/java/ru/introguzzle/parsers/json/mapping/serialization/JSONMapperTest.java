@@ -261,9 +261,9 @@ public class JSONMapperTest {
     @Test
     public void test_type_handlers() {
         var objectToJSONMapper = new JSONMapperImpl()
-                .withTypeHandler(RuntimeException.class, _ -> "RuntimeException handler")
-                .withTypeHandler(MappingException.class, _ -> "MappingException handler")
-                .withTypeHandler(Class.class, _ -> "Class handler");
+                .withTypeAdapter(RuntimeException.class, _ -> "RuntimeException handler")
+                .withTypeAdapter(MappingException.class, _ -> "MappingException handler")
+                .withTypeAdapter(Class.class, _ -> "Class handler");
 
         @AllArgsConstructor
         @SuppressWarnings("unused")
@@ -320,10 +320,10 @@ public class JSONMapperTest {
     @Test
     public void test_injections() {
         JSONMapper mapper1 = new JSONMapperImpl()
-                .withTypeHandler(String.class, _ -> "mapper1 handle");
+                .withTypeAdapter(String.class, _ -> "mapper1 handle");
 
         JSONMapper mapper2 = new JSONMapperImpl()
-                .withTypeHandler(String.class, _ -> "mapper2 handle");
+                .withTypeAdapter(String.class, _ -> "mapper2 handle");
 
         mapper1.bindTo(Other.class);
         mapper2.bindTo(Set.of(Foreign.class, ru.introguzzle.parsers.foreign.Test.class));

@@ -179,7 +179,7 @@ implements <a href="JSONMapper.html" title="interface in ru.introguzzle.parsers.
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;T&gt;&nbsp;@NotNull <a href="JSONMapper.html" title="interface in ru.introguzzle.parsers.json.mapping.serialization">JSONMapper</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withTypeHandler(java.lang.Class,ru.introguzzle.parsers.common.mapping.serialization.TypeHandler)" class="member-name-link">withTypeHandler</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type,
- @NotNull <a href="../../../common/mapping/serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization">TypeHandler</a>&lt;? super T&gt;&nbsp;typeHandler)</code></div>
+ @NotNull <a href="../../../common/mapping/serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization">TypeHandler</a>&lt;? super T&gt;&nbsp;typeAdapter)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Registers a custom <a href="../../../common/mapping/serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization"><code>TypeHandler</code></a> for the specified type.</div>
 </div>
@@ -355,7 +355,7 @@ implements <a href="JSONMapper.html" title="interface in ru.introguzzle.parsers.
 </span><span class="modifiers">public</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">@NotNull <a href="JSONMapper.html" title="interface in ru.introguzzle.parsers.json.mapping.serialization">JSONMapper</a></span>&nbsp;<span class="element-name">withTypeHandler</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type,
  @NotNull
- @NotNull <a href="../../../common/mapping/serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization">TypeHandler</a>&lt;? super T&gt;&nbsp;typeHandler)</span></div>
+ @NotNull <a href="../../../common/mapping/serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization">TypeHandler</a>&lt;? super T&gt;&nbsp;typeAdapter)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../common/mapping/ReadingMapper.html#withTypeHandler(java.lang.Class,ru.introguzzle.parsers.common.mapping.serialization.TypeHandler)">ReadingMapper</a></code></span></div>
 <div class="block">Registers a custom <a href="../../../common/mapping/serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization"><code>TypeHandler</code></a> for the specified type.
 
@@ -368,7 +368,7 @@ implements <a href="JSONMapper.html" title="interface in ru.introguzzle.parsers.
 <dd><code>T</code> - the type for which the handler is being registered</dd>
 <dt>Parameters:</dt>
 <dd><code>type</code> - the <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> object representing the type to register the handler for</dd>
-<dd><code>typeHandler</code> - the <a href="../../../common/mapping/serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization"><code>TypeHandler</code></a> that defines the serialization logic for the specified type</dd>
+<dd><code>typeAdapter</code> - the <a href="../../../common/mapping/serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization"><code>TypeHandler</code></a> that defines the serialization logic for the specified type</dd>
 <dt>Returns:</dt>
 <dd>the current instance of <code>M</code> to allow method chaining</dd>
 </dl>

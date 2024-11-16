@@ -21,7 +21,7 @@ import java.util.function.Function;
  *            <br>{@link String}
  */
 @FunctionalInterface
-public interface TypeHandler<T> extends Function<T, Object> {
+public interface TypeAdapter<T> extends Function<T, Object> {
     /**
      * Applies this handler to the given object.
      *
@@ -31,11 +31,11 @@ public interface TypeHandler<T> extends Function<T, Object> {
     @Override
     Object apply(T object);
 
-    static <T> TypeHandler<T> of(Function<? super T, Object> function) {
+    static <T> TypeAdapter<T> of(Function<? super T, Object> function) {
         return function::apply;
     }
 
-    static <T> Entry<Class<T>, TypeHandler<T>> newEntry(Class<T> type, Function<? super T, Object> function) {
+    static <T> Entry<Class<T>, TypeAdapter<T>> newEntry(Class<T> type, Function<? super T, Object> function) {
         return Map.entry(type, of(function));
     }
 }

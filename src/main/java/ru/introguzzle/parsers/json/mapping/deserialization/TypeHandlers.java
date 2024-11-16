@@ -2,7 +2,7 @@ package ru.introguzzle.parsers.json.mapping.deserialization;
 
 import lombok.experimental.UtilityClass;
 import ru.introguzzle.parsers.common.mapping.MappingException;
-import ru.introguzzle.parsers.common.mapping.deserialization.TypeHandler;
+import ru.introguzzle.parsers.common.mapping.deserialization.TypeAdapter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -13,8 +13,8 @@ import java.util.Map;
 
 @UtilityClass
 public final class TypeHandlers {
-    public static final Map<Class<?>, TypeHandler<?>> DEFAULT = Map.ofEntries(
-            TypeHandler.newEntry(Date.class, (o, genericTypes) -> {
+    public static final Map<Class<?>, TypeAdapter<?>> DEFAULT = Map.ofEntries(
+            TypeAdapter.newEntry(Date.class, (o, genericTypes) -> {
                 if (o instanceof String string) {
                     return Date.from(Instant.parse(string));
                 }
@@ -22,7 +22,7 @@ public final class TypeHandlers {
                 throw MappingException.ofConversion(Date.class, o.getClass());
             }),
 
-            TypeHandler.newEntry(BigDecimal.class, (o, genericTypes) -> {
+            TypeAdapter.newEntry(BigDecimal.class, (o, genericTypes) -> {
                 if (o instanceof String string) {
                     return new BigDecimal(string);
                 }
@@ -30,7 +30,7 @@ public final class TypeHandlers {
                 throw MappingException.ofConversion(BigDecimal.class, o.getClass());
             }),
 
-            TypeHandler.newEntry(BigInteger.class, (o, genericTypes) -> {
+            TypeAdapter.newEntry(BigInteger.class, (o, genericTypes) -> {
                 if (o instanceof String string) {
                     return new BigInteger(string);
                 }
@@ -38,7 +38,7 @@ public final class TypeHandlers {
                 throw MappingException.ofConversion(BigInteger.class, o.getClass());
             }),
 
-            TypeHandler.newEntry(URI.class, (o, genericTypes) -> {
+            TypeAdapter.newEntry(URI.class, (o, genericTypes) -> {
                 if (o instanceof String string) {
                     return URI.create(string);
                 }
@@ -46,7 +46,7 @@ public final class TypeHandlers {
                 throw MappingException.ofConversion(URI.class, o.getClass());
             }),
 
-            TypeHandler.newEntry(Throwable.class, (o, genericTypes) -> {
+            TypeAdapter.newEntry(Throwable.class, (o, genericTypes) -> {
                 if (o instanceof String string) {
                     return new Throwable(string);
                 }
@@ -54,7 +54,7 @@ public final class TypeHandlers {
                 throw MappingException.ofConversion(Throwable.class, o.getClass());
             }),
 
-            TypeHandler.newEntry(Class.class, (o, genericTypes) -> {
+            TypeAdapter.newEntry(Class.class, (o, genericTypes) -> {
                 if (o instanceof String string) {
                     try {
                         return Class.forName(string);

@@ -15,9 +15,11 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Optimized version of {@link ReflectionAnnotationInstanceSupplier}
@@ -58,8 +60,8 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
         return MethodType.methodType(void.class, argumentTypes);
     }
 
-    private static final Cache<Class<?>, ConstructorWrapper<?>> CONSTRUCTOR_CACHE;
-    private static final Cache<Class<?>, ConstructorData<?>> CONSTRUCTOR_DATA_CACHE;
+    private static final Cache<Type, ConstructorWrapper<?>> CONSTRUCTOR_CACHE;
+    private static final Cache<Type, ConstructorData<?>> CONSTRUCTOR_DATA_CACHE;
 
     static {
         CacheSupplier supplier = CacheService.instance();
@@ -112,12 +114,12 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
     }
 
     @SuppressWarnings("unchecked")
-    private <R> ConstructorWrapper<R> getConstructorWrapper(Class<R> type) {
+    private <R> ConstructorWrapper<R> getConstructorWrapper(Type type) {
         return (ConstructorWrapper<R>) CONSTRUCTOR_CACHE.get(type);
     }
 
     @SuppressWarnings("unchecked")
-    private <R> ConstructorData<R> getConstructorData(Class<R> type, E annotation) {
+    private <R> ConstructorData<R> getConstructorData(Type type, E annotation) {
         return (ConstructorData<R>) CONSTRUCTOR_DATA_CACHE.get(type, t -> createConstructorData(t, annotation));
     }
 
@@ -128,22 +130,24 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
     }
 
     @Override
-    public <R> @NotNull R acquire(@NotNull T object, @NotNull Class<R> type) {
+    public <R> @NotNull R acquire(@NotNull T object, @NotNull Type type) {
         requireNonNull(object, type);
-        E annotation = getAnnotation(type);
+        Class<R> rawType = getRawType(type);
+
+        E annotation = getAnnotation(rawType);
         if (annotation == null || retrieveConstructorArguments(annotation).length == 0) {
-            ConstructorWrapper<R> cw = getConstructorWrapper(type);
+            ConstructorWrapper<R> cw = getConstructorWrapper(rawType);
 
             if (cw == null) {
                 MethodHandle constructorHandle;
                 try {
-                    constructorHandle = LOOKUP.findConstructor(type, EMPTY_CONSTRUCTOR_SHAPE);
+                    constructorHandle = LOOKUP.findConstructor(rawType, EMPTY_CONSTRUCTOR_SHAPE);
                 } catch (NoSuchMethodException | IllegalAccessException e) {
                     throw new MappingException(e);
                 }
 
                 cw = new ConstructorWrapper<>(constructorHandle, 0);
-                CONSTRUCTOR_CACHE.put(type, cw);
+                CONSTRUCTOR_CACHE.put(rawType, cw);
             }
 
             return cw.invoke();
@@ -152,25 +156,30 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
         return getWithArguments(object, type, annotation);
     }
 
-    private <R> R getWithArguments(T object, Class<R> type, E annotation) {
-        ConstructorData<R> constructorData = getConstructorData(type, annotation);
+    private <R> R getWithArguments(T object, Type type, E annotation) {
+        Class<R> rawType = getRawType(type);
+        ConstructorData<R> constructorData = getConstructorData(rawType, annotation);
+        Map<String, Type> resolved = mapper.getTypeResolver().resolveTypes(rawType, type);
+
         Object[] args = constructorData.fields.stream()
                 .map(field -> {
                     String transformed = getFieldNameConverter().apply(field);
-                    List<Class<?>> genericTypes = mapper.getGenericTypeAccessor().acquire(field);
-                    return mapper.getForwardCaller().apply(retrieveValue(object, transformed), field.getType(), genericTypes);
+                    Type fieldType = resolved.get(field.getName());
+
+                    return mapper.getForwardCaller().apply(retrieveValue(object, transformed), fieldType);
                 })
                 .toArray();
 
         return constructorData.wrapper.invoke(args);
     }
 
-    private <R> ConstructorData<R> createConstructorData(Class<R> type, E annotation) {
+    private <R> ConstructorData<R> createConstructorData(Type type, E annotation) {
         String[] constructorNames = Arrays.stream(retrieveConstructorArguments(annotation))
                 .map(ConstructorArgument::value)
                 .toArray(String[]::new);
 
-        List<Field> fields = mapper.getFieldAccessor().acquire(type);
+        Class<R> rawType = getRawType(type);
+        List<Field> fields = mapper.getFieldAccessor().acquire(rawType);
 
         List<Field> matchedFields = new ArrayList<>();
         List<Class<?>> constructorTypes = new ArrayList<>();
@@ -194,7 +203,7 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
             MethodHandle constructorHandle;
             try {
                 MethodType shape = shapeOf(constructorTypes);
-                constructorHandle = LOOKUP.findConstructor(type, shape);
+                constructorHandle = LOOKUP.findConstructor(rawType, shape);
             } catch (NoSuchMethodException | IllegalAccessException e) {
                 throw new MappingException(e);
             }

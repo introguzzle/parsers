@@ -29,7 +29,7 @@ public class JSONMethodBinder extends AbstractBinder<JSONMapper, Bindable> {
     }
 
     @Override
-    public Map<Class<?>, JSONMapper> acquireDispatcherRegistry() {
+    public Map<Class<?>, JSONMapper> getDispatchRegistry() {
         return MAPPER_REGISTRY;
     }
 

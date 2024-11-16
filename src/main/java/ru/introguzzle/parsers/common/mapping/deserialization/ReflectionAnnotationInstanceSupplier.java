@@ -11,10 +11,8 @@ import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.lang.reflect.Type;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -31,7 +29,7 @@ import java.util.function.Function;
  * @param <F> the type of the field-level annotation
  */
 @ExtensionMethod({Classes.class})
-public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotation, F extends Annotation>
+abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotation, F extends Annotation>
         extends AnnotationInstanceSupplier<T, E, F> {
 
     /**
@@ -57,14 +55,15 @@ public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotati
     }
 
     @Override
-    public <R> @NotNull R acquire(@NotNull T object, @NotNull Class<R> type) {
+    public <R> @NotNull R acquire(@NotNull T object, @NotNull Type type) {
         requireNonNull(object, type);
-        Optional<E> optional = type.getAnnotationAsOptional(annotationData.entityAnnotationClass());
+        Class<R> rawType = getRawType(type);
+        Optional<E> optional = rawType.retrieveAnnotation(annotationData.entityAnnotationClass());
         if (optional.isEmpty() || retrieveConstructorArguments(optional.get()).length == 0) {
             try {
-                return type.getDefaultConstructor().newInstance();
+                return rawType.retrieveDefaultConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw MappingException.ofInstantiation(type, e);
+                throw MappingException.ofInstantiation(rawType, e);
             }
         }
 
@@ -82,9 +81,10 @@ public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotati
      * @return a new instance of the specified type
      * @throws MappingException if instantiation fails due to reflection errors or invalid constructor arguments
      */
-    private <R> R getWithArguments(T object, Class<R> type, E annotation) {
+    private <R> R getWithArguments(T object, Type type, E annotation) {
         String[] constructorNames = getConstructorNames(annotation);
-        List<Field> fields = mapper.getFieldAccessor().acquire(type);
+        Class<R> rawType = getRawType(type);
+        List<Field> fields = mapper.getFieldAccessor().acquire(rawType);
 
         Function<Field, Field> matcher = field -> {
             for (String constructorName : constructorNames) {
@@ -113,16 +113,18 @@ public abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotati
             throw new MappingException("Invalid specified constructor arguments: " + Arrays.toString(constructorNames));
         }
 
+        Map<String, Type> resolved = mapper.getTypeResolver().resolveTypes(rawType, type);
         Object[] args = matchedFields.stream()
                 .map(field -> {
                     String transformed = getFieldNameConverter().apply(field);
-                    List<Class<?>> genericTypes = mapper.getGenericTypeAccessor().acquire(field);
-                    return mapper.getForwardCaller().apply(retrieveValue(object, transformed), field.getType(), genericTypes);
+                    Type fieldType = resolved.get(field.getName());
+
+                    return mapper.getForwardCaller().apply(retrieveValue(object, transformed), fieldType);
                 })
                 .toArray();
 
         try {
-            return type.getConstructor(constructorTypes).newInstance(args);
+            return rawType.getConstructor(constructorTypes).newInstance(args);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new MappingException("Can't instantiate: " + type, e);
         }

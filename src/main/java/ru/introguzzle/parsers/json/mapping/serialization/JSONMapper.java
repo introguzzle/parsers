@@ -3,7 +3,7 @@ package ru.introguzzle.parsers.json.mapping.serialization;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.NameConverter;
 import ru.introguzzle.parsers.common.mapping.ReadingMapper;
-import ru.introguzzle.parsers.common.mapping.serialization.TypeHandler;
+import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapter;
 import ru.introguzzle.parsers.common.util.NamingUtilities;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
@@ -58,7 +58,7 @@ public interface JSONMapper extends ReadingMapper<JSONMapper, Bindable> {
      * Converts a Plain Old Java Object (POJO) to a {@link JSONObject}.
      *
      * <p>This method initiates the serialization process, transforming the given Java object into its JSON representation.
-     * It utilizes the registered {@link TypeHandler}s and the specified {@link MappingContext} to manage serialization rules and handle special cases.</p>
+     * It utilizes the registered {@link TypeAdapter}s and the specified {@link MappingContext} to manage serialization rules and handle special cases.</p>
      *
      * @param object  The POJO to be serialized.
      * @param context The {@link MappingContext} that provides context information for the serialization process, such as handling circular references.

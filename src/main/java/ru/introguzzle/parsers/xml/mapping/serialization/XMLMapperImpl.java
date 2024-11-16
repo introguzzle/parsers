@@ -10,7 +10,7 @@ import ru.introguzzle.parsers.common.inject.Binder;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.common.mapping.ClassTraverser;
 import ru.introguzzle.parsers.common.mapping.Traverser;
-import ru.introguzzle.parsers.common.mapping.serialization.TypeHandler;
+import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapter;
 import ru.introguzzle.parsers.common.type.Classes;
 import ru.introguzzle.parsers.config.Configuration;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
@@ -20,7 +20,6 @@ import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLRoot;
 import ru.introguzzle.parsers.xml.mapping.FieldAccessorImpl;
-import ru.introguzzle.parsers.xml.mapping.XMLFieldNameConverter;
 import ru.introguzzle.parsers.xml.meta.Encoding;
 import ru.introguzzle.parsers.xml.meta.Version;
 
@@ -52,11 +51,11 @@ class XMLMapperImpl implements XMLMapper {
 
         Class<?> type = object.getClass();
 
-        String name = type.getAnnotationAsOptional(XMLRoot.class)
+        String name = type.retrieveAnnotation(XMLRoot.class)
                 .map(XMLRoot::value)
                 .orElse(CONFIGURATION.getRootName().getValue());
 
-        Optional<XMLEntity> annotation = type.getAnnotationAsOptional(XMLEntity.class);
+        Optional<XMLEntity> annotation = type.retrieveAnnotation(XMLEntity.class);
 
         Version version = annotation.map(XMLEntity::version).orElse(Version.V1_0);
         Encoding encoding = annotation.map(XMLEntity::encoding).orElse(Encoding.UTF_8);
@@ -107,20 +106,20 @@ class XMLMapperImpl implements XMLMapper {
     }
 
     @Override
-    public <T> @NotNull XMLMapper withTypeHandler(@NotNull Class<T> type, @NotNull TypeHandler<? super T> handler) {
-        getElementMapper().withTypeHandler(type, handler);
+    public <T> @NotNull XMLMapper withTypeAdapter(@NotNull Class<T> type, @NotNull TypeAdapter<? super T> handler) {
+        getElementMapper().withTypeAdapter(type, handler);
         return this;
     }
 
     @Override
-    public @NotNull XMLMapper withTypeHandlers(@NotNull Map<Class<?>, TypeHandler<?>> handlers) {
-        getElementMapper().withTypeHandlers(handlers);
+    public @NotNull XMLMapper withTypeAdapters(@NotNull Map<Class<?>, TypeAdapter<?>> adapters) {
+        getElementMapper().withTypeAdapters(adapters);
         return this;
     }
 
     @Override
-    public @NotNull XMLMapper clearTypeHandlers() {
-        getElementMapper().clearTypeHandlers();
+    public @NotNull XMLMapper clearTypeAdapters() {
+        getElementMapper().clearTypeAdapters();
         return this;
     }
 }

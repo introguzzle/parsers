@@ -48,7 +48,7 @@ public class ObjectMapperTest {
         Person before = new Person(999, 10, 10, "NAME", true);
         XMLDocument document = xmlMapper.toXMLDocument(before);
 
-        Person after = objectMapper.toObject(document, Person.class);
+        Person after = (Person) objectMapper.toObject(document, Person.class);
         System.out.println(after);
     }
 
@@ -78,7 +78,7 @@ public class ObjectMapperTest {
                 List.of(new SomeClass1(List.of(false), List.of(444), List.of()))
         );
         XMLDocument document = xmlMapper.toXMLDocument(before);
-        SomeClass1 after = objectMapper.toObject(document, SomeClass1.class);
+        SomeClass1 after = (SomeClass1) objectMapper.toObject(document, SomeClass1.class);
         System.out.println(after);
     }
 
@@ -114,7 +114,7 @@ public class ObjectMapperTest {
         XMLDocument document = xmlMapper.toXMLDocument(before);
         System.out.println(document.toXMLString());
 
-        SomeClass2 after = objectMapper.toObject(document, SomeClass2.class);
+        SomeClass2 after = (SomeClass2) objectMapper.toObject(document, SomeClass2.class);
         System.out.println(after);
     }
 

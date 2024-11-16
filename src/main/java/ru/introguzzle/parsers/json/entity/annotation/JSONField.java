@@ -18,7 +18,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JSONField {
-
     /**
      * Specifies the name of the field in the JSON representation.
      * If not set, the name of the field itself will be used.

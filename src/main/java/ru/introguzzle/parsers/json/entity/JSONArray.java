@@ -97,9 +97,4 @@ public class JSONArray extends UntypedArray implements
     public String getClosingSymbol() {
         return "]";
     }
-
-    @Override
-    public String toString() {
-        return toJSONStringCompact();
-    }
 }

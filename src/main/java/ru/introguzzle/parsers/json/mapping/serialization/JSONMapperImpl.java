@@ -14,8 +14,8 @@ import ru.introguzzle.parsers.common.inject.BindException;
 import ru.introguzzle.parsers.common.inject.Binder;
 import ru.introguzzle.parsers.common.mapping.ClassTraverser;
 import ru.introguzzle.parsers.common.mapping.Traverser;
-import ru.introguzzle.parsers.common.mapping.serialization.TypeHandler;
-import ru.introguzzle.parsers.common.mapping.serialization.TypeHandlers;
+import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapter;
+import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapters;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 import ru.introguzzle.parsers.json.mapping.FieldAccessorImpl;
@@ -27,6 +27,7 @@ import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceSt
 import ru.introguzzle.parsers.json.mapping.type.JSONType;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -35,15 +36,29 @@ import java.util.Objects;
 import java.util.Optional;
 
 class JSONMapperImpl implements JSONMapper {
+    private static final MethodHandle SET_PRODUCER_HANDLE;
+
+    static {
+        try {
+            Class<?> internal = Class.forName("ru.introguzzle.parsers.json.entity.Internal");
+            Field f = internal.getDeclaredField("SET_PRODUCER");
+            f.setAccessible(true);
+            SET_PRODUCER_HANDLE = (MethodHandle) f.get(null);
+
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static final CacheSupplier CACHE_SUPPLIER = CacheService.instance();
-    private static final Cache<Class<?>, TypeHandler<?>> TYPE_HANDLER_CACHE = CACHE_SUPPLIER.newCache();
+    private static final Cache<Class<?>, TypeAdapter<?>> TYPE_HANDLER_CACHE = CACHE_SUPPLIER.newCache();
 
     private final FieldNameConverter<JSONField> nameConverter;
-    private final Map<Class<?>, TypeHandler<?>> typeHandlers =
-            Maps.of(TypeHandlers.DEFAULT, Map.ofEntries(
-                    TypeHandler.newEntry(Number.class, this::handleNumber),
-                    TypeHandler.newEntry(Boolean.class, this::handleBoolean),
-                    TypeHandler.newEntry(String.class, this::handleString)
+    private final Map<Class<?>, TypeAdapter<?>> typeHandlers =
+            Maps.of(TypeAdapters.DEFAULT, Map.ofEntries(
+                    TypeAdapter.newEntry(Number.class, this::handleNumber),
+                    TypeAdapter.newEntry(Boolean.class, this::handleBoolean),
+                    TypeAdapter.newEntry(String.class, this::handleString)
             ));
 
     private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
@@ -89,29 +104,29 @@ class JSONMapperImpl implements JSONMapper {
         return readingInvoker;
     }
 
-    private TypeHandler<?> findMostSpecificTypeHandler(Class<?> type) {
+    private TypeAdapter<?> findMostSpecificTypeHandler(Class<?> type) {
         return getTraverser().findMostSpecificMatch(typeHandlers, type).orElse(null);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> TypeHandler<T> findTypeHandler(@NotNull Class<T> type) {
-        return (TypeHandler<T>) TYPE_HANDLER_CACHE.get(type, this::findMostSpecificTypeHandler);
+    public <T> TypeAdapter<T> findTypeHandler(@NotNull Class<T> type) {
+        return (TypeAdapter<T>) TYPE_HANDLER_CACHE.get(type, this::findMostSpecificTypeHandler);
     }
 
     @Override
-    public <T> @NotNull JSONMapper withTypeHandler(@NotNull Class<T> type, @NotNull TypeHandler<? super T> typeHandler) {
-        this.typeHandlers.put(type, typeHandler);
+    public <T> @NotNull JSONMapper withTypeAdapter(@NotNull Class<T> type, @NotNull TypeAdapter<? super T> typeAdapter) {
+        this.typeHandlers.put(type, typeAdapter);
         return this;
     }
 
     @Override
-    public @NotNull JSONMapper withTypeHandlers(@NotNull Map<Class<?>, TypeHandler<?>> handlers) {
-        this.typeHandlers.putAll(handlers);
+    public @NotNull JSONMapper withTypeAdapters(@NotNull Map<Class<?>, TypeAdapter<?>> adapters) {
+        this.typeHandlers.putAll(adapters);
         return this;
     }
 
     @Override
-    public @NotNull JSONMapper clearTypeHandlers() {
+    public @NotNull JSONMapper clearTypeAdapters() {
         this.typeHandlers.clear();
         return this;
     }
@@ -140,9 +155,9 @@ class JSONMapperImpl implements JSONMapper {
         }
 
         JSONObject result = new JSONObject();
-        TypeHandler<?> typeHandler;
-        if ((typeHandler = findTypeHandler(object.getClass())) != null) {
-            return ((TypeHandler<Object>) typeHandler).apply(object);
+        TypeAdapter<?> typeAdapter;
+        if ((typeAdapter = findTypeHandler(object.getClass())) != null) {
+            return ((TypeAdapter<Object>) typeAdapter).apply(object);
         }
 
         List<Field> fields = getFieldAccessor().acquire(object.getClass());
@@ -159,7 +174,11 @@ class JSONMapperImpl implements JSONMapper {
 
             Object handled = handle(field, value, context);
             if (handled instanceof CircularReference<?>) {
-                result.setApplier(this);
+                try {
+                    SET_PRODUCER_HANDLE.invokeWithArguments(result, this);
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             result.put(name, handled);
@@ -193,9 +212,9 @@ class JSONMapperImpl implements JSONMapper {
                 .orElse(JSONType.UNSPECIFIED);
 
         if (actualType == JSONType.UNSPECIFIED) {
-            TypeHandler<?> typeHandler = findTypeHandler(field.getType());
-            if (typeHandler != null) {
-                return ((TypeHandler<Object>) typeHandler).apply(fieldValue);
+            TypeAdapter<?> typeAdapter = findTypeHandler(field.getType());
+            if (typeAdapter != null) {
+                return ((TypeAdapter<Object>) typeAdapter).apply(fieldValue);
             }
 
             actualType = inferType(field, fieldValue);

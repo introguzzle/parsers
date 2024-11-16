@@ -8,45 +8,56 @@ import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.cache.CacheSupplier;
 import ru.introguzzle.parsers.common.field.FieldAccessor;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
-import ru.introguzzle.parsers.common.field.GenericTypeAccessor;
 import ru.introguzzle.parsers.common.field.WritingInvoker;
-import ru.introguzzle.parsers.common.function.TriFunction;
+import ru.introguzzle.parsers.common.mapping.deserialization.TypeAdapter;
+import ru.introguzzle.parsers.common.mapping.deserialization.TypeResolver;
 import ru.introguzzle.parsers.common.type.Primitives;
 import ru.introguzzle.parsers.common.util.Maps;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.mapping.Traverser;
 import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
-import ru.introguzzle.parsers.common.mapping.deserialization.TypeHandler;
 import ru.introguzzle.parsers.xml.entity.XMLAttribute;
 import ru.introguzzle.parsers.xml.entity.XMLElement;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class ObjectElementMapperImpl implements ObjectElementMapper {
     private static final CacheSupplier CACHE_SUPPLIER = CacheService.instance();
-    private static final Cache<Class<?>, TypeHandler<?>> HANDLER_CACHE = CACHE_SUPPLIER.newCache();
+    private static final Cache<Class<?>, TypeAdapter<?>> HANDLER_CACHE = CACHE_SUPPLIER.newCache();
 
     private final ObjectMapper parent;
 
     private <T extends Collection<Object>>
-    Map.Entry<Class<T>, TypeHandler<T>> newEntryOfIterable(Class<T> type,
+    Map.Entry<Class<T>, TypeAdapter<T>> newEntryOfIterable(Class<T> type,
                                                            Supplier<? extends T> supplier) {
-        return TypeHandler.newEntry(type, (source, genericTypes) -> {
+        return TypeAdapter.newEntry(type, (source, t) -> {
             T collection = supplier.get();
-            if (genericTypes.isEmpty()) {
+            if (!(t instanceof ParameterizedType pt)) {
                 throw new MappingException("Untyped collection is not supported");
             }
 
-            Class<?> genericType = genericTypes.getFirst();
+            Type genericType = pt.getActualTypeArguments()[0];
             if (source instanceof XMLElement element && element.isIterable()) {
                 for (Object object : element.getChildren()) {
-                    collection.add(getForwardCaller().apply(object, genericType, List.of()));
+                    collection.add(getForwardCaller().apply(object, genericType));
                 }
             }
 
@@ -55,36 +66,39 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
     }
 
     @SuppressWarnings("unchecked")
-    private final Map<Class<?>, TypeHandler<?>> defaultTypeHandlers = Maps.of(TypeHandlers.DEFAULT, Map.ofEntries(
+    private final Map<Class<?>, TypeAdapter<?>> defaultTypeHandlers = Maps.of(TypeHandlers.DEFAULT, Map.ofEntries(
             newEntryOfIterable(List.class, ArrayList::new),
             newEntryOfIterable(Set.class, HashSet::new),
             newEntryOfIterable(Queue.class, LinkedList::new),
             newEntryOfIterable(Deque.class, LinkedList::new)
     ));
 
-    private final Map<Class<?>, TypeHandler<?>> typeHandlers = new ConcurrentHashMap<>(defaultTypeHandlers);
+    private final Map<Class<?>, TypeAdapter<?>> typeHandlers = new ConcurrentHashMap<>(defaultTypeHandlers);
 
     @Override
-    public <T> @NotNull T toObject(@NotNull XMLElement root, @NotNull Class<T> type) {
+    public @NotNull Object toObject(@NotNull XMLElement root, @NotNull Type type) {
         Objects.requireNonNull(type);
-        Objects.requireNonNull(type);
-        T result = map(root, type);
+        Object result = map(root, type);
         return Objects.requireNonNull(result);
     }
 
-    private <T> @Nullable T map(@Nullable XMLElement element, @NotNull Class<T> type) {
+    private @Nullable Object map(@Nullable XMLElement element, @NotNull Type type) {
         if (element == null) {
             return null;
         }
 
-        T instance = getInstanceSupplier().acquire(element, type);
-        List<Field> fields = getFieldAccessor().acquire(type);
+        Object instance = getInstanceSupplier().acquire(element, type);
+        Class<?> rawType = getTypeResolver().getRawType(type);
+        List<Field> fields = getFieldAccessor().acquire(rawType);
+        Map<String, Type> resolved = getTypeResolver().resolveTypes(rawType, type);
+
         for (Field field : fields) {
             String name = getNameConverter().apply(field);
             Object value = element.get(name);
-            List<Class<?>> genericTypes = getGenericTypeAccessor().acquire(field);
+            Type fieldType = resolved.get(field.getName());
 
-            getWritingInvoker().invoke(field, instance, match(value, field.getType(), genericTypes));
+            Object matched = getForwardCaller().apply(value, fieldType);
+            getWritingInvoker().invoke(field, instance, matched);
         }
 
         return instance;
@@ -97,21 +111,24 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
      * @param fieldType field type
      * @return matched object for field
      */
-    public @Nullable Object match(@Nullable Object object, @NotNull Class<?> fieldType, @NotNull List<Class<?>> genericTypes) {
-        TypeHandler<?> handler = getTypeHandler(fieldType);
+    public @Nullable Object match(@Nullable Object object, @NotNull Type fieldType) {
+        Class<?> raw = getTypeResolver().getRawType(fieldType);
+        TypeAdapter<?> handler = findTypeAdapter(raw);
         if (handler != null) {
-            return handler.apply(object, genericTypes);
+            return handler.apply(object, fieldType);
         }
 
-        if (fieldType.isArray()) {
+        Class<?> componentType = getTypeResolver().getComponentType(fieldType);
+        if (componentType != null) {
             if (!(object instanceof XMLElement element)) {
-                throw new MappingException("Cannot map an array element to an object of type " + fieldType.getName());
+                throw new MappingException("Cannot map an array element to an object of type " + fieldType);
             }
 
-            return handleArray(element, fieldType, genericTypes);
+            return handleArray(element, componentType);
         }
 
-        boolean primitive = Primitives.isPrimitive(fieldType);
+        boolean primitive = fieldType instanceof Class<?> cls
+                && Primitives.isPrimitive(cls);
 
         return switch (object) {
             case null -> null;
@@ -143,39 +160,39 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
         };
     }
 
-    private Object handleArray(XMLElement iterable, Class<?> fieldType, List<Class<?>> genericTypes) {
-        Class<?> componentType = fieldType.getComponentType();
+    private Object handleArray(XMLElement iterable, Class<?> componentType) {
         int length = iterable.getChildren().size();
         Object array = Array.newInstance(componentType, length);
 
         for (int i = 0; i < length; i++) {
             XMLElement item = iterable.getChildren().get(i);
-            Object element = getForwardCaller().apply(item, componentType, genericTypes);
+            Object element = getForwardCaller().apply(item, componentType);
             Array.set(array, i, element);
         }
 
         return array;
     }
 
-    private Object handlePrimitiveType(@Nullable String value, @NotNull Class<?> fieldType) {
+    private Object handlePrimitiveType(@Nullable String value, @NotNull Type fieldType) {
         if (value == null) {
             return null;
         }
 
-        @SuppressWarnings("ALL")
-        Class<?> ft = fieldType;
+        if (!(fieldType instanceof Class<?> pt)) {
+            throw new MappingException(fieldType + " is not a primitive type");
+        }
 
         try {
-            if (ft == String.class) return value;
+            if (pt == String.class) return value;
             if (value.isEmpty()) return null;
-            if (ft == int.class || ft == Integer.class) return Integer.parseInt(value);
-            if (ft == long.class || ft == Long.class) return Long.parseLong(value);
-            if (ft == double.class || ft == Double.class) return Double.parseDouble(value);
-            if (ft == float.class || ft == Float.class) return Float.parseFloat(value);
-            if (ft == boolean.class || ft == Boolean.class) return Boolean.parseBoolean(value);
-            if (ft == short.class || ft == Short.class) return Short.parseShort(value);
-            if (ft == byte.class || ft == Byte.class) return Byte.parseByte(value);
-            if (ft == char.class || ft == Character.class) {
+            if (pt == int.class || pt == Integer.class) return Integer.parseInt(value);
+            if (pt == long.class || pt == Long.class) return Long.parseLong(value);
+            if (pt == double.class || pt == Double.class) return Double.parseDouble(value);
+            if (pt == float.class || pt == Float.class) return Float.parseFloat(value);
+            if (pt == boolean.class || pt == Boolean.class) return Boolean.parseBoolean(value);
+            if (pt == short.class || pt == Short.class) return Short.parseShort(value);
+            if (pt == byte.class || pt == Byte.class) return Byte.parseByte(value);
+            if (pt == char.class || pt == Character.class) {
                 if (value.length() != 1) {
                     throw new MappingException("Cannot convert text to char: " + value);
                 }
@@ -184,7 +201,7 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
             }
 
         } catch (NumberFormatException e) {
-            throw new MappingException("Failed to parse element text '" + value + "' to type " + ft.getName(), e);
+            throw new MappingException("Failed to parse element text '" + value + "' to type " + pt.getName(), e);
         }
 
         return null;
@@ -192,13 +209,13 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> @Nullable TypeHandler<T> getTypeHandler(@NotNull Class<T> fieldType) {
-        return (TypeHandler<T>) HANDLER_CACHE.get(fieldType, this::findMostSpecificHandler);
+    public <T> @Nullable TypeAdapter<T> findTypeAdapter(@NotNull Class<T> fieldType) {
+        return (TypeAdapter<T>) HANDLER_CACHE.get(fieldType, this::findMostSpecificHandler);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> TypeHandler<T> findMostSpecificHandler(Class<T> fieldType) {
-        return (TypeHandler<T>) getTraverser().findMostSpecificMatch(typeHandlers, fieldType).orElse(null);
+    private <T> TypeAdapter<T> findMostSpecificHandler(Class<T> fieldType) {
+        return (TypeAdapter<T>) getTraverser().findMostSpecificMatch(typeHandlers, fieldType).orElse(null);
     }
 
     @Override
@@ -225,12 +242,7 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
     }
 
     @Override
-    public @NotNull GenericTypeAccessor getGenericTypeAccessor() {
-        return parent.getGenericTypeAccessor();
-    }
-
-    @Override
-    public @NotNull TriFunction<Object, Class<?>, List<Class<?>>, Object> getForwardCaller() {
+    public @NotNull BiFunction<Object, Type, Object> getForwardCaller() {
         return this::match;
     }
 
@@ -244,23 +256,28 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
     }
 
     @Override
-    public @NotNull <T> ObjectElementMapper withTypeHandler(@NotNull Class<T> type, @NotNull TypeHandler<? extends T> handler) {
+    public @NotNull <T> ObjectElementMapper withTypeAdapter(@NotNull Class<T> type, @NotNull TypeAdapter<? extends T> adapter) {
         clearCache();
-        typeHandlers.put(type, handler);
+        typeHandlers.put(type, adapter);
         return this;
     }
 
     @Override
-    public @NotNull ObjectElementMapper withTypeHandlers(@NotNull Map<Class<?>, @NotNull TypeHandler<?>> handlers) {
+    public @NotNull ObjectElementMapper withTypeAdapters(@NotNull Map<Class<?>, @NotNull TypeAdapter<?>> adapters) {
         clearCache();
-        typeHandlers.putAll(handlers);
+        typeHandlers.putAll(adapters);
         return this;
     }
 
     @Override
-    public @NotNull ObjectElementMapper clearTypeHandlers() {
+    public @NotNull ObjectElementMapper clearTypeAdapters() {
         typeHandlers.clear();
         return this;
+    }
+
+    @Override
+    public @NotNull TypeResolver getTypeResolver() {
+        return parent.getTypeResolver();
     }
 
     @Override

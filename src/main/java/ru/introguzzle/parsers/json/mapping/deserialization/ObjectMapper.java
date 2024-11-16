@@ -10,6 +10,7 @@ import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.json.mapping.JSONFieldNameConverter;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.function.Supplier;
 
@@ -97,99 +98,9 @@ public interface ObjectMapper extends WritingMapper<ObjectMapper> {
         return new ReflectionObjectMapper(new JSONFieldNameConverter(nameConverter));
     }
 
-    /**
-     * Converts a {@link JSONObject} to an instance of the specified type.
-     *
-     * <p>This method deserializes the provided {@code JSONObject} into a Java object of the specified
-     * {@code type}. It utilizes the configured {@link NameConverter} to map JSON field names to
-     * Java object fields according to the defined naming strategy.</p>
-     *
-     * <p><strong>Example:</strong></p>
-     * <pre>{@code
-     * JSONObject jsonObject = new JSONObject();
-     * jsonObject.put("id", 1);
-     * jsonObject.put("name", "John Doe");
-     *
-     * MyClass myObject = mapper.toObject(jsonObject, MyClass.class);
-     * }</pre>
-     *
-     * @param object The JSON object to convert.
-     * @param type   The class type to convert the JSON object into.
-     * @param <T>    The type of the resulting object.
-     * @return An instance of type {@code T} representing the converted JSON data.
-     * @throws MappingException   If an error occurs during the conversion process, such as type mismatches
-     *                            or missing required fields.
-     * @throws RuntimeException   If an unexpected error occurs that is not related to the mapping logic.
-     */
-    <T> @NotNull T toObject(@NotNull JSONObject object, @NotNull Class<T> type);
-
-    /**
-     * Converts a {@link JSONArray} to an array of the specified type.
-     *
-     * <p>This method deserializes the provided {@code JSONArray} into an array of Java objects of the specified
-     * {@code type}. It iterates through each element in the JSON array, converting each {@code JSONObject} to
-     * an instance of the array's component type using the configured {@link NameConverter}.</p>
-     *
-     * <p><strong>Example:</strong></p>
-     * <pre>{@code
-     * JSONArray jsonArray = new JSONArray();
-     * JSONObject jsonObject1 = new JSONObject();
-     * jsonObject1.put("id", 1);
-     * jsonObject1.put("name", "John Doe");
-     * jsonArray.add(jsonObject1);
-     *
-     * JSONObject jsonObject2 = new JSONObject();
-     * jsonObject2.put("id", 2);
-     * jsonObject2.put("name", "Jane Smith");
-     * jsonArray.add(jsonObject2);
-     *
-     * MyClass[] myObjectsArray = mapper.toArray(jsonArray, MyClass[].class);
-     * }</pre>
-     *
-     * @param array The JSON array to convert.
-     * @param type  The array class type to convert the JSON array into (e.g., {@code MyClass[].class}).
-     * @param <T>   The type of the elements in the resulting array.
-     * @return An array of type {@code T[]} representing the converted JSON data.
-     * @throws MappingException   If an error occurs during the conversion process, such as type mismatches
-     *                            or issues with individual array elements.
-     * @throws RuntimeException   If an unexpected error occurs that is not related to the mapping logic.
-     */
-    <T> @NotNull T[] toArray(@NotNull JSONArray array, @NotNull Class<T[]> type);
-
-    /**
-     * Converts a {@link JSONArray} to a {@link Collection} of the specified type.
-     *
-     * <p>This method deserializes the provided {@code JSONArray} into a {@code Collection} of Java objects of the specified
-     * {@code type}. The {@code supplier} is used to instantiate the desired {@code Collection} implementation (e.g., {@code ArrayList::new}).
-     * Each element in the JSON array is converted to an instance of the collection's generic type using the configured {@link NameConverter}.</p>
-     *
-     * <p><strong>Example:</strong></p>
-     * <pre>{@code
-     * JSONArray jsonArray = new JSONArray();
-     * JSONObject jsonObject1 = new JSONObject();
-     * jsonObject1.put("id", 1);
-     * jsonObject1.put("name", "John Doe");
-     * jsonArray.add(jsonObject1);
-     *
-     * JSONObject jsonObject2 = new JSONObject();
-     * jsonObject2.put("id", 2);
-     * jsonObject2.put("name", "Jane Smith");
-     * jsonArray.add(jsonObject2);
-     *
-     * List<MyClass> myObjectsList = mapper.toCollection(jsonArray, MyClass.class, ArrayList::new);
-     * }</pre>
-     *
-     * @param array    The JSON array to convert.
-     * @param type     The class type of the elements to convert each JSON object into.
-     * @param supplier A {@code Supplier} providing instances of the desired {@code Collection} implementation.
-     * @param <T>      The type of the elements in the resulting collection.
-     * @param <C>      The type of the {@code Collection} to return.
-     * @return A {@code Collection} of type {@code C} containing instances of type {@code T} representing the converted JSON data.
-     * @throws MappingException   If an error occurs during the conversion process, such as type mismatches
-     *                            or issues with individual array elements.
-     * @throws RuntimeException   If an unexpected error occurs that is not related to the mapping logic.
-     */
-    <T, C extends Collection<T>> @NotNull C toCollection(@NotNull JSONArray array, @NotNull Class<T> type, @NotNull Supplier<C> supplier);
+    @NotNull Object toObject(@NotNull JSONObject object, @NotNull Type type);
+    @NotNull Object[] toArray(@NotNull JSONArray array, @NotNull Type type);
+    <E, C extends Collection<E>> @NotNull C toCollection(@NotNull JSONArray array, @NotNull Type type, @NotNull Supplier<C> supplier);
 
     @NotNull InstanceSupplier<JSONObject> getInstanceSupplier();
 }

@@ -10,12 +10,12 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.util.Map;
 
 public abstract class AbstractBinder<S, T> implements Binder<S, T> {
-    public abstract Map<Class<?>, S> acquireDispatcherRegistry();
+    public abstract Map<Class<?>, S> getDispatchRegistry();
     private final S source;
 
     public AbstractBinder(S source, Class<? extends T> targetType) {
         this.source = source;
-        acquireDispatcherRegistry().put(targetType, source);
+        getDispatchRegistry().put(targetType, source);
     }
 
     @Override
@@ -41,7 +41,7 @@ public abstract class AbstractBinder<S, T> implements Binder<S, T> {
             ClassFileLocator locator = ClassFileLocator.ForClassLoader.of(targetType.getClassLoader());
             strategy.reset(locator, targetType);
 
-            acquireDispatcherRegistry().remove(targetType);
+            getDispatchRegistry().remove(targetType);
         } catch (Exception e) {
             throw new BindException("Unbinding failed.", e);
         }

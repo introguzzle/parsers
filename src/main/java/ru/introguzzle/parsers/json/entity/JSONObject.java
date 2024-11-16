@@ -1,6 +1,5 @@
 package ru.introguzzle.parsers.json.entity;
 
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.util.UntypedMap;
@@ -16,7 +15,7 @@ import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.xml.entity.XMLDocumentConvertable;
 
 import java.io.Serial;
-import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,7 +27,6 @@ import java.util.Objects;
  * It implements both {@link JSONStringConvertable} and {@link JSONObjectConvertable} interfaces.
  * </p>
  */
-@Getter
 public class JSONObject extends UntypedMap implements
         JSONStringConvertable, JSONObjectConvertable,
         XMLDocumentConvertable, Visitable<JSONObject, Visitor<JSONObject>> {
@@ -40,8 +38,12 @@ public class JSONObject extends UntypedMap implements
         CONVERTER = FACTORY.getJSONDocumentToXMLConverter();
     }
 
-    private static final Map<Class<?>, ObjectMapper> MAPPERS = new HashMap<>();
-    private transient WeakReference<JSONMapper> applier;
+    private static final Map<Type, ObjectMapper> MAPPERS = new HashMap<>();
+
+    /**
+     * Mapper that produced this object
+     */
+    private transient JSONMapper producer;
 
     @Serial
     private static final long serialVersionUID = -697931640108868641L;
@@ -69,7 +71,7 @@ public class JSONObject extends UntypedMap implements
     public JSONObject getObject(String key) {
         Object value = get(key);
         return value instanceof CircularReference<?> reference
-                ? Objects.requireNonNull(applier.get()).toJSONObject(reference.getValue())
+                ? Objects.requireNonNull(producer.toJSONObject(reference.getValue()))
                 : (JSONObject) value;
     }
 
@@ -106,8 +108,8 @@ public class JSONObject extends UntypedMap implements
         return flatten(FACTORY.getTextPlaceholder());
     }
 
-    public JSONObject flatten(String textKey) {
-        Object flattened = flatten(this, textKey);
+    public JSONObject flatten(String textPlaceholder) {
+        Object flattened = flatten(this, textPlaceholder);
         if (flattened instanceof JSONObject) {
             return (JSONObject) flattened;
         }
@@ -115,9 +117,9 @@ public class JSONObject extends UntypedMap implements
         throw new ClassCastException("Flattened root is not a JSONObject");
     }
 
-    private static Object flatten(JSONObject object, String textKey) {
-        if (object.size() == 1 && object.containsKey(textKey)) {
-            return object.get(textKey);
+    private static Object flatten(JSONObject object, String textPlaceholder) {
+        if (object.size() == 1 && object.containsKey(textPlaceholder)) {
+            return object.get(textPlaceholder);
         }
 
         JSONObject result = new JSONObject();
@@ -127,9 +129,9 @@ public class JSONObject extends UntypedMap implements
             Object value = entry.getValue();
 
             if (value instanceof JSONObject o) {
-                result.put(key, flatten(o, textKey));
+                result.put(key, flatten(o, textPlaceholder));
             } else if (value instanceof JSONArray a) {
-                result.put(key, flatten(a, textKey));
+                result.put(key, flatten(a, textPlaceholder));
             } else {
                 result.put(key, value);
             }
@@ -154,19 +156,19 @@ public class JSONObject extends UntypedMap implements
         return result;
     }
 
-    public static void bindTo(Class<?> type, ObjectMapper mapper) {
+    static void bindTo(Class<?> type, ObjectMapper mapper) {
         MAPPERS.put(type, mapper);
     }
 
-    public static void unbind(Class<?> type) {
+    static void unbind(Class<?> type) {
         MAPPERS.remove(type);
     }
 
-    public static void unbindAll() {
+    static void unbindAll() {
         MAPPERS.clear();
     }
 
-    public <T> T toObject(Class<T> type) {
+    public Object toObject(Type type) {
         ObjectMapper associate = MAPPERS.get(type);
         if (associate == null) {
             throw new MappingException("No mapper present for " + type);
@@ -175,9 +177,10 @@ public class JSONObject extends UntypedMap implements
         return associate.toObject(this, type);
     }
 
-    public void setApplier(JSONMapper mapper) {
-        if (applier == null) {
-            applier = new WeakReference<>(mapper);
+    void setProducer(JSONMapper mapper) {
+        // Can be set only once
+        if (producer == null) {
+            producer = mapper;
         }
     }
 

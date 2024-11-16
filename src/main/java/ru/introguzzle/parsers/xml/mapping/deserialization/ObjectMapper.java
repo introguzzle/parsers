@@ -9,8 +9,10 @@ import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.xml.entity.XMLElement;
 import ru.introguzzle.parsers.xml.mapping.XMLFieldNameConverter;
 
+import java.lang.reflect.Type;
+
 public interface ObjectMapper extends WritingMapper<ObjectMapper> {
-    <T> @NotNull T toObject(@NotNull XMLDocument document, @NotNull Class<T> type);
+    @NotNull Object toObject(@NotNull XMLDocument document, @NotNull Type type);
     @NotNull InstanceSupplier<XMLElement> getInstanceSupplier();
 
     static ObjectMapper newMapper() {

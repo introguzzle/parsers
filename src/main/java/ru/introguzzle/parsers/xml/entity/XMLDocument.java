@@ -16,6 +16,7 @@ import ru.introguzzle.parsers.xml.meta.Version;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -95,7 +96,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * A cache mapping Java classes to their corresponding {@link ObjectMapper} instances.
      * This facilitates efficient deserialization of XML data into Java objects.
      */
-    private static final Map<Class<?>, ObjectMapper> MAPPERS = new HashMap<>();
+    private static final Map<Type, ObjectMapper> MAPPERS = new HashMap<>();
 
     /**
      * Serial version UID for serialization compatibility.
@@ -217,7 +218,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @param mapper The {@code ObjectMapper} instance to bind.
      * @throws NullPointerException if {@code type} or {@code mapper} is {@code null}.
      */
-    public static void bindTo(Class<?> type, ObjectMapper mapper) {
+    static void bindTo(Class<?> type, ObjectMapper mapper) {
         Objects.requireNonNull(type, "Type cannot be null");
         Objects.requireNonNull(mapper, "ObjectMapper cannot be null");
         MAPPERS.put(type, mapper);
@@ -233,7 +234,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @param mapper The {@code ObjectMapper} instance to bind.
      * @throws NullPointerException if {@code types} or {@code mapper} is {@code null}.
      */
-    public static void bindTo(Class<?>[] types, ObjectMapper mapper) {
+    static void bindTo(Class<?>[] types, ObjectMapper mapper) {
         Objects.requireNonNull(types, "Types array cannot be null");
         Objects.requireNonNull(mapper, "ObjectMapper cannot be null");
         for (Class<?> type : types) {
@@ -251,7 +252,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @param mapper The {@code ObjectMapper} instance to bind.
      * @throws NullPointerException if {@code types} or {@code mapper} is {@code null}.
      */
-    public static void bindTo(@NotNull Set<Class<?>> types, @NotNull ObjectMapper mapper) {
+    static void bindTo(@NotNull Set<Class<?>> types, @NotNull ObjectMapper mapper) {
         Objects.requireNonNull(types, "Types set cannot be null");
         Objects.requireNonNull(mapper, "ObjectMapper cannot be null");
         for (Class<?> type : types) {
@@ -268,7 +269,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @param type The Java class type to unbind the mapper from.
      * @throws NullPointerException if {@code type} is {@code null}.
      */
-    public static void unbind(@NotNull Class<?> type) {
+    static void unbind(@NotNull Class<?> type) {
         Objects.requireNonNull(type, "Type cannot be null");
         MAPPERS.remove(type);
     }
@@ -279,7 +280,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * <p>After invoking this method, no class types will have an associated mapper, and attempting
      * to deserialize {@code XMLDocument} instances into any class will result in an exception.</p>
      */
-    public static void unbindAll() {
+    static void unbindAll() {
         MAPPERS.clear();
     }
 
@@ -295,16 +296,16 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * }</pre>
      *
      * @param type The Java class type to deserialize the XML document into.
-     * @param <T>  The type of the resulting object.
      * @return An instance of type {@code T} representing the deserialized XML data.
      * @throws MappingException If no mapper is bound to the specified class or if deserialization fails.
      * @throws NullPointerException If {@code type} is null
      */
-    public <T> @NotNull T toObject(@NotNull Class<T> type) {
+    public @NotNull Object toObject(@NotNull Type type) {
         ObjectMapper mapper = MAPPERS.get(type);
         if (mapper == null) {
-            throw new MappingException("No mapper present for " + type.getName());
+            throw new MappingException("No mapper present for " + type);
         }
+
         return mapper.toObject(this, type);
     }
 

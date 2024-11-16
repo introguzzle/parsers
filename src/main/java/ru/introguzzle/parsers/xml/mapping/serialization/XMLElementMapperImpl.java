@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.mapping.MappingException;
+import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapter;
 import ru.introguzzle.parsers.common.util.Maps;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
@@ -12,8 +13,7 @@ import ru.introguzzle.parsers.common.field.FieldAccessor;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.common.field.ReadingInvoker;
 import ru.introguzzle.parsers.common.mapping.Traverser;
-import ru.introguzzle.parsers.common.mapping.serialization.TypeHandler;
-import ru.introguzzle.parsers.common.mapping.serialization.TypeHandlers;
+import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapters;
 import ru.introguzzle.parsers.xml.entity.XMLAttribute;
 import ru.introguzzle.parsers.xml.entity.XMLElement;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
@@ -25,38 +25,46 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 @RequiredArgsConstructor
-public class XMLElementMapperImpl implements XMLElementMapper {
+class XMLElementMapperImpl implements XMLElementMapper {
     private static final CacheSupplier CACHE_SUPPLIER = CacheService.instance();
-    private static final Cache<Class<?>, TypeHandler<?>> TYPE_HANDLER_CACHE = CACHE_SUPPLIER.newCache();
-    private final Map<Class<?>, TypeHandler<?>> typeHandlers = Maps.of(TypeHandlers.DEFAULT, Map.ofEntries(
-            TypeHandler.newEntry(Number.class, Object::toString),
-            TypeHandler.newEntry(Boolean.class, Object::toString),
-            TypeHandler.newEntry(String.class, Object::toString)
+    private static final Cache<Class<?>, TypeAdapter<?>> TYPE_HANDLER_CACHE = CACHE_SUPPLIER.newCache();
+    private final Map<Class<?>, TypeAdapter<?>> typeHandlers = Maps.of(TypeAdapters.DEFAULT, Map.ofEntries(
+            TypeAdapter.newEntry(Number.class, Object::toString),
+            TypeAdapter.newEntry(Boolean.class, Object::toString),
+            TypeAdapter.newEntry(String.class, Object::toString)
     ));
 
     private final XMLMapper parent;
-    private final Inflector inflector = new DefaultInflector();
+    private final Inflector inflector = s -> {
+        if (s.endsWith("s")) {
+            return s.substring(0, s.length() - 1);
+        }
+
+        return s.contains("_")
+                ? s.concat("_item")
+                : s.concat("Item");
+    };
 
     @SuppressWarnings("unchecked")
-    private <T> TypeHandler<T> findTypeHandler(Class<T> type) {
-        return (TypeHandler<T>) TYPE_HANDLER_CACHE.get(type, this::findMostSpecificTypeHandler);
+    private <T> TypeAdapter<T> findTypeHandler(Class<T> type) {
+        return (TypeAdapter<T>) TYPE_HANDLER_CACHE.get(type, this::findMostSpecificTypeHandler);
     }
 
     @SuppressWarnings("ALL")
     @Override
-    public <T> @NotNull XMLElementMapper withTypeHandler(@NotNull Class<T> type, @NotNull TypeHandler<? super T> handler) {
+    public <T> @NotNull XMLElementMapper withTypeAdapter(@NotNull Class<T> type, @NotNull TypeAdapter<? super T> handler) {
         typeHandlers.put(type, handler);
         return this;
     }
 
     @Override
-    public @NotNull XMLElementMapper withTypeHandlers(@NotNull Map<Class<?>, TypeHandler<?>> handlers) {
-        typeHandlers.putAll(handlers);
+    public @NotNull XMLElementMapper withTypeAdapters(@NotNull Map<Class<?>, TypeAdapter<?>> adapters) {
+        typeHandlers.putAll(adapters);
         return this;
     }
 
     @Override
-    public @NotNull XMLElementMapper clearTypeHandlers() {
+    public @NotNull XMLElementMapper clearTypeAdapters() {
         typeHandlers.clear();
         return this;
     }
@@ -73,7 +81,7 @@ public class XMLElementMapperImpl implements XMLElementMapper {
         return this;
     }
 
-    private TypeHandler<?> findMostSpecificTypeHandler(Class<?> type) {
+    private TypeAdapter<?> findMostSpecificTypeHandler(Class<?> type) {
         return getTraverser().findMostSpecificMatch(typeHandlers, type).orElse(null);
     }
 
@@ -96,9 +104,9 @@ public class XMLElementMapperImpl implements XMLElementMapper {
             return root;
         }
 
-        TypeHandler<?> typeHandler = findTypeHandler(object.getClass());
-        if (type != null && typeHandler != null) {
-            String value = ((TypeHandler<Object>) typeHandler).apply(object).toString();
+        TypeAdapter<?> typeAdapter = findTypeHandler(object.getClass());
+        if (type != null && typeAdapter != null) {
+            String value = ((TypeAdapter<Object>) typeAdapter).apply(object).toString();
             switch (type) {
                 case ELEMENT -> root.setText(value);
                 case CHARACTER_DATA -> root.setCharacterData(value);
@@ -147,6 +155,10 @@ public class XMLElementMapperImpl implements XMLElementMapper {
     }
 
     private XMLElement handle(XMLField parentAnnotation, String name, Object value) {
+        if (value == null) {
+            return new XMLElement(name);
+        }
+
         Class<?> type = value.getClass();
         if (Iterable.class.isAssignableFrom(type) || type.isArray()) {
             XMLElement root = new XMLElement(name);

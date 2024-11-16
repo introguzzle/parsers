@@ -156,7 +156,7 @@ extends <a href="Mapper.html" title="interface in ru.introguzzle.parsers.common.
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="ReadingMapper.html" title="type parameter in ReadingMapper">M</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withTypeHandler(java.lang.Class,ru.introguzzle.parsers.common.mapping.serialization.TypeHandler)" class="member-name-link">withTypeHandler</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type,
- @NotNull <a href="serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization">TypeHandler</a>&lt;? super T&gt;&nbsp;typeHandler)</code></div>
+ @NotNull <a href="serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization">TypeHandler</a>&lt;? super T&gt;&nbsp;typeAdapter)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Registers a custom <a href="serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization"><code>TypeHandler</code></a> for the specified type.</div>
 </div>
@@ -204,7 +204,7 @@ extends <a href="Mapper.html" title="interface in ru.introguzzle.parsers.common.
 </span><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="ReadingMapper.html" title="type parameter in ReadingMapper">M</a></span>&nbsp;<span class="element-name">withTypeHandler</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type,
  @NotNull
- @NotNull <a href="serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization">TypeHandler</a>&lt;? super T&gt;&nbsp;typeHandler)</span></div>
+ @NotNull <a href="serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization">TypeHandler</a>&lt;? super T&gt;&nbsp;typeAdapter)</span></div>
 <div class="block">Registers a custom <a href="serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization"><code>TypeHandler</code></a> for the specified type.
 
  <p>This method allows defining how instances of a particular type should be serialized.
@@ -214,11 +214,11 @@ extends <a href="Mapper.html" title="interface in ru.introguzzle.parsers.common.
 <dd><code>T</code> - the type for which the handler is being registered</dd>
 <dt>Parameters:</dt>
 <dd><code>type</code> - the <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> object representing the type to register the handler for</dd>
-<dd><code>typeHandler</code> - the <a href="serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization"><code>TypeHandler</code></a> that defines the serialization logic for the specified type</dd>
+<dd><code>typeAdapter</code> - the <a href="serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization"><code>TypeHandler</code></a> that defines the serialization logic for the specified type</dd>
 <dt>Returns:</dt>
 <dd>the current instance of <code>M</code> to allow method chaining</dd>
 <dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/NullPointerException.html" title="class or interface in java.lang" class="external-link">NullPointerException</a></code> - if either <code>type</code> or <code>typeHandler</code> is <code>null</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/NullPointerException.html" title="class or interface in java.lang" class="external-link">NullPointerException</a></code> - if either <code>type</code> or <code>typeAdapter</code> is <code>null</code></dd>
 </dl>
 </div>
 </section>

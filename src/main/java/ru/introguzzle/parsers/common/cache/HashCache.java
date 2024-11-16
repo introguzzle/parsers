@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */
-public class HashCache<K, V> implements Cache<K, V> {
+class HashCache<K, V> implements Cache<K, V> {
     private final ConcurrentMap<K, V> map;
     private final int maximalCapacity;
     private final @Nullable Runnable onCloseHandler;
@@ -102,10 +102,6 @@ public class HashCache<K, V> implements Cache<K, V> {
             size.incrementAndGet();
             return value;
         });
-    }
-
-    public int approximateSize() {
-        return size.get();
     }
 
     @Override

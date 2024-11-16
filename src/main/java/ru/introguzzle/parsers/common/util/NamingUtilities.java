@@ -1,8 +1,5 @@
 package ru.introguzzle.parsers.common.util;
 
-import lombok.experimental.UtilityClass;
-
-@UtilityClass
 public final class NamingUtilities {
     /**
      * Converts a given string to snake_case format.
@@ -111,5 +108,12 @@ public final class NamingUtilities {
         }
 
         return result.toString();
+    }
+
+    /**
+     * Private constructor. Always throws {@code AssertionError}
+     */
+    private NamingUtilities() {
+        throw Meta.newInstantiationError(NamingUtilities.class);
     }
 }

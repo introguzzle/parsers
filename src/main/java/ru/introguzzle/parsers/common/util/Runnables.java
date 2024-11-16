@@ -1,16 +1,12 @@
 package ru.introguzzle.parsers.common.util;
 
-import lombok.experimental.UtilityClass;
-
-import java.util.function.Function;
-
-@UtilityClass
-@SuppressWarnings("unused")
 public final class Runnables {
-    public static Runnable fromFunction(Function<Object, ?> function, Object value) {
-        return () -> function.apply(value);
-    }
-
+    /**
+     * Composes a few {@code Runnable} objects
+     * @param runnable first
+     * @param after other
+     * @return composed {@code Runnable}
+     */
     public static Runnable andThen(Runnable runnable, Runnable... after) {
         return () -> {
             runnable.run();
@@ -20,13 +16,23 @@ public final class Runnables {
         };
     }
 
-    public static Runnable before(Runnable runnable, Runnable... before) {
+    /**
+     * Composes two runnables
+     * @param runnable second
+     * @param before first
+     * @return composed {@code Runnable}
+     */
+    public static Runnable before(Runnable runnable, Runnable before) {
         return () -> {
-            for (Runnable r : before) {
-                r.run();
-            }
-
+            before.run();
             runnable.run();
         };
+    }
+
+    /**
+     * Private constructor. Always throws {@code AssertionError}
+     */
+    private Runnables() {
+        throw Meta.newInstantiationError(Runnables.class);
     }
 }

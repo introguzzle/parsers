@@ -49,7 +49,7 @@ public class JSONParser extends Parser {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T map(String data, Class<? extends T> type) {
+    private <T> T map(String data, Class<? extends T> type) {
         Object result;
 
         // If the string starts with '{', treat it as a JSON object
@@ -175,7 +175,7 @@ public class JSONParser extends Parser {
         return entries;
     }
 
-    public void validate(String data) {
+    private void validate(String data) {
         Stack<Character> stack = new Stack<>();
 
         boolean inQuotes = false;

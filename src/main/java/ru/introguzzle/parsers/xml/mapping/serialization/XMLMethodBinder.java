@@ -29,7 +29,7 @@ public class XMLMethodBinder extends AbstractBinder<XMLMapper, Bindable> {
     }
 
     @Override
-    public Map<Class<?>, XMLMapper> acquireDispatcherRegistry() {
+    public Map<Class<?>, XMLMapper> getDispatchRegistry() {
         return MAPPER_REGISTRY;
     }
 

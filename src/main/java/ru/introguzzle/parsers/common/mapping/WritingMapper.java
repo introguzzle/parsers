@@ -2,14 +2,14 @@ package ru.introguzzle.parsers.common.mapping;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.introguzzle.parsers.common.field.GenericTypeAccessor;
 import ru.introguzzle.parsers.common.field.WritingInvoker;
-import ru.introguzzle.parsers.common.function.TriFunction;
-import ru.introguzzle.parsers.common.mapping.deserialization.TypeHandler;
+import ru.introguzzle.parsers.common.mapping.deserialization.TypeAdapter;
+import ru.introguzzle.parsers.common.mapping.deserialization.TypeResolver;
 
-import java.util.List;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 public interface WritingMapper<M extends WritingMapper<M>> extends Mapper {
     @NotNull M bindTo(@NotNull Class<?> targetType);
@@ -33,7 +33,6 @@ public interface WritingMapper<M extends WritingMapper<M>> extends Mapper {
     }
 
     @NotNull WritingInvoker getWritingInvoker();
-    @NotNull GenericTypeAccessor getGenericTypeAccessor();
 
     /**
      * Retrieves the forward caller function used for type conversions.
@@ -45,10 +44,12 @@ public interface WritingMapper<M extends WritingMapper<M>> extends Mapper {
      * @return A {@code BiFunction} that performs type conversions, taking an {@code Object} and a target {@code Class},
      * and returning an instance of the target type.
      */
-    @NotNull TriFunction<Object, Class<?>, List<Class<?>>, Object> getForwardCaller();
+    @NotNull BiFunction<Object, Type, Object> getForwardCaller();
 
-    <T> @Nullable TypeHandler<T> getTypeHandler(@NotNull Class<T> type);
-    <T> @NotNull M withTypeHandler(@NotNull Class<T> type, @NotNull TypeHandler<? extends T> handler);
-    @NotNull M withTypeHandlers(@NotNull Map<Class<?>, @NotNull TypeHandler<?>> handlers);
-    @NotNull M clearTypeHandlers();
+    <T> @Nullable TypeAdapter<T> findTypeAdapter(@NotNull Class<T> type);
+    <T> @NotNull M withTypeAdapter(@NotNull Class<T> type, @NotNull TypeAdapter<? extends T> adapter);
+    @NotNull M withTypeAdapters(@NotNull Map<Class<?>, @NotNull TypeAdapter<?>> adapters);
+    @NotNull M clearTypeAdapters();
+
+    @NotNull TypeResolver getTypeResolver();
 }

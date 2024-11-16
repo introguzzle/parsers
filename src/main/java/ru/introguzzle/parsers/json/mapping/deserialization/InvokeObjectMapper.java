@@ -2,17 +2,15 @@ package ru.introguzzle.parsers.json.mapping.deserialization;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.cache.CacheSupplier;
 import ru.introguzzle.parsers.common.field.MethodHandleInvoker;
 import ru.introguzzle.parsers.common.field.WritingInvoker;
 import ru.introguzzle.parsers.common.function.TriConsumer;
-import ru.introguzzle.parsers.common.mapping.AnnotationData;
 import ru.introguzzle.parsers.common.mapping.MappingException;
-import ru.introguzzle.parsers.common.mapping.deserialization.CachingAnnotationInstanceSupplier;
 import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
+import ru.introguzzle.parsers.common.util.DelegatingMap;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
@@ -21,6 +19,7 @@ import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
@@ -28,35 +27,13 @@ class InvokeObjectMapper extends AbstractObjectMapper {
     private final FieldNameConverter<JSONField> nameConverter;
 
     private final WritingInvoker writingInvoker = new MethodHandleInvoker.Writing();
-    private final AnnotationData<JSONEntity, JSONField> annotationData = new AnnotationData<>(JSONEntity.class, JSONField.class);
-
-    private final InstanceSupplier<JSONObject> instanceSupplier = new CachingAnnotationInstanceSupplier<>(this, annotationData) {
-        private static final Cache<Class<?>, JSONEntity> ANNOTATION_CACHE;
-
-        static {
-            CacheSupplier instance = CacheService.instance();
-            ANNOTATION_CACHE = instance.newCache();
-        }
-
-        @Override
-        public Cache<Class<?>, JSONEntity> getAnnotationCache() {
-            return ANNOTATION_CACHE;
-        }
-
-        @Override
-        public ConstructorArgument[] retrieveConstructorArguments(JSONEntity annotation) {
-            return annotation.constructorArguments();
-        }
-
-        @Override
-        public Object retrieveValue(JSONObject object, String name) {
-            return object.get(name);
-        }
-    };
+    private final InstanceSupplier<JSONObject> instanceSupplier = InstanceSupplier.getMethodHandleSupplier(
+            this, JSONEntity.class, JSONField.class, JSONEntity::constructorArguments, DelegatingMap::get, ANNOTATION_CACHE);
 
     private static final Cache<Class<?>, Class<?>> ARRAY_TYPE_CACHE;
     private static final Cache<Class<?>, MethodHandle> ARRAY_CONSTRUCTOR_CACHE;
     private static final Cache<Class<?>, MethodHandle> ARRAY_SETTER_CACHE;
+    private static final Cache<Class<?>, JSONEntity> ANNOTATION_CACHE;
 
     static {
         CacheSupplier supplier = CacheService.instance();
@@ -64,6 +41,7 @@ class InvokeObjectMapper extends AbstractObjectMapper {
         ARRAY_TYPE_CACHE = supplier.newCache();
         ARRAY_CONSTRUCTOR_CACHE = supplier.newCache();
         ARRAY_SETTER_CACHE = supplier.newCache();
+        ANNOTATION_CACHE = supplier.newCache();
     }
 
     @SuppressWarnings("unchecked")
@@ -91,10 +69,11 @@ class InvokeObjectMapper extends AbstractObjectMapper {
     }
 
     @Override
-    protected @NotNull BiFunction<Class<?>, Integer, Object> getArraySupplier() {
+    protected @NotNull BiFunction<Type, Integer, Object> getArraySupplier() {
         return (type, size) -> {
             try {
-                return getArrayConstructorHandle(getArrayType(type)).invoke(size);
+                Class<?> raw = getTypeResolver().getRawType(type);
+                return getArrayConstructorHandle(getArrayType(raw)).invoke(size);
             } catch (Throwable e) {
                 throw new MappingException("Failed to instantiate array", e);
             }
