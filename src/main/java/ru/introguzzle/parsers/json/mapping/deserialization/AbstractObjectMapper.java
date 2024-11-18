@@ -11,13 +11,17 @@ import ru.introguzzle.parsers.common.function.TriConsumer;
 import ru.introguzzle.parsers.common.mapping.ClassTraverser;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.mapping.Traverser;
+import ru.introguzzle.parsers.common.util.Nullability;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.json.mapping.FieldAccessorImpl;
 import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceStrategies.CircularReference;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -27,7 +31,6 @@ import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -220,11 +223,11 @@ abstract class AbstractObjectMapper implements ObjectMapper {
     @Override
     public @NotNull Object toObject(@NotNull JSONObject object, @NotNull Type type) {
         Object result = map(object, type);
-        Objects.requireNonNull(object);
-        Objects.requireNonNull(type);
+        Nullability.requireNonNull(object, "object");
+        Nullability.requireNonNull(type, "type");
 
         referenceMap.clear();
-        Objects.requireNonNull(result);
+        assert result != null;
         return result;
     }
 
@@ -267,7 +270,7 @@ abstract class AbstractObjectMapper implements ObjectMapper {
 
             if (!Modifier.isFinal(field.getModifiers())) {
                 if (value instanceof CircularReference<?> reference) {
-                    getWritingInvoker().invoke(field, instance, reference.getValue());
+                    getWritingInvoker().invoke(field, instance, reference.dereference());
                     continue;
                 }
 
@@ -353,7 +356,7 @@ abstract class AbstractObjectMapper implements ObjectMapper {
                 throw newConversionException(value, cls);
             }
             case "byte", "Byte" -> {
-                if (value instanceof Number n) yield n.shortValue();
+                if (value instanceof Number n) yield n.byteValue();
                 if (value instanceof String s) yield Byte.parseByte(s);
                 throw newConversionException(value, cls);
             }

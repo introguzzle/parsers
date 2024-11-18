@@ -26,13 +26,35 @@ implementation 'ru.introguzzle:parsers:1.0-SNAPSHOT'
 ```
 # Requirements
 Java 22
+Jetbrains Annotations
+Lombok
 
 # Getting Started
+### JSON related classes overview
+- JSONArray - represents JSON array
+- JSONObject - represents JSON object
+- JSONEntity - class-level annotation that defines mapping configuration
+- JSONField - field-level annotation
+- JSONType - enum that represents all possible types in JSON according to specification
+- JSONParser - parser that parses strings into corresponding type according to JSONType
+- JSONMapper - class that is responsible for mapping objects into JSONObject instances
+- ObjectMapper - class that is responsible for mapping JSONObject instance into other data classes
+
+### XML related classes overview
+- XMLElement - represents XML element
+- XMLDocument - represents XML document
+- XMLAttribute - represents XML attribute
+- XMLEntity - class-level annotation that defines mapping configuration
+- XMLField - field-level annotation
+- XMLParser - parser that parses strings into XMLDocument instances
+- XMLMapper - class that is responsible for mapping objects into XMLDocument instances
+- ObjectMapper - class that is responsible for mapping XMLDocument instance into other data classes
+
 ### Parsing a JSON string to a JSONObject
 
 ```java
 import ru.introguzzle.parsers.json.JSONParser;
-import ru.introguzzle.parsers.json.entity.JSONObject;
+import ru.introguzzle.parsers.json.entityUnion.JSONObject;
 import ru.introguzzle.parsers.json.parse.JSONParser;
 
 public class Example {
@@ -55,9 +77,9 @@ package ru.introguzzle.parsers.example;
 import lombok.AllArgsConstructor;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.common.mapping.deserialization.TypeToken;
-import ru.introguzzle.parsers.json.entity.JSONObject;
-import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
-import ru.introguzzle.parsers.json.entity.annotation.JSONField;
+import ru.introguzzle.parsers.json.entityUnion.JSONObject;
+import ru.introguzzle.parsers.json.entityUnion.annotation.JSONEntity;
+import ru.introguzzle.parsers.json.entityUnion.annotation.JSONField;
 import ru.introguzzle.parsers.json.mapping.deserialization.ObjectMapper;
 import ru.introguzzle.parsers.json.mapping.serialization.JSONMapper;
 import ru.introguzzle.parsers.json.parse.JSONParser;
@@ -108,11 +130,11 @@ package ru.introguzzle.parsers.example;
 
 import lombok.AllArgsConstructor;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
-import ru.introguzzle.parsers.xml.entity.XMLDocument;
-import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
-import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
-import ru.introguzzle.parsers.xml.entity.annotation.XMLRoot;
-import ru.introguzzle.parsers.xml.entity.type.XMLType;
+import ru.introguzzle.parsers.xml.entityUnion.XMLDocument;
+import ru.introguzzle.parsers.xml.entityUnion.annotation.XMLEntity;
+import ru.introguzzle.parsers.xml.entityUnion.annotation.XMLField;
+import ru.introguzzle.parsers.xml.entityUnion.annotation.XMLRoot;
+import ru.introguzzle.parsers.xml.entityUnion.type.XMLType;
 import ru.introguzzle.parsers.xml.mapping.deserialization.ObjectMapper;
 import ru.introguzzle.parsers.xml.mapping.serialization.Bindable;
 import ru.introguzzle.parsers.xml.mapping.serialization.XMLMapper;

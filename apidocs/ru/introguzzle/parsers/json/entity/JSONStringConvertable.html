@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="dc.created" content="2024-11-13">
-<meta name="description" content="declaration: package: ru.introguzzle.parsers.json.entity, interface: JSONStringConvertable">
+<meta name="description" content="declaration: package: ru.introguzzle.parsers.json.entityUnion, interface: JSONStringConvertable">
 <meta name="generator" content="javadoc/ClassWriter">
 <link rel="stylesheet" type="text/css" href="../../../../../resource-files/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../../resource-files/stylesheet.css" title="Style">
@@ -81,22 +81,22 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">ru.introguzzle.parsers.json.entity</a></div>
+<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">ru.introguzzle.parsers.json.entityUnion</a></div>
 <h1 title="Interface JSONStringConvertable" class="title">Interface JSONStringConvertable</h1>
 </div>
 <section class="class-description" id="class-description">
 <div class="horizontal-scroll">
 <dl class="notes">
 <dt>All Known Implementing Classes:</dt>
-<dd><code><a href="JSONArray.html" title="class in ru.introguzzle.parsers.json.entity">JSONArray</a></code>, <code><a href="JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a></code></dd>
+<dd><code><a href="JSONArray.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONArray</a></code>, <code><a href="JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a></code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">JSONStringConvertable</span></div>
-<div class="block">Interface representing an entity that can be converted to a JSON string.
+<div class="block">Interface representing an entityUnion that can be converted to a JSON string.
  <p>
  This interface defines methods to retrieve the opening and closing symbols,
- iterate over its contents, and obtain the size of the entity. It provides
- default methods for converting the entity to a JSON string in both compact
+ iterate over its contents, and obtain the size of the entityUnion. It provides
+ default methods for converting the entityUnion to a JSON string in both compact
  and pretty-printed formats.
  </p></div>
 </div>
@@ -147,7 +147,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Iterator.html" title="class or interface in java.util" class="external-link">Iterator</a><wbr>&lt;?&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getIterator()" class="member-name-link">getIterator</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Returns an iterator for the contents of this entity.</div>
+<div class="block">Returns an iterator for the contents of this entityUnion.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getOpeningSymbol()" class="member-name-link">getOpeningSymbol</a>()</code></div>
@@ -157,17 +157,17 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#size()" class="member-name-link">size</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Returns the number of elements in this entity.</div>
+<div class="block">Returns the number of elements in this entityUnion.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#toJSONString()" class="member-name-link">toJSONString</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Converts this entity to a JSON string in a pretty-printed format.</div>
+<div class="block">Converts this entityUnion to a JSON string in a pretty-printed format.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#toJSONStringCompact()" class="member-name-link">toJSONStringCompact</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Converts this entity to a JSON string in a compact format.</div>
+<div class="block">Converts this entityUnion to a JSON string in a compact format.</div>
 </div>
 </div>
 </div>
@@ -193,7 +193,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="../../../../../constant-values.html#ru.introguzzle.parsers.json.entity.JSONStringConvertable.TAB">Constant Field Values</a></li>
+<li><a href="../../../../../constant-values.html#ru.introguzzle.parsers.json.entityUnion.JSONStringConvertable.TAB">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -210,7 +210,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="../../../../../constant-values.html#ru.introguzzle.parsers.json.entity.JSONStringConvertable.INITIAL_LEVEL">Constant Field Values</a></li>
+<li><a href="../../../../../constant-values.html#ru.introguzzle.parsers.json.entityUnion.JSONStringConvertable.INITIAL_LEVEL">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -226,7 +226,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="../../../../../constant-values.html#ru.introguzzle.parsers.json.entity.JSONStringConvertable.QUOTE">Constant Field Values</a></li>
+<li><a href="../../../../../constant-values.html#ru.introguzzle.parsers.json.entityUnion.JSONStringConvertable.QUOTE">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -246,7 +246,7 @@ loadScripts(document, 'script');</script>
 <h3>getIterator</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Iterator.html" title="class or interface in java.util" class="external-link">Iterator</a>&lt;?&gt;</span>&nbsp;<span class="element-name">getIterator</span>()</div>
-<div class="block">Returns an iterator for the contents of this entity.</div>
+<div class="block">Returns an iterator for the contents of this entityUnion.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>an iterator over the contents</dd>
@@ -285,10 +285,10 @@ loadScripts(document, 'script');</script>
 <h3>size</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">int</span>&nbsp;<span class="element-name">size</span>()</div>
-<div class="block">Returns the number of elements in this entity.</div>
+<div class="block">Returns the number of elements in this entityUnion.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the size of the entity</dd>
+<dd>the size of the entityUnion</dd>
 </dl>
 </div>
 </section>
@@ -298,10 +298,10 @@ loadScripts(document, 'script');</script>
 <h3>toJSONString</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">toJSONString</span>()</div>
-<div class="block">Converts this entity to a JSON string in a pretty-printed format.</div>
+<div class="block">Converts this entityUnion to a JSON string in a pretty-printed format.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>a pretty-printed JSON string representation of this entity</dd>
+<dd>a pretty-printed JSON string representation of this entityUnion</dd>
 </dl>
 </div>
 </section>
@@ -311,10 +311,10 @@ loadScripts(document, 'script');</script>
 <h3>toJSONStringCompact</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">toJSONStringCompact</span>()</div>
-<div class="block">Converts this entity to a JSON string in a compact format.</div>
+<div class="block">Converts this entityUnion to a JSON string in a compact format.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>a compact JSON string representation of this entity</dd>
+<dd>a compact JSON string representation of this entityUnion</dd>
 </dl>
 </div>
 </section>

@@ -97,7 +97,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">JSONMapper</span><span class="extends-implements">
 extends <a href="../../../common/mapping/ReadingMapper.html" title="interface in ru.introguzzle.parsers.common.mapping">ReadingMapper</a>&lt;<a href="JSONMapper.html" title="interface in ru.introguzzle.parsers.json.mapping.serialization">JSONMapper</a>,<wbr><a href="Bindable.html" title="interface in ru.introguzzle.parsers.json.mapping.serialization">Bindable</a>&gt;</span></div>
-<div class="block">Interface for mapping Plain Old Java Objects (POJOs) to <a href="../../entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> instances.
+<div class="block">Interface for mapping Plain Old Java Objects (POJOs) to <a href="../../entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> instances.
 
  <p>This interface defines the contract for converting Java objects into their JSON representation.
  It provides mechanisms to register custom type handlers that dictate how specific types are serialized.
@@ -121,7 +121,7 @@ extends <a href="../../../common/mapping/ReadingMapper.html" title="interface in
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="../../entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a></li>
+<li><a href="../../entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a></li>
 <li><a href="../MappingContext.html" title="class in ru.introguzzle.parsers.json.mapping"><code>MappingContext</code></a></li>
 <li><a href="../../../common/convert/NameConverter.html" title="interface in ru.introguzzle.parsers.common.convert"><code>NameConverter</code></a></li>
 </ul>
@@ -142,20 +142,20 @@ extends <a href="../../../common/mapping/ReadingMapper.html" title="interface in
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NotNull <a href="../../entity/JSONArray.html" title="class in ru.introguzzle.parsers.json.entity">JSONArray</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NotNull <a href="../../entityUnion/JSONArray.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONArray</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#toJSONArray(java.lang.Object,ru.introguzzle.parsers.json.mapping.MappingContext)" class="member-name-link">toJSONArray</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;iterable,
  @NotNull <a href="../MappingContext.html" title="class in ru.introguzzle.parsers.json.mapping">MappingContext</a>&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Converts a <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link"><code>Iterable</code></a> or Java array of POJOs to a <a href="../../entity/JSONArray.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONArray</code></a>.</div>
+<div class="block">Converts a <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link"><code>Iterable</code></a> or Java array of POJOs to a <a href="../../entityUnion/JSONArray.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONArray</code></a>.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NotNull <a href="../../entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NotNull <a href="../../entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#toJSONObject(java.lang.Object)" class="member-name-link">toJSONObject</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NotNull <a href="../../entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NotNull <a href="../../entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#toJSONObject(java.lang.Object,ru.introguzzle.parsers.json.mapping.MappingContext)" class="member-name-link">toJSONObject</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
  @NotNull <a href="../MappingContext.html" title="class in ru.introguzzle.parsers.json.mapping">MappingContext</a>&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Converts a Plain Old Java Object (POJO) to a <a href="../../entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a>.</div>
+<div class="block">Converts a Plain Old Java Object (POJO) to a <a href="../../entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a>.</div>
 </div>
 </div>
 </div>
@@ -182,7 +182,7 @@ extends <a href="../../../common/mapping/ReadingMapper.html" title="interface in
 <h3>toJSONObject</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@NotNull
-</span><span class="modifiers">default</span>&nbsp;<span class="return-type">@NotNull <a href="../../entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a></span>&nbsp;<span class="element-name">toJSONObject</span><wbr><span class="parameters">(@NotNull
+</span><span class="modifiers">default</span>&nbsp;<span class="return-type">@NotNull <a href="../../entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a></span>&nbsp;<span class="element-name">toJSONObject</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</span></div>
 </div>
 </section>
@@ -192,11 +192,11 @@ extends <a href="../../../common/mapping/ReadingMapper.html" title="interface in
 <h3>toJSONObject</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@NotNull
-</span><span class="return-type">@NotNull <a href="../../entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a></span>&nbsp;<span class="element-name">toJSONObject</span><wbr><span class="parameters">(@NotNull
+</span><span class="return-type">@NotNull <a href="../../entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a></span>&nbsp;<span class="element-name">toJSONObject</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
  @NotNull
  @NotNull <a href="../MappingContext.html" title="class in ru.introguzzle.parsers.json.mapping">MappingContext</a>&nbsp;context)</span></div>
-<div class="block">Converts a Plain Old Java Object (POJO) to a <a href="../../entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a>.
+<div class="block">Converts a Plain Old Java Object (POJO) to a <a href="../../entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a>.
 
  <p>This method initiates the serialization process, transforming the given Java object into its JSON representation.
  It utilizes the registered <a href="../../../common/mapping/serialization/TypeHandler.html" title="interface in ru.introguzzle.parsers.common.mapping.serialization"><code>TypeHandler</code></a>s and the specified <a href="../MappingContext.html" title="class in ru.introguzzle.parsers.json.mapping"><code>MappingContext</code></a> to manage serialization rules and handle special cases.</p></div>
@@ -205,7 +205,7 @@ extends <a href="../../../common/mapping/ReadingMapper.html" title="interface in
 <dd><code>object</code> - The POJO to be serialized.</dd>
 <dd><code>context</code> - The <a href="../MappingContext.html" title="class in ru.introguzzle.parsers.json.mapping"><code>MappingContext</code></a> that provides context information for the serialization process, such as handling circular references.</dd>
 <dt>Returns:</dt>
-<dd>A <a href="../../entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> representing the serialized form of the given POJO.</dd>
+<dd>A <a href="../../entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> representing the serialized form of the given POJO.</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../../../common/mapping/MappingException.html" title="class in ru.introguzzle.parsers.common.mapping">MappingException</a></code> - If an error occurs during the serialization process.</dd>
 </dl>
@@ -217,17 +217,17 @@ extends <a href="../../../common/mapping/ReadingMapper.html" title="interface in
 <h3>toJSONArray</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@NotNull
-</span><span class="return-type">@NotNull <a href="../../entity/JSONArray.html" title="class in ru.introguzzle.parsers.json.entity">JSONArray</a></span>&nbsp;<span class="element-name">toJSONArray</span><wbr><span class="parameters">(@NotNull
+</span><span class="return-type">@NotNull <a href="../../entityUnion/JSONArray.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONArray</a></span>&nbsp;<span class="element-name">toJSONArray</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;iterable,
  @NotNull
  @NotNull <a href="../MappingContext.html" title="class in ru.introguzzle.parsers.json.mapping">MappingContext</a>&nbsp;context)</span></div>
-<div class="block">Converts a <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link"><code>Iterable</code></a> or Java array of POJOs to a <a href="../../entity/JSONArray.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONArray</code></a>.</div>
+<div class="block">Converts a <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link"><code>Iterable</code></a> or Java array of POJOs to a <a href="../../entityUnion/JSONArray.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONArray</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>iterable</code> - The <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link"><code>Iterable</code></a> of POJOs or Java array of POJOs.</dd>
 <dd><code>context</code> - The <a href="../MappingContext.html" title="class in ru.introguzzle.parsers.json.mapping"><code>MappingContext</code></a> that provides context information for the serialization process, such as handling circular references.</dd>
 <dt>Returns:</dt>
-<dd>A <a href="../../entity/JSONArray.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONArray</code></a> representing the serialized form of the given POJOs.</dd>
+<dd>A <a href="../../entityUnion/JSONArray.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONArray</code></a> representing the serialized form of the given POJOs.</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../../../common/mapping/MappingException.html" title="class in ru.introguzzle.parsers.common.mapping">MappingException</a></code> - if <code>iterable</code> is not instance either of <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link"><code>Iterable</code></a> or Java array.</dd>
 </dl>

@@ -67,7 +67,6 @@ import java.lang.reflect.InvocationTargetException;
  * @see JSONObject
  * @see XMLDocument
  * @see XMLElement
- * @see XMLMappingException
  */
 public abstract class ConverterFactory {
 

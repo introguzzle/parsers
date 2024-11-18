@@ -30,6 +30,7 @@ import ru.introguzzle.parsers.json.entity.JSONObject;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -167,7 +168,9 @@ class JSONMapperImpl implements JSONMapper {
             Object value;
 
             try {
-                value = getReadingInvoker().invoke(field, object);
+                value = Modifier.isStatic(field.getModifiers())
+                        ? getReadingInvoker().invokeStatic(field, object)
+                        : getReadingInvoker().invoke(field, object);
             } catch (Throwable e) {
                 throw new MappingException("Cannot retrieve value from property: " + field.getName(), e);
             }

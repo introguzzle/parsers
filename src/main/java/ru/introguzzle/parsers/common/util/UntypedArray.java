@@ -23,7 +23,7 @@ public abstract class UntypedArray extends DelegatingArray<Object> {
     }
 
     /**
-     * Retrieves the value at the specified index and casts it to the desired type.
+     * Retrieves the value at the specified index and casts it to {@code type}.
      *
      * @param index the index of the value to retrieve
      * @param type  the class type to cast to
@@ -35,7 +35,7 @@ public abstract class UntypedArray extends DelegatingArray<Object> {
     }
 
     /**
-     * Retrieves the value at the specified index and casts it to the desired type,
+     * Retrieves the value at the specified index and casts it to {@code type},
      * or returns a default value if the index is out of bounds or the value is null.
      *
      * @param index        the index of the value to retrieve

@@ -18,7 +18,7 @@ public class YAMLDocument extends UntypedMap {
     }
 
     @Override
-    public Object put(String key, Object value) {
+    public Object put(@NotNull String key, Object value) {
         String[] keys = key.split("\\.");
         if (keys.length == 1) {
             return super.put(key, value);

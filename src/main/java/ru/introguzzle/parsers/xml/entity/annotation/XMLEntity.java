@@ -1,7 +1,7 @@
 package ru.introguzzle.parsers.xml.entity.annotation;
 
 import org.intellij.lang.annotations.MagicConstant;
-import ru.introguzzle.parsers.common.mapping.AccessLevel;
+import ru.introguzzle.parsers.common.mapping.AccessPolicy;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.common.annotation.Excluded;
 import ru.introguzzle.parsers.xml.meta.Encoding;
@@ -15,8 +15,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface XMLEntity {
-    @MagicConstant(valuesFromClass = AccessLevel.class)
-    int accessLevel() default AccessLevel.DEFAULT;
+    /**
+     *
+     * @return bit flags of access policy
+     */
+    @MagicConstant(valuesFromClass = AccessPolicy.class)
+    int accessPolicy() default AccessPolicy.DEFAULT;
 
     /**
      *

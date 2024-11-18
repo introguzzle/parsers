@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.ConverterFactory;
 import ru.introguzzle.parsers.common.convert.Converter;
 import ru.introguzzle.parsers.common.mapping.MappingException;
+import ru.introguzzle.parsers.common.util.Nullability;
 import ru.introguzzle.parsers.common.visit.Visitable;
 import ru.introguzzle.parsers.common.visit.Visitor;
 import ru.introguzzle.parsers.json.entity.JSONObject;
@@ -131,7 +132,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @return A string representation of the XML document.
      */
     @Override
-    public String toXMLString() {
+    public @NotNull String toXMLString() {
         return "<?xml version=\"" + version.getValue() + "\" encoding=\"" + encoding.getValue() + "\"?>\n" + root.toXMLString();
     }
 
@@ -141,7 +142,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @return A compact string representation of the XML document.
      */
     @Override
-    public String toXMLStringCompact() {
+    public @NotNull String toXMLStringCompact() {
         return "<?xml version=\"" + version.getValue() + "\" encoding=\"" + encoding.getValue() + "\"?>" + root.toXMLStringCompact();
     }
 
@@ -219,8 +220,9 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @throws NullPointerException if {@code type} or {@code mapper} is {@code null}.
      */
     static void bindTo(Class<?> type, ObjectMapper mapper) {
-        Objects.requireNonNull(type, "Type cannot be null");
-        Objects.requireNonNull(mapper, "ObjectMapper cannot be null");
+        Nullability.requireNonNull(type, "type");
+        Nullability.requireNonNull(mapper, "mapper");
+
         MAPPERS.put(type, mapper);
     }
 
@@ -235,8 +237,9 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @throws NullPointerException if {@code types} or {@code mapper} is {@code null}.
      */
     static void bindTo(Class<?>[] types, ObjectMapper mapper) {
-        Objects.requireNonNull(types, "Types array cannot be null");
-        Objects.requireNonNull(mapper, "ObjectMapper cannot be null");
+        Nullability.requireNonNull(types, "types");
+        Nullability.requireNonNull(mapper, "mapper");
+
         for (Class<?> type : types) {
             bindTo(type, mapper);
         }
@@ -253,8 +256,9 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @throws NullPointerException if {@code types} or {@code mapper} is {@code null}.
      */
     static void bindTo(@NotNull Set<Class<?>> types, @NotNull ObjectMapper mapper) {
-        Objects.requireNonNull(types, "Types set cannot be null");
-        Objects.requireNonNull(mapper, "ObjectMapper cannot be null");
+        Nullability.requireNonNull(types, "types");
+        Nullability.requireNonNull(mapper, "mapper");
+
         for (Class<?> type : types) {
             bindTo(type, mapper);
         }
@@ -270,7 +274,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @throws NullPointerException if {@code type} is {@code null}.
      */
     static void unbind(@NotNull Class<?> type) {
-        Objects.requireNonNull(type, "Type cannot be null");
+        Nullability.requireNonNull(type, "type");
         MAPPERS.remove(type);
     }
 
@@ -301,6 +305,7 @@ public class XMLDocument implements Serializable, JSONObjectConvertable, XMLDocu
      * @throws NullPointerException If {@code type} is null
      */
     public @NotNull Object toObject(@NotNull Type type) {
+        Nullability.requireNonNull(type, "type");
         ObjectMapper mapper = MAPPERS.get(type);
         if (mapper == null) {
             throw new MappingException("No mapper present for " + type);

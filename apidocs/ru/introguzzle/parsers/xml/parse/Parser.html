@@ -91,7 +91,7 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></code>, <code><a href="../../common/parse/BaseParser.html" title="interface in ru.introguzzle.parsers.common.parse">BaseParser</a>&lt;<a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></code>, <code><a href="../../common/parse/BaseParser.html" title="interface in ru.introguzzle.parsers.common.parse">BaseParser</a>&lt;<a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;</code></dd>
 </dl>
 <dl class="notes">
 <dt>Direct Known Subclasses:</dt>
@@ -100,7 +100,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public abstract class </span><span class="element-name type-name-label">Parser</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>, <a href="../../common/parse/BaseParser.html" title="interface in ru.introguzzle.parsers.common.parse">BaseParser</a>&lt;<a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;</span></div>
+implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>, <a href="../../common/parse/BaseParser.html" title="interface in ru.introguzzle.parsers.common.parse">BaseParser</a>&lt;<a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;</span></div>
 <div class="block">Abstract base class for XML parsers.
  This class provides a common structure for parsers that utilize a <a href="../token/Tokenizer.html" title="class in ru.introguzzle.parsers.xml.token"><code>Tokenizer</code></a>
  to convert XML data into structured tokens. It also supports asynchronous parsing using an
@@ -168,15 +168,15 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the current tokenizer used by this parser.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract @Nullable <a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract @Nullable <a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#parse(java.lang.String)" class="member-name-link">parse</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;data)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Synchronously parses the given XML data into an <a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLDocument</code></a>.</div>
+<div class="block">Synchronously parses the given XML data into an <a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLDocument</code></a>.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final @NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a><wbr>&lt;<a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final @NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a><wbr>&lt;<a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#parseAsync(java.lang.String)" class="member-name-link">parseAsync</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;data)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Asynchronously parses the given XML data into an <a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLDocument</code></a>.</div>
+<div class="block">Asynchronously parses the given XML data into an <a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLDocument</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final <a href="Parser.html" title="class in ru.introguzzle.parsers.xml.parse">Parser</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setExecutor(java.util.concurrent.Executor)" class="member-name-link">setExecutor</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/concurrent/Executor.html" title="class or interface in java.util.concurrent" class="external-link">Executor</a>&nbsp;executor)</code></div>
@@ -300,18 +300,18 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <h3>parse</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@Nullable
-</span><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">@Nullable <a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a></span>&nbsp;<span class="element-name">parse</span><wbr><span class="parameters">(@NotNull
+</span><span class="modifiers">public abstract</span>&nbsp;<span class="return-type">@Nullable <a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a></span>&nbsp;<span class="element-name">parse</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;data)</span></div>
-<div class="block">Synchronously parses the given XML data into an <a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLDocument</code></a>.
+<div class="block">Synchronously parses the given XML data into an <a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLDocument</code></a>.
  This method is to be implemented by subclasses, as the parsing logic depends on the
  specific XML format.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../common/parse/BaseParser.html#parse(java.lang.String)">parse</a></code>&nbsp;in interface&nbsp;<code><a href="../../common/parse/BaseParser.html" title="interface in ru.introguzzle.parsers.common.parse">BaseParser</a>&lt;<a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;</code></dd>
+<dd><code><a href="../../common/parse/BaseParser.html#parse(java.lang.String)">parse</a></code>&nbsp;in interface&nbsp;<code><a href="../../common/parse/BaseParser.html" title="interface in ru.introguzzle.parsers.common.parse">BaseParser</a>&lt;<a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>data</code> - the XML data as a <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link"><code>String</code></a>, or <code>null</code> if no data is provided.</dd>
 <dt>Returns:</dt>
-<dd>an <a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLDocument</code></a> representing the parsed XML, or <code>null</code> if parsing fails.</dd>
+<dd>an <a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLDocument</code></a> representing the parsed XML, or <code>null</code> if parsing fails.</dd>
 </dl>
 </div>
 </section>
@@ -321,16 +321,16 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <h3>parseAsync</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@NotNull
-</span><span class="modifiers">public final</span>&nbsp;<span class="return-type">@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;</span>&nbsp;<span class="element-name">parseAsync</span><wbr><span class="parameters">(@NotNull
+</span><span class="modifiers">public final</span>&nbsp;<span class="return-type">@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a>&lt;<a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;</span>&nbsp;<span class="element-name">parseAsync</span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;data)</span></div>
-<div class="block">Asynchronously parses the given XML data into an <a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLDocument</code></a>.
+<div class="block">Asynchronously parses the given XML data into an <a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLDocument</code></a>.
  This method runs the <a href="#parse(java.lang.String)"><code>parse(String)</code></a> method asynchronously using the provided
  executor.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>data</code> - the XML data as a <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link"><code>String</code></a>, or <code>null</code> if no data is provided.</dd>
 <dt>Returns:</dt>
-<dd>a <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link"><code>CompletableFuture</code></a> that will contain the parsed <a href="../entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLDocument</code></a>.</dd>
+<dd>a <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link"><code>CompletableFuture</code></a> that will contain the parsed <a href="../entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLDocument</code></a>.</dd>
 </dl>
 </div>
 </section>

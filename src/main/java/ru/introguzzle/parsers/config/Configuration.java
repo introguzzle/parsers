@@ -32,6 +32,8 @@ public final class Configuration {
     final Property<Long> cacheInitialDelay;
     final Property<Long> cacheInvalidatePeriod;
     final Property<TimeUnit> cacheTimeUnit;
+    final Property<Boolean> debugEnabled;
+    final Property<Boolean> entityValidationEnabled;
 
     public static Configuration instance() {
         return Holder.INSTANCE;
@@ -57,6 +59,9 @@ public final class Configuration {
         cacheInitialDelay = Property.ofLong("cache.initial_delay", 1L);
         cacheInvalidatePeriod = Property.ofLong("cache.invalidate_period", 1L);
         cacheTimeUnit = Property.ofEnum("cache.time_unit", TimeUnit.class, TimeUnit.DAYS);
+
+        debugEnabled = Property.ofBoolean("debug", false);
+        entityValidationEnabled = Property.ofBoolean("entity.validation", true);
     }
 
     public boolean isLoaded() {
@@ -133,6 +138,16 @@ public final class Configuration {
         return cacheTimeUnit;
     }
 
+    @SuppressWarnings("ALL")
+    public Property<Boolean> getDebugEnabled() {
+        return debugEnabled;
+    }
+
+    @SuppressWarnings("ALL")
+    public Property<Boolean> getEntityValidationEnabled() {
+        return entityValidationEnabled;
+    }
+
     private static <T> T instanceFrom(String name, Class<T> base) throws Exception {
         return base.cast(Class.forName(name).getConstructor().newInstance());
     }
@@ -202,6 +217,10 @@ public final class Configuration {
         @SuppressWarnings("ALL")
         static <T extends Enum<T>> Property<T> ofEnum(String key, Class<T> type, T defaultValue) {
             return of(key, value -> Enum.valueOf(type, value), defaultValue);
+        }
+
+        static Property<Boolean> ofBoolean(String key, boolean defaultValue) {
+            return of(key, Boolean::valueOf, defaultValue);
         }
 
         public @NotNull String getKey() {

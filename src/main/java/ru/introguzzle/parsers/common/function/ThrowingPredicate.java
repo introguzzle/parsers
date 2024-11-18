@@ -1,5 +1,8 @@
 package ru.introguzzle.parsers.common.function;
 
+import org.jetbrains.annotations.NotNull;
+import ru.introguzzle.parsers.common.util.Nullability;
+
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -34,8 +37,8 @@ public interface ThrowingPredicate<T> {
      *         of this predicate and the {@code other} predicate
      * @throws NullPointerException if {@code other} is {@code null}
      */
-    default ThrowingPredicate<T> and(ThrowingPredicate<? super T> other) {
-        return t -> test(t) && Objects.requireNonNull(other).test(t);
+    default @NotNull ThrowingPredicate<T> and(@NotNull ThrowingPredicate<? super T> other) {
+        return t -> test(t) && Nullability.requireNonNull(other, "other").test(t);
     }
 
     /**
@@ -48,8 +51,8 @@ public interface ThrowingPredicate<T> {
      *         of this predicate and the {@code other} predicate
      * @throws NullPointerException if {@code other} is {@code null}
      */
-    default ThrowingPredicate<T> or(ThrowingPredicate<? super T> other) {
-        return t -> test(t) || Objects.requireNonNull(other).test(t);
+    default @NotNull ThrowingPredicate<T> or(@NotNull ThrowingPredicate<? super T> other) {
+        return t -> test(t) || Nullability.requireNonNull(other, "other").test(t);
     }
 
     /**
@@ -57,7 +60,7 @@ public interface ThrowingPredicate<T> {
      *
      * @return a predicate that represents the logical negation of this predicate
      */
-    default ThrowingPredicate<T> negate() {
+    default @NotNull ThrowingPredicate<T> negate() {
         return t -> !test(t);
     }
 
@@ -70,8 +73,8 @@ public interface ThrowingPredicate<T> {
      * @throws NullPointerException if {@code target} is {@code null}
      */
     @SuppressWarnings("unchecked")
-    static <T> ThrowingPredicate<T> not(ThrowingPredicate<? super T> target) {
-        return (ThrowingPredicate<T>) Objects.requireNonNull(target).negate();
+    static <T> @NotNull ThrowingPredicate<T> not(@NotNull ThrowingPredicate<? super T> target) {
+        return (ThrowingPredicate<T>) Nullability.requireNonNull(target, "target").negate();
     }
 
     /**
@@ -83,12 +86,12 @@ public interface ThrowingPredicate<T> {
      * @return a {@code Predicate} that wraps this predicate and handles checked exceptions
      * @throws NullPointerException if {@code handler} is {@code null}
      */
-    default Predicate<T> toPredicate(Transformer<? extends RuntimeException> handler) {
+    default @NotNull Predicate<T> toPredicate(@NotNull Transformer<? extends RuntimeException> handler) {
         return t -> {
             try {
                 return test(t);
             } catch (Throwable e) {
-                throw handler.apply(e);
+                throw Nullability.requireNonNull(handler, "handler").apply(e);
             }
         };
     }
@@ -103,12 +106,12 @@ public interface ThrowingPredicate<T> {
      *         returning {@code false} on error
      * @throws NullPointerException if {@code handler} is {@code null}
      */
-    default Predicate<T> toPredicate(Handler handler) {
+    default @NotNull Predicate<T> toPredicate(@NotNull Handler handler) {
         return t -> {
             try {
                 return test(t);
             } catch (Throwable e) {
-                handler.accept(e);
+                Nullability.requireNonNull(handler, "handler").accept(e);
                 return false;
             }
         };

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="dc.created" content="2024-11-13">
-<meta name="description" content="declaration: package: ru.introguzzle.parsers.xml.entity, class: XMLDocument">
+<meta name="description" content="declaration: package: ru.introguzzle.parsers.xml.entityUnion, class: XMLDocument">
 <meta name="generator" content="javadoc/ClassWriter">
 <link rel="stylesheet" type="text/css" href="../../../../../resource-files/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../../resource-files/stylesheet.css" title="Style">
@@ -81,22 +81,22 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">ru.introguzzle.parsers.xml.entity</a></div>
+<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">ru.introguzzle.parsers.xml.entityUnion</a></div>
 <h1 title="Class XMLDocument" class="title">Class XMLDocument</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance">ru.introguzzle.parsers.xml.entity.XMLDocument</div>
+<div class="inheritance">ru.introguzzle.parsers.xml.entityUnion.XMLDocument</div>
 </div>
 <section class="class-description" id="class-description">
 <div class="horizontal-scroll">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></code>, <code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../../common/visit/Visitor.html" title="interface in ru.introguzzle.parsers.common.visit">Visitor</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;&gt;</code>, <code><a href="../../common/visit/Visitable.html" title="interface in ru.introguzzle.parsers.common.visit">Visitable</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>,<wbr><a href="../../common/visit/Visitor.html" title="interface in ru.introguzzle.parsers.common.visit">Visitor</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;&gt;</code>, <code><a href="../../json/mapping/JSONObjectConvertable.html" title="interface in ru.introguzzle.parsers.json.mapping">JSONObjectConvertable</a></code>, <code><a href="XMLDocumentConvertable.html" title="interface in ru.introguzzle.parsers.xml.entity">XMLDocumentConvertable</a></code>, <code><a href="XMLStringConvertable.html" title="interface in ru.introguzzle.parsers.xml.entity">XMLStringConvertable</a></code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></code>, <code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../../common/visit/Visitor.html" title="interface in ru.introguzzle.parsers.common.visit">Visitor</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;&gt;</code>, <code><a href="../../common/visit/Visitable.html" title="interface in ru.introguzzle.parsers.common.visit">Visitable</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>,<wbr><a href="../../common/visit/Visitor.html" title="interface in ru.introguzzle.parsers.common.visit">Visitor</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;&gt;</code>, <code><a href="../../json/mapping/JSONObjectConvertable.html" title="interface in ru.introguzzle.parsers.json.mapping">JSONObjectConvertable</a></code>, <code><a href="XMLDocumentConvertable.html" title="interface in ru.introguzzle.parsers.xml.entityUnion">XMLDocumentConvertable</a></code>, <code><a href="XMLStringConvertable.html" title="interface in ru.introguzzle.parsers.xml.entityUnion">XMLStringConvertable</a></code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">XMLDocument</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>, <a href="../../json/mapping/JSONObjectConvertable.html" title="interface in ru.introguzzle.parsers.json.mapping">JSONObjectConvertable</a>, <a href="XMLDocumentConvertable.html" title="interface in ru.introguzzle.parsers.xml.entity">XMLDocumentConvertable</a>, <a href="XMLStringConvertable.html" title="interface in ru.introguzzle.parsers.xml.entity">XMLStringConvertable</a>, <a href="../../common/visit/Visitable.html" title="interface in ru.introguzzle.parsers.common.visit">Visitable</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>,<wbr><a href="../../common/visit/Visitor.html" title="interface in ru.introguzzle.parsers.common.visit">Visitor</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;&gt;</span></div>
+implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>, <a href="../../json/mapping/JSONObjectConvertable.html" title="interface in ru.introguzzle.parsers.json.mapping">JSONObjectConvertable</a>, <a href="XMLDocumentConvertable.html" title="interface in ru.introguzzle.parsers.xml.entityUnion">XMLDocumentConvertable</a>, <a href="XMLStringConvertable.html" title="interface in ru.introguzzle.parsers.xml.entityUnion">XMLStringConvertable</a>, <a href="../../common/visit/Visitable.html" title="interface in ru.introguzzle.parsers.common.visit">Visitable</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>,<wbr><a href="../../common/visit/Visitor.html" title="interface in ru.introguzzle.parsers.common.visit">Visitor</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;&gt;</span></div>
 <div class="block">Represents an XML document and provides functionalities for converting between XML and JSON representations,
  as well as deserializing XML data into Java objects.
 
@@ -146,14 +146,14 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a></li>
+<li><a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a></li>
 <li><a href="../mapping/deserialization/ObjectMapper.html" title="interface in ru.introguzzle.parsers.xml.mapping.deserialization"><code>ObjectMapper</code></a></li>
 <li><a href="../mapping/XMLMappingException.html" title="class in ru.introguzzle.parsers.xml.mapping"><code>XMLMappingException</code></a></li>
 <li><a href="../../common/convert/ConverterFactory.html" title="class in ru.introguzzle.parsers.common.convert"><code>ConverterFactory</code></a></li>
 <li><a href="../../common/convert/Converter.html" title="interface in ru.introguzzle.parsers.common.convert"><code>Converter</code></a></li>
 <li><a href="../../common/visit/Visitable.html" title="interface in ru.introguzzle.parsers.common.visit"><code>Visitable</code></a></li>
 <li><a href="../../common/visit/Visitor.html" title="interface in ru.introguzzle.parsers.common.visit"><code>Visitor</code></a></li>
-<li><a href="../../../../../serialized-form.html#ru.introguzzle.parsers.xml.entity.XMLDocument">Serialized Form</a></li>
+<li><a href="../../../../../serialized-form.html#ru.introguzzle.parsers.xml.entityUnion.XMLDocument">Serialized Form</a></li>
 </ul>
 </dd>
 </dl>
@@ -170,7 +170,7 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static final <a href="../../common/convert/Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>,<wbr><a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a>&gt;</code></div>
+<div class="col-first even-row-color"><code>static final <a href="../../common/convert/Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>,<wbr><a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a>&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#CONVERTER" class="member-name-link">CONVERTER</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">A converter that transforms <code>XMLDocument</code> instances into <code>JSONObject</code> instances.</div>
@@ -235,15 +235,15 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns a hash code value for the XMLDocument.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toJSONObject()" class="member-name-link">toJSONObject</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Converts the XML document to a <a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> representation.</div>
+<div class="block">Converts the XML document to a <a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> representation.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toJSONObjectWithMetadata()" class="member-name-link">toJSONObjectWithMetadata</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Converts the XML document to a <a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> representation, including additional metadata.</div>
+<div class="block">Converts the XML document to a <a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> representation, including additional metadata.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;T&gt;&nbsp;T</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toObject(java.lang.Class)" class="member-name-link">toObject</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</code></div>
@@ -255,12 +255,12 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the compact string representation of the XML document.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toXMLDocument()" class="member-name-link">toXMLDocument</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns this XMLDocument instance.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toXMLDocumentWithMetadata()" class="member-name-link">toXMLDocumentWithMetadata</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Converts this XMLDocument to an XMLDocument with additional metadata.</div>
@@ -322,7 +322,7 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <section class="detail" id="CONVERTER">
 <h3>CONVERTER</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="../../common/convert/Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>,<wbr><a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a>&gt;</span>&nbsp;<span class="element-name">CONVERTER</span></div>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="../../common/convert/Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a>&lt;<a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>,<wbr><a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a>&gt;</span>&nbsp;<span class="element-name">CONVERTER</span></div>
 <div class="block">A converter that transforms <code>XMLDocument</code> instances into <code>JSONObject</code> instances.</div>
 </div>
 </section>
@@ -359,7 +359,7 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <div class="block">Converts the XML document to a well-formatted XML string with proper indentation and line breaks.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="XMLStringConvertable.html#toXMLString()">toXMLString</a></code>&nbsp;in interface&nbsp;<code><a href="XMLStringConvertable.html" title="interface in ru.introguzzle.parsers.xml.entity">XMLStringConvertable</a></code></dd>
+<dd><code><a href="XMLStringConvertable.html#toXMLString()">toXMLString</a></code>&nbsp;in interface&nbsp;<code><a href="XMLStringConvertable.html" title="interface in ru.introguzzle.parsers.xml.entityUnion">XMLStringConvertable</a></code></dd>
 <dt>Returns:</dt>
 <dd>A string representation of the XML document.</dd>
 </dl>
@@ -374,7 +374,7 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <div class="block">Converts the XML document to a compact XML string without unnecessary whitespace or line breaks.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="XMLStringConvertable.html#toXMLStringCompact()">toXMLStringCompact</a></code>&nbsp;in interface&nbsp;<code><a href="XMLStringConvertable.html" title="interface in ru.introguzzle.parsers.xml.entity">XMLStringConvertable</a></code></dd>
+<dd><code><a href="XMLStringConvertable.html#toXMLStringCompact()">toXMLStringCompact</a></code>&nbsp;in interface&nbsp;<code><a href="XMLStringConvertable.html" title="interface in ru.introguzzle.parsers.xml.entityUnion">XMLStringConvertable</a></code></dd>
 <dt>Returns:</dt>
 <dd>A compact string representation of the XML document.</dd>
 </dl>
@@ -401,8 +401,8 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <h3>toJSONObject</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@NotNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a></span>&nbsp;<span class="element-name">toJSONObject</span>()</div>
-<div class="block">Converts the XML document to a <a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> representation.</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a></span>&nbsp;<span class="element-name">toJSONObject</span>()</div>
+<div class="block">Converts the XML document to a <a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> representation.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../json/mapping/JSONObjectConvertable.html#toJSONObject()">toJSONObject</a></code>&nbsp;in interface&nbsp;<code><a href="../../json/mapping/JSONObjectConvertable.html" title="interface in ru.introguzzle.parsers.json.mapping">JSONObjectConvertable</a></code></dd>
@@ -416,8 +416,8 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <section class="detail" id="toJSONObjectWithMetadata()">
 <h3>toJSONObjectWithMetadata</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a></span>&nbsp;<span class="element-name">toJSONObjectWithMetadata</span>()</div>
-<div class="block">Converts the XML document to a <a href="../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> representation, including additional metadata.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a></span>&nbsp;<span class="element-name">toJSONObjectWithMetadata</span>()</div>
+<div class="block">Converts the XML document to a <a href="../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> representation, including additional metadata.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>A <code>JSONObject</code> representing the XML document with metadata.</dd>
@@ -461,11 +461,11 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <section class="detail" id="toXMLDocument()">
 <h3>toXMLDocument</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a></span>&nbsp;<span class="element-name">toXMLDocument</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a></span>&nbsp;<span class="element-name">toXMLDocument</span>()</div>
 <div class="block">Returns this XMLDocument instance.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="XMLDocumentConvertable.html#toXMLDocument()">toXMLDocument</a></code>&nbsp;in interface&nbsp;<code><a href="XMLDocumentConvertable.html" title="interface in ru.introguzzle.parsers.xml.entity">XMLDocumentConvertable</a></code></dd>
+<dd><code><a href="XMLDocumentConvertable.html#toXMLDocument()">toXMLDocument</a></code>&nbsp;in interface&nbsp;<code><a href="XMLDocumentConvertable.html" title="interface in ru.introguzzle.parsers.xml.entityUnion">XMLDocumentConvertable</a></code></dd>
 <dt>Returns:</dt>
 <dd>This XMLDocument instance.</dd>
 </dl>
@@ -599,14 +599,14 @@ implements <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base
 <section class="detail" id="toXMLDocumentWithMetadata()">
 <h3>toXMLDocumentWithMetadata</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a></span>&nbsp;<span class="element-name">toXMLDocumentWithMetadata</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a></span>&nbsp;<span class="element-name">toXMLDocumentWithMetadata</span>()</div>
 <div class="block">Converts this XMLDocument to an XMLDocument with additional metadata.
 
  <p>Currently, this method returns <code>null</code> and should be implemented to include metadata
  if required.</p></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="XMLDocumentConvertable.html#toXMLDocumentWithMetadata()">toXMLDocumentWithMetadata</a></code>&nbsp;in interface&nbsp;<code><a href="XMLDocumentConvertable.html" title="interface in ru.introguzzle.parsers.xml.entity">XMLDocumentConvertable</a></code></dd>
+<dd><code><a href="XMLDocumentConvertable.html#toXMLDocumentWithMetadata()">toXMLDocumentWithMetadata</a></code>&nbsp;in interface&nbsp;<code><a href="XMLDocumentConvertable.html" title="interface in ru.introguzzle.parsers.xml.entityUnion">XMLDocumentConvertable</a></code></dd>
 <dt>Returns:</dt>
 <dd>An <code>XMLDocument</code> instance with metadata, or <code>null</code> if not implemented.</dd>
 <dt>See Also:</dt>

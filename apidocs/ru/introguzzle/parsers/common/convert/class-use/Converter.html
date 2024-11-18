@@ -55,9 +55,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="#ru.introguzzle.parsers.common.convert">ru.introguzzle.parsers.common.convert</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#ru.introguzzle.parsers.json.entity">ru.introguzzle.parsers.json.entity</a></div>
+<div class="col-first odd-row-color"><a href="#ru.introguzzle.parsers.json.entityUnion">ru.introguzzle.parsers.json.entityUnion</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#ru.introguzzle.parsers.xml.entity">ru.introguzzle.parsers.xml.entity</a></div>
+<div class="col-first even-row-color"><a href="#ru.introguzzle.parsers.xml.entityUnion">ru.introguzzle.parsers.xml.entityUnion</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
@@ -73,7 +73,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="../JSONObjectToXMLDocumentConverter.html" class="type-name-link" title="class in ru.introguzzle.parsers.common.convert">JSONObjectToXMLDocumentConverter</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">This class is responsible for converting a <a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> into an <a href="../../../xml/entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLDocument</code></a>.</div>
+<div class="block">This class is responsible for converting a <a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> into an <a href="../../../xml/entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLDocument</code></a>.</div>
 </div>
 <div class="col-first odd-row-color"><code>class&nbsp;</code></div>
 <div class="col-second odd-row-color"><code><a href="../XMLDocumentToJSONConverter.html" class="type-name-link" title="class in ru.introguzzle.parsers.common.convert">XMLDocumentToJSONConverter</a></code></div>
@@ -87,53 +87,53 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>abstract <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a>,<wbr><a href="../../../xml/entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;</code></div>
+<div class="col-first even-row-color"><code>abstract <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a>,<wbr><a href="../../../xml/entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ConverterFactory.</span><code><a href="../ConverterFactory.html#getJSONDocumentToXMLConverter()" class="member-name-link">getJSONDocumentToXMLConverter</a>()</code></div>
 <div class="col-last even-row-color">
-<div class="block">Retrieves a converter that transforms <a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> instances into <a href="../../../xml/entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLDocument</code></a> instances.</div>
+<div class="block">Retrieves a converter that transforms <a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> instances into <a href="../../../xml/entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLDocument</code></a> instances.</div>
 </div>
-<div class="col-first odd-row-color"><code>abstract <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../xml/entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>,<wbr><a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a>&gt;</code></div>
+<div class="col-first odd-row-color"><code>abstract <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../xml/entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>,<wbr><a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a>&gt;</code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ConverterFactory.</span><code><a href="../ConverterFactory.html#getXMLDocumentToJSONConverter()" class="member-name-link">getXMLDocumentToJSONConverter</a>()</code></div>
 <div class="col-last odd-row-color">
-<div class="block">Retrieves a converter that transforms <a href="../../../xml/entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLDocument</code></a> instances into <a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> instances.</div>
+<div class="block">Retrieves a converter that transforms <a href="../../../xml/entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLDocument</code></a> instances into <a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> instances.</div>
 </div>
-<div class="col-first even-row-color"><code>abstract @NotNull <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../xml/entity/XMLElement.html" title="class in ru.introguzzle.parsers.xml.entity">XMLElement</a>,<wbr><a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a>&gt;</code></div>
+<div class="col-first even-row-color"><code>abstract @NotNull <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../xml/entityUnion/XMLElement.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLElement</a>,<wbr><a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a>&gt;</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ConverterFactory.</span><code><a href="../ConverterFactory.html#getXMLElementToJSONConverter()" class="member-name-link">getXMLElementToJSONConverter</a>()</code></div>
 <div class="col-last even-row-color">
-<div class="block">Retrieves a converter that transforms <a href="../../../xml/entity/XMLElement.html" title="class in ru.introguzzle.parsers.xml.entity"><code>XMLElement</code></a> instances into <a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity"><code>JSONObject</code></a> instances.</div>
+<div class="block">Retrieves a converter that transforms <a href="../../../xml/entityUnion/XMLElement.html" title="class in ru.introguzzle.parsers.xml.entityUnion"><code>XMLElement</code></a> instances into <a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion"><code>JSONObject</code></a> instances.</div>
 </div>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="ru.introguzzle.parsers.json.entity">
-<h2>Uses of <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a> in <a href="../../../json/entity/package-summary.html">ru.introguzzle.parsers.json.entity</a></h2>
-<div class="caption"><span>Fields in <a href="../../../json/entity/package-summary.html">ru.introguzzle.parsers.json.entity</a> declared as <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a></span></div>
+<section class="detail" id="ru.introguzzle.parsers.json.entityUnion">
+<h2>Uses of <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a> in <a href="../../../json/entityUnion/package-summary.html">ru.introguzzle.parsers.json.entityUnion</a></h2>
+<div class="caption"><span>Fields in <a href="../../../json/entityUnion/package-summary.html">ru.introguzzle.parsers.json.entityUnion</a> declared as <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static final <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a>,<wbr><a href="../../../xml/entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">JSONObject.</span><code><a href="../../../json/entity/JSONObject.html#CONVERTER" class="member-name-link">CONVERTER</a></code></div>
+<div class="col-first even-row-color"><code>static final <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a>,<wbr><a href="../../../xml/entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">JSONObject.</span><code><a href="../../../json/entityUnion/JSONObject.html#CONVERTER" class="member-name-link">CONVERTER</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="ru.introguzzle.parsers.xml.entity">
-<h2>Uses of <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a> in <a href="../../../xml/entity/package-summary.html">ru.introguzzle.parsers.xml.entity</a></h2>
-<div class="caption"><span>Fields in <a href="../../../xml/entity/package-summary.html">ru.introguzzle.parsers.xml.entity</a> declared as <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a></span></div>
+<section class="detail" id="ru.introguzzle.parsers.xml.entityUnion">
+<h2>Uses of <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a> in <a href="../../../xml/entityUnion/package-summary.html">ru.introguzzle.parsers.xml.entityUnion</a></h2>
+<div class="caption"><span>Fields in <a href="../../../xml/entityUnion/package-summary.html">ru.introguzzle.parsers.xml.entityUnion</a> declared as <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static final <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../xml/entity/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entity">XMLDocument</a>,<wbr><a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">XMLDocument.</span><code><a href="../../../xml/entity/XMLDocument.html#CONVERTER" class="member-name-link">CONVERTER</a></code></div>
+<div class="col-first even-row-color"><code>static final <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../xml/entityUnion/XMLDocument.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLDocument</a>,<wbr><a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">XMLDocument.</span><code><a href="../../../xml/entityUnion/XMLDocument.html#CONVERTER" class="member-name-link">CONVERTER</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">A converter that transforms <code>XMLDocument</code> instances into <code>JSONObject</code> instances.</div>
 </div>
-<div class="col-first odd-row-color"><code>static final <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../xml/entity/XMLElement.html" title="class in ru.introguzzle.parsers.xml.entity">XMLElement</a>,<wbr><a href="../../../json/entity/JSONObject.html" title="class in ru.introguzzle.parsers.json.entity">JSONObject</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">XMLElement.</span><code><a href="../../../xml/entity/XMLElement.html#CONVERTER" class="member-name-link">CONVERTER</a></code></div>
+<div class="col-first odd-row-color"><code>static final <a href="../Converter.html" title="interface in ru.introguzzle.parsers.common.convert">Converter</a><wbr>&lt;<a href="../../../xml/entityUnion/XMLElement.html" title="class in ru.introguzzle.parsers.xml.entityUnion">XMLElement</a>,<wbr><a href="../../../json/entityUnion/JSONObject.html" title="class in ru.introguzzle.parsers.json.entityUnion">JSONObject</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">XMLElement.</span><code><a href="../../../xml/entityUnion/XMLElement.html#CONVERTER" class="member-name-link">CONVERTER</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>

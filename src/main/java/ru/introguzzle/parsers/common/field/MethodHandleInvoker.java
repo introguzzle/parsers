@@ -3,6 +3,7 @@ package ru.introguzzle.parsers.common.field;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.cache.CacheSupplier;
+import ru.introguzzle.parsers.common.mapping.MappingException;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -20,7 +21,7 @@ public final class MethodHandleInvoker {
             try {
                 return READ_CACHE.get(field, LOOKUP::unreflectGetter).invokeWithArguments(instance);
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new MappingException(e);
             }
         }
 
@@ -29,7 +30,7 @@ public final class MethodHandleInvoker {
             try {
                 return READ_CACHE.get(field, LOOKUP::unreflectGetter).invokeWithArguments();
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new MappingException(e);
             }
         }
     }
@@ -41,7 +42,7 @@ public final class MethodHandleInvoker {
                 WRITE_CACHE.get(field, LOOKUP::unreflectSetter).invokeWithArguments(instance, arguments[0]);
                 return null;
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new MappingException(e);
             }
         }
 
@@ -51,7 +52,7 @@ public final class MethodHandleInvoker {
                 WRITE_CACHE.get(field, LOOKUP::unreflectSetter).invokeWithArguments(arguments[0]);
                 return null;
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new MappingException(e);
             }
         }
     }

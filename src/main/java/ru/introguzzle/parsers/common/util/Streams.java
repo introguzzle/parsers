@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import ru.introguzzle.parsers.common.function.*;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +55,7 @@ public final class Streams {
     // casting
     //
 
-    public static <T> Stream<T> select(Stream<T> stream, Class<? extends T> type) {
+    public static <T, R extends T> Stream<T> select(Stream<T> stream, Class<R> type) {
         return stream.filter(type::isInstance);
     }
 
@@ -62,7 +63,7 @@ public final class Streams {
         return stream.filter(type::isInstance).map(type::cast);
     }
 
-    public static <T> Stream<? super T> upcast(Stream<T> stream, Class<? super T> type) {
+    public static <T extends R, R> Stream<R> upcast(Stream<T> stream, Class<R> type) {
         return stream.map(type::cast);
     }
 
@@ -209,10 +210,22 @@ public final class Streams {
         return Stream.concat(stream, Stream.of(elements));
     }
 
+    public static <T> Stream<T> duplicate(Stream<T> stream) {
+        return stream.toList().stream();
+    }
+
+    public static <T> Stream<T> ofIterable(Iterable<T> iterable) {
+        return ofIterable(iterable, false);
+    }
+
+    public static <T> Stream<T> ofIterable(Iterable<T> iterable, boolean parallel) {
+        return StreamSupport.stream(iterable.spliterator(), parallel);
+    }
+
     /**
      * Private constructor. Always throws {@code AssertionError}
      */
     private Streams() {
-        throw Meta.newInstantiationError(MethodHandles.lookup().lookupClass());
+        throw Meta.newInstantiationError(Streams.class);
     }
 }

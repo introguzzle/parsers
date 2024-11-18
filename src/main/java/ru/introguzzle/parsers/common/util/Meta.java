@@ -1,16 +1,6 @@
 package ru.introguzzle.parsers.common.util;
 
-import java.lang.invoke.MethodHandles;
-
 public final class Meta {
-
-    /**
-     * Private constructor. Always throws {@code AssertionError}
-     */
-    private Meta() {
-        throw newInstantiationError(Meta.class);
-    }
-
     /**
      * Creates new {@code AssertionError} for using it in private constructors
      * with detailed message
@@ -19,7 +9,23 @@ public final class Meta {
      * @return assertion error
      */
     public static AssertionError newInstantiationError(Class<?> type) {
-        System.out.println(MethodHandles.lookup().lookupClass());
         return new AssertionError(type + " is a utility class and cannot be instantiated");
+    }
+
+    @SuppressWarnings("ALL")
+    /**
+     * Throws new {@code AssertionError}
+     *
+     * @param type class
+     */
+    public static void /** never */ throwInstantiationError(Class<?> type) {
+        throw newInstantiationError(type);
+    }
+
+    /**
+     * Private constructor. Always throws {@code AssertionError}
+     */
+    private Meta() {
+        throwInstantiationError(Meta.class);
     }
 }

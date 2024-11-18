@@ -16,12 +16,14 @@ import ru.introguzzle.parsers.common.mapping.Traverser;
 import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapters;
 import ru.introguzzle.parsers.xml.entity.XMLAttribute;
 import ru.introguzzle.parsers.xml.entity.XMLElement;
+import ru.introguzzle.parsers.xml.entity.XMLElementConvertable;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLValue;
 import ru.introguzzle.parsers.xml.entity.type.XMLType;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -95,8 +97,8 @@ class XMLElementMapperImpl implements XMLElementMapper {
 
     @SuppressWarnings("unchecked")
     public XMLElement toElement(@NotNull String name, @Nullable Object object, @Nullable XMLType type) {
-        if (object instanceof XMLElement element) {
-            return element;
+        if (object instanceof XMLElementConvertable convertable) {
+            return convertable.toXMLElement();
         }
 
         XMLElement root = new XMLElement(name);
@@ -124,7 +126,9 @@ class XMLElementMapperImpl implements XMLElementMapper {
 
             Object value;
             try {
-                value = getReadingInvoker().invoke(field, object);
+                value = Modifier.isStatic(field.getModifiers())
+                        ? getReadingInvoker().invokeStatic(field, object)
+                        : getReadingInvoker().invoke(field, object);
             } catch (Throwable e) {
                 throw new MappingException("Cannot retrieve value from property: " + field.getName(), e);
             }

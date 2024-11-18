@@ -3,7 +3,6 @@ package ru.introguzzle.parsers.common.field;
 import lombok.AllArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.parsers.common.mapping.AccessLevel;
 import ru.introguzzle.parsers.common.util.Streams;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
@@ -13,16 +12,26 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import static ru.introguzzle.parsers.common.mapping.AccessPolicy.*;
 
 @ExtensionMethod({Streams.class})
 @AllArgsConstructor
 public abstract class AbstractFieldAccessor<A extends Annotation> implements FieldAccessor {
     public static final CacheSupplier CACHE_SUPPLIER = CacheService.instance();
-    static final int DEFAULT = AccessLevel.DEFAULT;
-    static final int EXCLUDE_TRANSIENT = AccessLevel.EXCLUDE_TRANSIENT;
-    static final int EXCLUDE_STATIC = AccessLevel.EXCLUDE_STATIC;
-    static final int EXCLUDE_VOLATILE = AccessLevel.EXCLUDE_VOLATILE;
+    private final Map<Integer, Predicate<Field>> FILTERS = Map.of(
+            EXCLUDE_TRANSIENT, Fields::isTransient,
+            EXCLUDE_FINAL, Fields::isFinal,
+            EXCLUDE_STATIC, Fields::isStatic,
+            EXCLUDE_VOLATILE, Fields::isVolatile,
+            EXCLUDE_PUBLIC, Fields::isPublic,
+            EXCLUDE_PROTECTED, Fields::isProtected,
+            EXCLUDE_PRIVATE, Fields::isPrivate,
+            EXCLUDE_PACKAGE_PRIVATE, Fields::isPackagePrivate
+    );
 
     private final Class<A> annotationType;
 
@@ -42,24 +51,22 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
         List<Field> fields = acquireThroughHierarchy(type);
         Stream<Field> stream = fields.stream();
 
-        int accessLevel = DEFAULT;
+        int accessPolicy = DEFAULT;
 
         // Filter out excluded fields, if any to remove
         if (annotation != null) {
             List<String> excluded = retrieveExcluded(annotation);
-            accessLevel = retrieveAccessLevel(annotation);
+            accessPolicy = retrieveAccessLevel(annotation);
 
             stream = stream.reject(field -> excluded.contains(field.getName()));
         }
 
-        if ((accessLevel & EXCLUDE_TRANSIENT) == EXCLUDE_TRANSIENT)
-            stream = stream.reject(Fields::isTransient);
-
-        if ((accessLevel & EXCLUDE_STATIC) == EXCLUDE_STATIC)
-            stream = stream.reject(Fields::isStatic);
-
-        if ((accessLevel & EXCLUDE_VOLATILE) == EXCLUDE_VOLATILE)
-            stream = stream.reject(Fields::isVolatile);
+        for (Map.Entry<Integer, Predicate<Field>> entry : FILTERS.entrySet()) {
+            int policy = entry.getKey();
+            if ((accessPolicy & policy) == policy) {
+                stream = stream.reject(entry.getValue());
+            }
+        }
 
         return stream.toList();
     }

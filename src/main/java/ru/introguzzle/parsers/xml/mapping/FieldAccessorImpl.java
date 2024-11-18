@@ -34,6 +34,6 @@ public class FieldAccessorImpl extends AbstractFieldAccessor<XMLEntity> {
 
     @Override
     public int retrieveAccessLevel(XMLEntity annotation) {
-        return annotation.accessLevel();
+        return annotation.accessPolicy();
     }
 }

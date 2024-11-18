@@ -8,11 +8,22 @@ import java.util.Objects;
  */
 public final class Nullability {
     /**
-     * Private constructor. Always throws {@code AssertionError}
+     * Convenient adaptation of {@link java.util.Objects#requireNonNull(Object, String)} method.
+     * <p>
+     * This method ensures that the provided object reference is not {@code null}.
+     * </p>
+     *
+     * @param object the object reference to check for nullity
+     * @param name   the name of the object, used in the exception message if {@code object} is {@code null}
+     * @return the non-{@code null} object reference that was validated
+     * @param <T>    the type of the object reference
+     * @throws NullPointerException if {@code object} is {@code null}
+     * @see java.util.Objects#requireNonNull(Object, String)
      */
-    private Nullability() {
-        throw Meta.newInstantiationError(Nullability.class);
+    public static <T> T requireNonNull(T object, String name) {
+        return Objects.requireNonNull(object, name + " cannot be null");
     }
+
 
     /**
      * Selects first non-null object in {@code objects}, if there is any.
@@ -41,5 +52,12 @@ public final class Nullability {
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Private constructor. Always throws {@code AssertionError}
+     */
+    private Nullability() {
+        throw Meta.newInstantiationError(Nullability.class);
     }
 }

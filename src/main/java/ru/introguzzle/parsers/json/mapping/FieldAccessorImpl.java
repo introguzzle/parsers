@@ -32,6 +32,6 @@ public class FieldAccessorImpl extends AbstractFieldAccessor<JSONEntity> {
 
     @Override
     public int retrieveAccessLevel(JSONEntity annotation) {
-        return annotation.accessLevel();
+        return annotation.accessPolicy();
     }
 }
