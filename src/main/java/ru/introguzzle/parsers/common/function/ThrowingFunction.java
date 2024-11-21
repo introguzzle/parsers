@@ -3,7 +3,6 @@ package ru.introguzzle.parsers.common.function;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.util.Nullability;
 
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -51,8 +50,8 @@ public interface ThrowingFunction<T, R> {
      *
      * @return a {@link Function} that does not throw checked exceptions
      */
-    default @NotNull Function<T, R> toFunction() {
-        return toFunction(Transformer.runtime());
+    default @NotNull Function<T, R> asFunction() {
+        return asFunction(Transformer.runtime());
     }
 
     /**
@@ -64,8 +63,8 @@ public interface ThrowingFunction<T, R> {
      * @param defaultValue the default value to return if an exception occurs
      * @return a {@link Function} that returns the default value upon exception
      */
-    default @NotNull Function<T, R> toFunction(R defaultValue) {
-        return toFunction(() -> defaultValue);
+    default @NotNull Function<T, R> asFunction(R defaultValue) {
+        return asFunction(() -> defaultValue);
     }
 
     /**
@@ -76,7 +75,7 @@ public interface ThrowingFunction<T, R> {
      * @return a {@link Function} that does not throw checked exceptions
      * @throws NullPointerException if {@code transformer} is null
      */
-    default @NotNull Function<T, R> toFunction(@NotNull Transformer<? extends RuntimeException> transformer) {
+    default @NotNull Function<T, R> asFunction(@NotNull Transformer<? extends RuntimeException> transformer) {
         return t -> {
             try {
                 return apply(t);
@@ -94,7 +93,7 @@ public interface ThrowingFunction<T, R> {
      * @return a {@link Function} that returns a fallback result upon exception
      * @throws NullPointerException if {@code supplier} is null
      */
-    default @NotNull Function<T, R> toFunction(@NotNull Supplier<? extends R> supplier) {
+    default @NotNull Function<T, R> asFunction(@NotNull Supplier<? extends R> supplier) {
         return t -> {
             try {
                 return apply(t);

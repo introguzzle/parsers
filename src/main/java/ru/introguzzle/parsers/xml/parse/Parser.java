@@ -1,10 +1,8 @@
 package ru.introguzzle.parsers.xml.parse;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.parse.BaseParser;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
-import ru.introguzzle.parsers.xml.token.Tokenizer;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -22,6 +20,10 @@ public abstract class Parser implements Serializable, BaseParser<XMLDocument> {
 
     @Serial
     private static final long serialVersionUID = 6386722082362042387L;
+
+    public static Parser newParser() {
+        return new XMLParser();
+    }
 
     /**
      * The executor responsible for running asynchronous parsing tasks.

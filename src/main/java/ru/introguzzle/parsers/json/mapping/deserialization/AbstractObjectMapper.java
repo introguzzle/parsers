@@ -1,7 +1,10 @@
 package ru.introguzzle.parsers.json.mapping.deserialization;
 
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.introguzzle.parsers.common.field.Fields;
+import ru.introguzzle.parsers.common.mapping.deserialization.ArrayType;
 import ru.introguzzle.parsers.common.mapping.deserialization.TypeAdapter;
 import ru.introguzzle.parsers.common.mapping.deserialization.TypeResolver;
 import ru.introguzzle.parsers.common.type.Primitives;
@@ -14,12 +17,11 @@ import ru.introguzzle.parsers.common.mapping.Traverser;
 import ru.introguzzle.parsers.common.util.Nullability;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
-import ru.introguzzle.parsers.json.mapping.FieldAccessorImpl;
+import ru.introguzzle.parsers.json.mapping.JSONFieldAccessor;
 import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceStrategies.CircularReference;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+@ExtensionMethod(Fields.class)
 abstract class AbstractObjectMapper implements ObjectMapper {
     private static final MethodHandle BIND_TO_HANDLE, UNBIND_HANDLE, UNBIND_ALL_HANDLE;
 
@@ -125,7 +128,7 @@ abstract class AbstractObjectMapper implements ObjectMapper {
     ));
 
     private final Traverser<Class<?>> traverser = new ClassTraverser();
-    private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
+    private final FieldAccessor fieldAccessor = new JSONFieldAccessor();
     private final Map<JSONObject, Object> referenceMap = new IdentityHashMap<>();
     private final Map<Class<?>, TypeAdapter<?>> typeHandlers = new ConcurrentHashMap<>(defaultTypeHandlers);
     private final TypeResolver typeResolver = TypeResolver.newResolver(fieldAccessor);
@@ -135,7 +138,7 @@ abstract class AbstractObjectMapper implements ObjectMapper {
         return typeResolver;
     }
 
-    private Class<?> getRawType(Type type) {
+    private Class<?> rawType(Type type) {
         return typeResolver.getRawType(type);
     }
 
@@ -238,6 +241,18 @@ abstract class AbstractObjectMapper implements ObjectMapper {
 
     @Override
     @SuppressWarnings("unchecked")
+    public <T> @NotNull T toObject(@NotNull JSONObject object, @NotNull Class<? extends T> type) {
+        return (T) toObject(object, (Type) type);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> @NotNull T[] toArray(@NotNull JSONArray array, @NotNull Class<? extends T[]> type) {
+        return (T[]) toArray(array, (Type) type);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public <E, C extends Collection<E>> @NotNull C toCollection(@NotNull JSONArray array, @NotNull Type type, @NotNull Supplier<C> supplier) {
         C collection = supplier.get();
         for (Object item : array) {
@@ -245,6 +260,11 @@ abstract class AbstractObjectMapper implements ObjectMapper {
         }
 
         return collection;
+    }
+
+    @Override
+    public <E, C extends Collection<E>> @NotNull C toCollection(@NotNull JSONArray array, @NotNull Class<? extends E> type, @NotNull Supplier<C> supplier) {
+        return toCollection(array, (Type) type, supplier);
     }
 
     public @Nullable Object map(@Nullable JSONObject object, @NotNull Type type) {
@@ -255,9 +275,9 @@ abstract class AbstractObjectMapper implements ObjectMapper {
         Object instance = getInstanceSupplier().acquire(object, type);
         referenceMap.put(object, instance);
 
-        Class<?> rawType = getRawType(type);
-        List<Field> fields = getFieldAccessor().acquire(rawType);
-        Map<String, Type> resolvedTypes = typeResolver.resolveTypes(rawType, type);
+        Class<?> raw = rawType(type);
+        List<Field> fields = getFieldAccessor().acquire(raw);
+        Map<String, Type> resolvedTypes = typeResolver.resolveTypes(raw, type);
 
         for (Field field : fields) {
             String name = getNameConverter().apply(field);
@@ -268,7 +288,7 @@ abstract class AbstractObjectMapper implements ObjectMapper {
                 value = referenceMap.get(object);
             }
 
-            if (!Modifier.isFinal(field.getModifiers())) {
+            if (!field.isFinal()) {
                 if (value instanceof CircularReference<?> reference) {
                     getWritingInvoker().invoke(field, instance, reference.dereference());
                     continue;
@@ -276,7 +296,9 @@ abstract class AbstractObjectMapper implements ObjectMapper {
 
                 if (value != null) {
                     Object applied = getForwardCaller().apply(value, resolved);
-                    getWritingInvoker().invoke(field, instance, applied);
+                    Void _ = field.isStatic()
+                            ? getWritingInvoker().invokeStatic(field, applied)
+                            : getWritingInvoker().invoke(field, instance, applied);
                 }
             }
         }
@@ -285,7 +307,8 @@ abstract class AbstractObjectMapper implements ObjectMapper {
     }
 
     protected @Nullable Object match(@Nullable Object value, @NotNull Type fieldType) {
-        Class<?> raw = getRawType(fieldType);
+        Class<?> raw = rawType(fieldType);
+
         return switch (value) {
             case null -> null;
             case JSONObject object -> {
@@ -293,16 +316,16 @@ abstract class AbstractObjectMapper implements ObjectMapper {
                     yield referenceMap.get(object);
                 }
 
-                TypeAdapter<?> th = findTypeAdapter(raw);
-                if (th != null) {
-                    yield th.apply(value, fieldType);
+                TypeAdapter<?> ta = raw == null ? null : findTypeAdapter(raw);
+                if (ta != null) {
+                    yield ta.apply(value, fieldType);
                 }
 
                 yield map(object, fieldType);
             }
             case JSONArray array -> handleArray(array, fieldType);
             default -> {
-                TypeAdapter<?> typeAdapter = findTypeAdapter(raw);
+                TypeAdapter<?> typeAdapter = raw == null ? null : findTypeAdapter(raw);
                 yield typeAdapter == null
                         ? handlePrimitiveType(value, fieldType)
                         : typeAdapter.apply(value, fieldType);
@@ -311,7 +334,10 @@ abstract class AbstractObjectMapper implements ObjectMapper {
     }
 
     protected Object handleArray(JSONArray array, @NotNull Type fieldType) {
-        Type componentType = getTypeResolver().getComponentType(fieldType);
+        Type componentType = fieldType instanceof ArrayType arrayType
+                ? arrayType.getComponentType()
+                : getTypeResolver().getComponentType(fieldType);
+
         if (componentType == null) {
             return handleCollection(array, fieldType);
         }
@@ -327,7 +353,7 @@ abstract class AbstractObjectMapper implements ObjectMapper {
     }
 
     protected Object handleCollection(JSONArray array, @NotNull Type fieldType) {
-        Class<?> raw = getRawType(fieldType);
+        Class<?> raw = rawType(fieldType);
         TypeAdapter<?> typeAdapter = findTypeAdapter(raw);
         if (typeAdapter != null) {
             return typeAdapter.apply(array, fieldType);
@@ -341,60 +367,65 @@ abstract class AbstractObjectMapper implements ObjectMapper {
     }
 
     protected Object handlePrimitiveType(Object value, @NotNull Type fieldType) {
-        if (!(fieldType instanceof Class<?> cls)) {
+        if (!(fieldType instanceof Class<?> ft)) {
             throw new MappingException(fieldType + " is not a primitive type");
         }
 
-        if (!Primitives.isPrimitive(cls)) {
-            throw newConversionException(value, cls);
+        // Should we even handle Object.class?
+        if (ft == Object.class) {
+            return value;
         }
 
-        return switch (cls.getSimpleName()) {
+        if (!Primitives.isPrimitive(ft)) {
+            throw newConversionException(value, ft);
+        }
+
+        return switch (ft.getSimpleName()) {
             case "boolean", "Boolean" -> {
                 if (value instanceof Boolean b) yield b;
                 if (value instanceof String s) yield Boolean.parseBoolean(s);
-                throw newConversionException(value, cls);
+                throw newConversionException(value, ft);
             }
             case "byte", "Byte" -> {
                 if (value instanceof Number n) yield n.byteValue();
                 if (value instanceof String s) yield Byte.parseByte(s);
-                throw newConversionException(value, cls);
+                throw newConversionException(value, ft);
             }
             case "short", "Short" -> {
                 if (value instanceof Number n) yield n.shortValue();
                 if (value instanceof String s) yield Short.parseShort(s);
-                throw newConversionException(value, cls);
+                throw newConversionException(value, ft);
             }
             case "int", "Integer" -> {
                 if (value instanceof Number n) yield n.intValue();
                 if (value instanceof String s) yield Integer.parseInt(s);
-                throw newConversionException(value, cls);
+                throw newConversionException(value, ft);
             }
             case "long", "Long" -> {
                 if (value instanceof Number n) yield n.longValue();
                 if (value instanceof String s) yield Long.parseLong(s);
-                throw newConversionException(value, cls);
+                throw newConversionException(value, ft);
             }
             case "float", "Float" -> {
                 if (value instanceof Number n) yield n.floatValue();
                 if (value instanceof String s) yield Float.parseFloat(s);
-                throw newConversionException(value, cls);
+                throw newConversionException(value, ft);
             }
             case "double", "Double" -> {
                 if (value instanceof Number n) yield n.doubleValue();
                 if (value instanceof String s) yield Double.parseDouble(s);
-                throw newConversionException(value, cls);
+                throw newConversionException(value, ft);
             }
             case "char", "Character" -> {
                 if (value instanceof String s) yield s.charAt(0);
-                throw newConversionException(value, cls);
+                throw newConversionException(value, ft);
             }
             case "String" -> {
                 if (value instanceof String s) yield s;
-                throw newConversionException(value, cls);
+                throw newConversionException(value, ft);
             }
 
-            default -> throw new IllegalStateException("Unexpected value: " + cls.getSimpleName());
+            default -> throw new IllegalStateException("Unexpected value: " + ft.getSimpleName());
         };
     }
 }

@@ -8,10 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class TokenizerImpl implements Tokenizer {
-
+class TokenizerImpl implements Tokenizer {
     @Override
-    public List<Token> tokenize(String input) {
+    public List<Token> tokenize(@NotNull String input) {
         List<Token> tokens = new ArrayList<>();
         StringBuilder buffer = new StringBuilder();
 

@@ -84,11 +84,12 @@ public class JSONObject extends UntypedMap implements
      * {@code Boolean}, and {@code CircularReference}.
      */
     public static final Set<Class<?>> PERMITTED_CLASSES;
+    private static final DeepCopier COPIER = new DeepCopier();
 
     static {
         FACTORY = ConverterFactory.getFactory();
         CONVERTER = FACTORY.getJSONDocumentToXMLConverter();
-        PERMITTED_CLASSES = Validation.PERMITTED_CLASSES;
+        PERMITTED_CLASSES = Types.PERMITTED_CLASSES;
     }
 
     /**
@@ -105,20 +106,21 @@ public class JSONObject extends UntypedMap implements
     private static final long serialVersionUID = -697931640108868641L;
 
     /**
-     * Constructs an empty {@code JSONObject}.
+     * Constructs an empty {@code JSONObject} with {@link LinkedHashMap}
+     * as map to delegate
      */
     public JSONObject() {
         super();
     }
 
     /**
-     * Constructs a {@code JSONObject} initialized with the specified map.
+     * Constructs a {@code JSONObject} initialized with the specified map to delegate
      *
-     * @param map the map whose mappings are to be placed in this object
+     * @param map the map to delegate
      * @throws IllegalArgumentException if class of any value is not permitted or any key is {@code null}
      */
     public JSONObject(Map<? extends String, ?> map) {
-        super(Validation.requirePermittedType(map));
+        super(Types.requirePermittedTypes(map));
     }
 
     /**
@@ -197,7 +199,7 @@ public class JSONObject extends UntypedMap implements
             throw new IllegalArgumentException("Null key is not permitted in JSONObject");
         }
 
-        return super.put(key, Validation.requirePermittedType(value, EntityUnion.OBJECT));
+        return super.put(key, Types.requirePermittedType(value, EntityUnion.OBJECT));
     }
 
     /**
@@ -206,7 +208,7 @@ public class JSONObject extends UntypedMap implements
      */
     @Override
     public void putAll(@NotNull Map<? extends String, ?> m) {
-        super.putAll(Validation.requirePermittedType(m));
+        super.putAll(Types.requirePermittedTypes(m));
     }
 
     /**
@@ -399,7 +401,7 @@ public class JSONObject extends UntypedMap implements
      * Sets the {@link JSONMapper} that produced this object.
      * This method can only be called once.
      *
-     * @param mapper the {@code JSONMapper} that created this object
+     * @param mapper the {@code JSONMapper} that produced this object
      */
     void setProducer(JSONMapper mapper) {
         // Can be set only once
@@ -418,5 +420,31 @@ public class JSONObject extends UntypedMap implements
     @Override
     public XMLDocument toXMLDocumentWithMetadata() {
         return CONVERTER.convertWithMetadata(this);
+    }
+
+    /**
+     * Class of delegate map of this object
+     * @return class of delegate map of this object
+     */
+    @Override
+    public Class<? extends Map<String, Object>> getImplementationClass() {
+        return super.getImplementationClass();
+    }
+
+    /**
+     *
+     * Creates a new immutable view {@code JSONObject} of this object with map that doesn't
+     * support adding new entries as delegate
+     *
+     * @return immutable view {@code JSONObject} of this object with immutable map as delegate
+     * <br>
+     * For reference: {@linkplain java.util.Collections#unmodifiableMap(Map)}
+     */
+    public JSONObject asImmutable() {
+        return new JSONObject(Collections.unmodifiableMap(this));
+    }
+
+    public JSONObject deepCopy() {
+        return COPIER.createDeepCopy(this);
     }
 }

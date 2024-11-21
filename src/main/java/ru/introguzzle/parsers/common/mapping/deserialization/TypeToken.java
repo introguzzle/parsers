@@ -49,16 +49,19 @@ public abstract class TypeToken<T> {
     @SuppressWarnings("unchecked")
     public TypeToken() {
         type = getParentTypeParameter();
-        rawType = (Class<? super T>) ((ParameterizedType) type).getRawType();
+        rawType = (Class<? super T>) (type instanceof ParameterizedType pt
+                ? pt.getRawType()
+                : notParameterized());
     }
 
     private Type getParentTypeParameter() {
         Type parent = getClass().getGenericSuperclass();
-        if (parent instanceof Class<?>) {
-            throw new RuntimeException("Missing type parameter.");
-        } else {
-            ParameterizedType parameterized = (ParameterizedType) parent;
-            return parameterized.getActualTypeArguments()[0];
-        }
+        return parent instanceof ParameterizedType pt
+                ? pt.getActualTypeArguments()[0]
+                : notParameterized();
+    }
+
+    private Type notParameterized() {
+        throw new RuntimeException("Not a parameterized type");
     }
 }

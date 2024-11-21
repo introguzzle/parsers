@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import lombok.Getter;
 import ru.introguzzle.parsers.xml.meta.Encoding;
@@ -7,7 +7,7 @@ import ru.introguzzle.parsers.xml.meta.Version;
 import java.io.Serial;
 
 @Getter
-public non-sealed class DeclarationToken extends Token {
+non-sealed class DeclarationToken extends Token {
     @Serial
     private static final long serialVersionUID = -2475454735183998374L;
 

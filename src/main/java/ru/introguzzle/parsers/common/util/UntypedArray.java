@@ -2,24 +2,47 @@ package ru.introguzzle.parsers.common.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * List that contains elements as {@code Object} instances.
+ */
 public abstract class UntypedArray extends DelegatingArray<Object> {
+    /**
+     * Constructs a new empty UntypedArray with {@link ArrayList} as delegate
+     */
     public UntypedArray() {
         super();
     }
 
+    /**
+     * Constructs a new UntypedArray with {@link ArrayList} as delegate
+     * that contains elements of {@code collection}
+     *
+     * @param collection collection
+     */
     public UntypedArray(@NotNull Collection<?> collection) {
         super(collection);
     }
 
+    /**
+     * Constructs a new UntypedArray with {@link ArrayList} as delegate
+     * that contains elements of {@code array}
+     *
+     * @param array array
+     */
     public UntypedArray(@NotNull Object[] array) {
         super(array);
     }
 
-    public UntypedArray(@NotNull List<?> l) {
-        super(l);
+    /**
+     * Constructs a new UntypedArray with specified {@code list} as {@link List} to delegate
+     * @param list delegate
+     */
+    public UntypedArray(@NotNull List<?> list) {
+        super(list);
     }
 
     /**

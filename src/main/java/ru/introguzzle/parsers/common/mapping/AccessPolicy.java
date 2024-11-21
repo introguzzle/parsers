@@ -69,31 +69,36 @@ public final class AccessPolicy {
     public static final int EXCLUDE_VOLATILE = 1 << 4;
 
     /**
-     *  Excludes fields that are marked as {@code public}.
+     * Flag that defines excluding fields that are marked as {@code public} policy.
      */
     public static final int EXCLUDE_PUBLIC = 1 << 5; // 0b00100000
 
     /**
-     * Excludes fields that are marked as {@code protected}.
+     * Flag that defines excluding fields that are marked as {@code protected} policy.
      */
     public static final int EXCLUDE_PROTECTED = 1 << 6; // 0b01000000
 
     /**
-     * Excludes fields that are marked as {@code private}.
+     * Flag that defines excluding fields that are marked as {@code private} policy.
      */
     public static final int EXCLUDE_PRIVATE = 1 << 7; // 0b10000000
 
     /**
-     * Excludes fields that have default (package-private) access.
+     * Flag that defines excluding fields that have default (package-private) access policy
      */
     public static final int EXCLUDE_PACKAGE_PRIVATE = 1 << 8; // 0b0001_0000_0000
 
     /**
+     * Flag that defines excluding synthetic fields policy
+     */
+    public static final int EXCLUDE_SYNTHETIC = 1 << 9;
+
+    /**
      * Represents the default exclusion policy, which excludes all fields marked as {@code transient},
-     * {@code final}, {@code static}, or {@code volatile}.
+     * {@code final}, {@code static}, or {@code volatile}, or synthetic.
      */
     public static final int DEFAULT = EXCLUDE_TRANSIENT
-            | EXCLUDE_STATIC | EXCLUDE_VOLATILE;
+            | EXCLUDE_STATIC | EXCLUDE_VOLATILE | EXCLUDE_SYNTHETIC;
 
     /**
      * Includes all fields regardless of their modifiers.
@@ -103,6 +108,10 @@ public final class AccessPolicy {
      * {@code static}, or {@code volatile}, are included during the mapping or deserialization process.</p>
      */
     public static final int INCLUDE_ALL = 0;
+
+    /**
+     * Flag that defines including all fields policy
+     */
     public static final int NONE = DEFAULT | EXCLUDE_FINAL
             | EXCLUDE_PUBLIC | EXCLUDE_PROTECTED | EXCLUDE_PRIVATE;
 

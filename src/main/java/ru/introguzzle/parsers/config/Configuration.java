@@ -69,82 +69,82 @@ public final class Configuration {
     }
 
     @SuppressWarnings("ALL")
-    public Property<String> getConverterFactoryClass() {
+    public Property<String> getConverterFactoryClassProperty() {
         return converterFactoryClass;
     }
 
     @SuppressWarnings("ALL")
-    public Property<NameConverter> getXMLNameConverter() {
+    public Property<NameConverter> getXMLNameConverterProperty() {
         return xmlNameConverter;
     }
 
     @SuppressWarnings("ALL")
-    public Property<NameConverter> getJSONNameConverter() {
+    public Property<NameConverter> getJSONNameConverterProperty() {
         return jsonNameConverter;
     }
 
     @SuppressWarnings("ALL")
-    public Property<String> getAttributePrefix() {
+    public Property<String> getAttributePrefixProperty() {
         return attributePrefix;
     }
 
     @SuppressWarnings("ALL")
-    public Property<String> getRootName() {
+    public Property<String> getRootNameProperty() {
         return rootName;
     }
 
     @SuppressWarnings("ALL")
-    public Property<String> getTextPlaceholder() {
+    public Property<String> getTextPlaceholderProperty() {
         return textPlaceholder;
     }
 
     @SuppressWarnings("ALL")
-    public Property<String> getCharacterDataPlaceholder() {
+    public Property<String> getCharacterDataPlaceholderProperty() {
         return characterDataPlaceholder;
     }
 
     @SuppressWarnings("ALL")
-    public Property<Long> getCacheInvalidatePeriod() {
+    public Property<Long> getCacheInvalidatePeriodProperty() {
         return cacheInvalidatePeriod;
     }
 
     @SuppressWarnings("ALL")
-    public Property<Integer> getCacheInitialCapacity() {
+    public Property<Integer> getCacheInitialCapacityProperty() {
         return cacheInitialCapacity;
     }
 
     @SuppressWarnings("ALL")
-    public Property<Float> getLoadFactor() {
+    public Property<Float> getLoadFactorProperty() {
         return loadFactor;
     }
 
     @SuppressWarnings("ALL")
-    public Property<Integer> getConcurrencyLevel() {
+    public Property<Integer> getConcurrencyLevelProperty() {
         return concurrencyLevel;
     }
 
     @SuppressWarnings("ALL")
-    public Property<Integer> getCacheMaximalCapacity() {
+    public Property<Integer> getCacheMaximalCapacityProperty() {
         return cacheMaximalCapacity;
     }
 
     @SuppressWarnings("ALL")
-    public Property<Long> getCacheInitialDelay() {
+    public Property<Long> getCacheInitialDelayProperty() {
         return cacheInitialDelay;
     }
 
     @SuppressWarnings("ALL")
-    public Property<TimeUnit> getCacheTimeUnit() {
+    public Property<TimeUnit> getCacheTimeUnitProperty() {
         return cacheTimeUnit;
     }
 
     @SuppressWarnings("ALL")
-    public Property<Boolean> getDebugEnabled() {
+    public Property<Boolean> getDebugEnabledProperty() {
         return debugEnabled;
     }
 
     @SuppressWarnings("ALL")
-    public Property<Boolean> getEntityValidationEnabled() {
+    public Property<Boolean> getEntityValidationEnabledProperty() {
         return entityValidationEnabled;
     }
 
@@ -171,7 +171,7 @@ public final class Configuration {
         private final @NotNull T value;
         private final boolean usingDefaultValue;
 
-        public Property(@NotNull String key, @NotNull T value, boolean usingDefaultValue) {
+        private Property(@NotNull String key, @NotNull T value, boolean usingDefaultValue) {
             this.key = key;
             this.value = value;
             this.usingDefaultValue = usingDefaultValue;

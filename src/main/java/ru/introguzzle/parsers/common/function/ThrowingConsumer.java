@@ -3,7 +3,6 @@ package ru.introguzzle.parsers.common.function;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.util.Nullability;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -52,8 +51,8 @@ public interface ThrowingConsumer<T> {
      *
      * @return a {@link Consumer} that does not throw checked exceptions
      */
-    default @NotNull Consumer<T> toConsumer() {
-        return toConsumer(Transformer.runtime());
+    default @NotNull Consumer<T> asConsumer() {
+        return asConsumer(Transformer.runtime());
     }
 
     /**
@@ -64,7 +63,7 @@ public interface ThrowingConsumer<T> {
      * @return a {@link Consumer} that does not throw checked exceptions
      * @throws NullPointerException if the transformer is null
      */
-    default @NotNull Consumer<T> toConsumer(@NotNull Transformer<? extends RuntimeException> transformer) {
+    default @NotNull Consumer<T> asConsumer(@NotNull Transformer<? extends RuntimeException> transformer) {
         return t -> {
             try {
                 accept(t);
@@ -82,7 +81,7 @@ public interface ThrowingConsumer<T> {
      * @return a {@link Consumer} that handles exceptions using the provided handler
      * @throws NullPointerException if the handler is null
      */
-    default @NotNull Consumer<T> toConsumer(@NotNull Handler handler) {
+    default @NotNull Consumer<T> asConsumer(@NotNull Handler handler) {
         return t -> {
             try {
                 accept(t);

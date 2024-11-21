@@ -100,7 +100,7 @@ public abstract class ConverterFactory {
             return getDefault();
         }
 
-        Configuration.Property<String> factoryClassProperty = CONFIGURATION.getConverterFactoryClass();
+        Configuration.Property<String> factoryClassProperty = CONFIGURATION.getConverterFactoryClassProperty();
         if (factoryClassProperty.isUsingDefaultValue()) {
             return getDefault();
         }
@@ -131,12 +131,12 @@ public abstract class ConverterFactory {
      */
     private static @NotNull ConverterFactory getDefault() {
         return new ConverterFactoryImpl(
-                CONFIGURATION.getXMLNameConverter().getValue(),
-                CONFIGURATION.getJSONNameConverter().getValue(),
-                CONFIGURATION.getAttributePrefix().getValue(),
-                CONFIGURATION.getRootName().getValue(),
-                CONFIGURATION.getTextPlaceholder().getValue(),
-                CONFIGURATION.getCharacterDataPlaceholder().getValue()
+                CONFIGURATION.getXMLNameConverterProperty().getValue(),
+                CONFIGURATION.getJSONNameConverterProperty().getValue(),
+                CONFIGURATION.getAttributePrefixProperty().getValue(),
+                CONFIGURATION.getRootNameProperty().getValue(),
+                CONFIGURATION.getTextPlaceholderProperty().getValue(),
+                CONFIGURATION.getCharacterDataPlaceholderProperty().getValue()
         );
     }
 

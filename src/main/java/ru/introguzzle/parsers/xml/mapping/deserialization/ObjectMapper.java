@@ -13,6 +13,13 @@ import java.lang.reflect.Type;
 
 public interface ObjectMapper extends WritingMapper<ObjectMapper> {
     @NotNull Object toObject(@NotNull XMLDocument document, @NotNull Type type);
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    default <T> T toObject(@NotNull XMLDocument document, @NotNull Class<? extends T> type) {
+        return (T) toObject(document, (Type) type);
+    }
+
     @NotNull InstanceSupplier<XMLElement> getInstanceSupplier();
 
     static ObjectMapper newMapper() {

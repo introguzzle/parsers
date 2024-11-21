@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.util.NumberUtilities;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
+import ru.introguzzle.parsers.json.parse.tokenize.Tokenizer;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -35,6 +36,18 @@ public abstract class Parser {
         return this;
     }
 
+    public static Parser newParser() {
+        return new JSONParser();
+    }
+
+    public static Parser newTokenParser() {
+        return new JSONTokenParser();
+    }
+
+    public static Parser newTokenParser(Tokenizer tokenizer) {
+        return new JSONTokenParser(tokenizer);
+    }
+
     /**
      * Validates and parses the raw JSON string into the corresponding Java object type.
      *
@@ -46,16 +59,17 @@ public abstract class Parser {
      *         <br> an empty {@code JSONArray}  - if {@code data} is an empty string and {@code type} is {@code JSONArray.class}; <br>
      *         <br> otherwise, the converted object of type {@code T} <br>
      */
-    public abstract <T> T parse(@Nullable String data,
-                                @NotNull Class<? extends T> type);
+    public abstract <T> @Nullable T parse(@Nullable String data,
+                                          @NotNull Class<? extends T> type);
 
-    public final <T> CompletableFuture<T> parseAsync(@Nullable String data,
-                                                     @NotNull Class<? extends T> type) {
+    public final <T> @NotNull CompletableFuture<T> parseAsync(@Nullable String data,
+                                                              @NotNull Class<? extends T> type) {
         Supplier<T> supplier = () -> parse(data, type);
         return CompletableFuture.supplyAsync(supplier, executor);
     }
 
-    final <T> @Nullable T handleEmptyString(@NotNull String data, Class<? extends T> type) {
+    final <T> @Nullable T handleEmptyString(@NotNull String data,
+                                            @NotNull Class<? extends T> type) {
         Object result = null;
 
         if (type == JSONObject.class) {
@@ -105,7 +119,7 @@ public abstract class Parser {
         throw new JSONParseException("Not a numeric or string value: " + data);
     }
 
-    private static String unescape(String data) {
+    private static String unescape(@NotNull String data) {
         return data.replace("\"", "");
     }
 }

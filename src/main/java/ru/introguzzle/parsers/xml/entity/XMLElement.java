@@ -13,7 +13,7 @@ import ru.introguzzle.parsers.common.visit.Visitable;
 import ru.introguzzle.parsers.common.visit.Visitor;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.json.mapping.JSONObjectConvertable;
-import ru.introguzzle.parsers.xml.token.CharacterDataToken;
+import ru.introguzzle.parsers.xml.parse.CharacterData;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -267,11 +267,11 @@ public class XMLElement implements Serializable, JSONObjectConvertable, XMLEleme
             }
 
             if (characterData != null && !characterData.isEmpty()) {
-                xml.append(indent).append(CharacterDataToken.HEAD)
+                xml.append(indent).append(CharacterData.HEAD)
                         .append(newLine)
                         .append(indent).append(indent).append(characterData)
                         .append(newLine)
-                        .append(indent).append(CharacterDataToken.TAIL)
+                        .append(indent).append(CharacterData.TAIL)
                         .append(newLine);
             }
 

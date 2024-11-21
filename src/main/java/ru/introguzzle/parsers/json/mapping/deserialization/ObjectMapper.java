@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.convert.NameConverter;
 import ru.introguzzle.parsers.common.mapping.WritingMapper;
 import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
+import ru.introguzzle.parsers.common.mapping.deserialization.TypeToken;
 import ru.introguzzle.parsers.common.util.NamingUtilities;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
@@ -40,7 +41,7 @@ import java.util.function.Supplier;
  * <p><strong>Example Usage:</strong></p>
  * <pre>{@code
  * // Instantiate an ObjectMapper implementation
- * ObjectMapper mapper = new JSONToObjectMapperImpl();
+ * ObjectMapper mapper = ObjectMapper.newReflectionMapper();
  *
  * // Example JSON data
  * JSONObject jsonObject = new JSONObject();
@@ -80,27 +81,162 @@ import java.util.function.Supplier;
  * @see MappingException
  */
 public interface ObjectMapper extends WritingMapper<ObjectMapper> {
+    /**
+     * Default naming converter that transforms field names to snake_case.
+     */
     NameConverter DEFAULT_CONVERTER = NamingUtilities::toSnakeCase;
 
+    /**
+     * Creates a new {@code ObjectMapper} instance that utilizes method handles for mapping,
+     * employing the default naming converter.
+     *
+     * @return a new {@code ObjectMapper} instance using method handles and the default naming strategy
+     */
     static ObjectMapper newMethodHandleMapper() {
         return newMethodHandleMapper(DEFAULT_CONVERTER);
     }
 
+    /**
+     * Creates a new {@code ObjectMapper} instance that utilizes method handles for mapping,
+     * with a specified naming converter.
+     *
+     * @param nameConverter the naming strategy to apply to fields
+     * @return a new {@code ObjectMapper} instance using method handles and the provided naming strategy
+     */
     static ObjectMapper newMethodHandleMapper(NameConverter nameConverter) {
         return new InvokeObjectMapper(new JSONFieldNameConverter(nameConverter));
     }
 
+    /**
+     * Creates a new {@code ObjectMapper} instance that utilizes reflection for mapping,
+     * employing the default naming converter.
+     *
+     * @return a new {@code ObjectMapper} instance using reflection and the default naming strategy
+     */
     static ObjectMapper newReflectionMapper() {
         return newReflectionMapper(DEFAULT_CONVERTER);
     }
 
+    /**
+     * Creates a new {@code ObjectMapper} instance that utilizes reflection for mapping,
+     * with a specified naming converter.
+     *
+     * @param nameConverter the naming strategy to apply to fields
+     * @return a new {@code ObjectMapper} instance using reflection and the provided naming strategy
+     */
     static ObjectMapper newReflectionMapper(NameConverter nameConverter) {
         return new ReflectionObjectMapper(new JSONFieldNameConverter(nameConverter));
     }
 
-    @NotNull Object toObject(@NotNull JSONObject object, @NotNull Type type);
-    @NotNull Object[] toArray(@NotNull JSONArray array, @NotNull Type type);
+    /**
+     * Converts a {@link JSONObject} into an object of the specified {@code Type}.
+     *
+     * @param object the JSON object to be deserialized
+     * @param type   the target type for deserialization (e.g., {@code new TypeToken<Target<Integer>>() {}.getType()})
+     * @return the deserialized object
+     * @throws MappingException if deserialization fails due to type mismatches, missing fields, or other mapping issues
+     */
+    @NotNull
+    Object toObject(@NotNull JSONObject object, @NotNull Type type);
+
+    /**
+     * Converts a {@link JSONArray} into an array of objects of the specified {@code Type}.
+     *
+     * @param array the JSON array to be deserialized
+     * @param type  the target array type for deserialization (e.g., {@code new TypeToken<Target<Integer>>() {}.getType()})
+     * @return an array of deserialized objects
+     * @see TypeToken
+     * @throws MappingException if deserialization fails due to type mismatches or other mapping issues
+     */
+    @NotNull
+    Object[] toArray(@NotNull JSONArray array, @NotNull Type type);
+
+    /**
+     * Converts a {@link JSONObject} into object of the specified class.
+     *
+     * @param object the JSON object to be deserialized
+     * @param type   the target class for deserialization
+     * @param <T>    the type of the object to be returned
+     * @return the deserialized object of type {@code T}
+     * @throws MappingException if deserialization fails due to type mismatches, missing fields, or other mapping issues
+     */
+    @NotNull
+    <T> T toObject(@NotNull JSONObject object, @NotNull Class<? extends T> type);
+
+    /**
+     * Converts a {@link JSONArray} into an array of objects of the specified array class.
+     *
+     * @param array the JSON array to be deserialized
+     * @param type  the target array class for deserialization (e.g., {@code Target[].class})
+     * @param <T>   the type of objects within the array
+     * @return an array of deserialized objects of type {@code T}
+     * @throws MappingException if deserialization fails due to type mismatches or other mapping issues
+     */
+    @NotNull
+    <T> T[] toArray(@NotNull JSONArray array, @NotNull Class<? extends T[]> type);
+
+    /**
+     * Converts a {@link JSONArray} into a Java {@code Collection} of the specified type,
+     * using a provided {@link Supplier} to instantiate the collection.
+     *
+     * @param array    the JSON array to be deserialized
+     * @param type     the target element type for deserialization.
+     *                 Either it's {@code Class} or {@link Type} obtained from {@link TypeToken}
+     * @param supplier a supplier that provides an instance of the desired collection type
+     * @param <E>      the type of elements within the collection
+     * @param <C>      the type of the collection to be returned
+     * @return a collection of deserialized objects of type {@code E}
+     * @throws MappingException if deserialization fails due to type mismatches or other mapping issues
+     * @apiNote
+     * Example of usage:
+     * <pre>{@code
+     *     // Suppose we have generic type Target<A, B> and we want
+     *     // to deserialize array of Target<Integer, String>
+     *     JSONArray array = new JSONArray();
+     *     array.add({JSON representation of Target<Integer, String> instance})
+     *     array.add({JSON representation of Target<Integer, String> type})
+     *
+     *     ObjectMapper mapper = ...
+     *     java.lang.reflect.Type type = new TypeToken<Target<Integer, String>>() {}.getType();
+     *     // Safe cast
+     *     List<Target<Integer, String>> list = (List<Target<Integer, String>>) mapper.toCollection(array, type, ArrayList::new);
+     * }</pre>
+     */
     <E, C extends Collection<E>> @NotNull C toCollection(@NotNull JSONArray array, @NotNull Type type, @NotNull Supplier<C> supplier);
 
-    @NotNull InstanceSupplier<JSONObject> getInstanceSupplier();
+    /**
+     * Converts a {@link JSONArray} into a Java {@code Collection} of the specified type,
+     * using a provided {@link Supplier} to instantiate the collection.
+     *
+     * @param array    the JSON array to be deserialized
+     * @param type     the raw target element type for deserialization (e.g., {@code Target.class})
+     * @param supplier a supplier that provides an instance of the desired collection type.
+     *                 <strong><p>
+     *                 It's recommended that supplier returns a new, empty collection instance (e.g., {@code ArrayList::new})
+     *                 </p></strong>
+     * @param <E>      the type of elements within the collection.
+     * @param <C>      the type of the collection to be returned
+     * @return a collection of deserialized objects of type {@code E}
+     * @throws MappingException if deserialization fails due to type mismatches or other mapping issues
+     * @apiNote
+     * Example of usage:
+     * <pre>{@code
+     *     JSONArray array = new JSONArray();
+     *     array.add({JSON representation of object of target element type})
+     *     array.add({JSON representation of object of target element type})
+     *
+     *     ObjectMapper mapper = ...
+     *     List<Target> list = mapper.toCollection(array, Target.class, ArrayList::new);
+     * }</pre>
+     */
+    <E, C extends Collection<E>> @NotNull C toCollection(@NotNull JSONArray array, @NotNull Class<? extends E> type, @NotNull Supplier<C> supplier);
+
+    /**
+     * Retrieves the {@link InstanceSupplier} responsible for providing instances from {@link JSONObject}.
+     * This can be used to customize how instances are supplied from {@link JSONObject} during deserialization.
+     *
+     * @return the {@link InstanceSupplier} for {@link JSONObject}
+     */
+    @NotNull
+    InstanceSupplier<JSONObject> getInstanceSupplier();
 }

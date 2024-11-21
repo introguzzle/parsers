@@ -7,7 +7,7 @@ import ru.introguzzle.parsers.json.entity.JSONObject;
 
 import java.util.*;
 
-public class JSONParser extends Parser {
+class JSONParser extends Parser {
     private static final Map<Character, Character> BRACKET_MAP = Map.of(
             '{', '}',
             '[', ']',

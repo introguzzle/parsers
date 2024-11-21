@@ -3,11 +3,11 @@ package ru.introguzzle.parsers.json.mapping.serialization;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 
 /**
- * An interface representing an object that can be bound to a JSON object mapper for serialization.
- * It provides a default implementation of the `toJSONObject()` method, which returns `null` by default.
+ * An interface representing an object that can be bound to a {@link JSONMapper} for serialization.
+ * It provides a default implementation of the {@linkplain Bindable#toJSONObject() Bindable::toJSONObject} method, which returns {@code null} by default.
  *
- * <p>When implementing this interface, you should override the `toJSONObject()` method to enable proper
- * serialization by the `ObjectToJSONMapper`. To ensure that the default behavior is utilized and to
+ * <p>When implementing this interface, inheritor should override the {@linkplain Bindable#toJSONObject() Bindable::toJSONObject} method to enable proper
+ * serialization by the {@link JSONMapper}. To ensure that the default behavior is utilized and to
  * allow for dynamic method replacement by the mapper, override the method as follows:</p>
  *
  * <pre>{@code
@@ -17,10 +17,8 @@ import ru.introguzzle.parsers.json.entity.JSONObject;
  * }
  * }</pre>
  *
- * <p>This approach allows the JSON mapper to inject or replace the implementation of `toJSONObject()` at runtime,
+ * <p>This approach allows the {@link JSONMapper} to inject or replace the implementation of {@linkplain Bindable#toJSONObject() Bindable::toJSONObject} at runtime,
  * facilitating the serialization process without introducing compile-time dependencies on the mapper's internal implementation.</p>
- *
- * {@linkplain JSONMapper#toJSONObject(Object)}
  */
 public interface Bindable {
     /**

@@ -1,8 +1,7 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.introguzzle.parsers.xml.parse.XMLParseException;
 import ru.introguzzle.parsers.xml.meta.Encoding;
 import ru.introguzzle.parsers.xml.meta.Version;
 
@@ -13,15 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-public class Tokenizer implements Serializable {
+class Tokenizer implements Serializable {
     @Serial
     private static final long serialVersionUID = -2340475536496178165L;
 
     public @NotNull List<Token> tokenize(@Nullable String data) {
-        if (data == null) return new ArrayList<>();
         List<Token> tokens = new ArrayList<>();
-        List<String> lines = split(data);
+        if (data == null) return tokens;
 
+        List<String> lines = split(data);
         if (!lines.getFirst().startsWith("<?xml")) {
             throw new XMLParseException("Invalid syntax");
         }

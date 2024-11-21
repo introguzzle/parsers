@@ -1,9 +1,9 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import java.io.Serial;
 import java.util.List;
 
-public class SelfClosingElementToken extends ElementToken {
+class SelfClosingElementToken extends ElementToken {
     @Serial
     private static final long serialVersionUID = 2145722705005714923L;
 

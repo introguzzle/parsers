@@ -15,6 +15,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,11 +35,11 @@ import java.util.Map;
 public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation, F extends Annotation>
         extends AnnotationInstanceSupplier<T, E, F> {
     private static final MethodHandles.Lookup LOOKUP;
-    private static final MethodType EMPTY_CONSTRUCTOR_SHAPE;
+    private static final MethodType DEFAULT_CONSTRUCTOR_SHAPE;
 
     static {
         LOOKUP = MethodHandles.publicLookup();
-        EMPTY_CONSTRUCTOR_SHAPE = MethodType.methodType(void.class);
+        DEFAULT_CONSTRUCTOR_SHAPE = MethodType.methodType(void.class);
     }
 
     /**
@@ -108,7 +109,7 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
             try {
                 return (R) constructorHandle.invokeWithArguments(arguments);
             } catch (Throwable e) {
-                throw new MappingException(e);
+                throw new MappingException("Can't invoke MethodHandle " + constructorHandle, e);
             }
         }
     }
@@ -132,7 +133,7 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
     @Override
     public <R> @NotNull R acquire(@NotNull T object, @NotNull Type type) {
         requireNonNull(object, type);
-        Class<R> rawType = getRawType(type);
+        Class<R> rawType = rawType(type);
 
         E annotation = getAnnotation(rawType);
         if (annotation == null || retrieveConstructorArguments(annotation).length == 0) {
@@ -141,8 +142,10 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
             if (cw == null) {
                 MethodHandle constructorHandle;
                 try {
-                    constructorHandle = LOOKUP.findConstructor(rawType, EMPTY_CONSTRUCTOR_SHAPE);
-                } catch (NoSuchMethodException | IllegalAccessException e) {
+                    constructorHandle = LOOKUP.findConstructor(rawType, DEFAULT_CONSTRUCTOR_SHAPE);
+                } catch (NoSuchMethodException e) {
+                    throw new MappingException("No default constructor", e);
+                } catch (IllegalAccessException e) {
                     throw new MappingException(e);
                 }
 
@@ -157,8 +160,8 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
     }
 
     private <R> R getWithArguments(T object, Type type, E annotation) {
-        Class<R> rawType = getRawType(type);
-        ConstructorData<R> constructorData = getConstructorData(rawType, annotation);
+        Class<R> rawType = rawType(type);
+        ConstructorData<R> constructorData = getConstructorData(type, annotation);
         Map<String, Type> resolved = mapper.getTypeResolver().resolveTypes(rawType, type);
 
         Object[] args = constructorData.fields.stream()
@@ -174,28 +177,61 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
     }
 
     private <R> ConstructorData<R> createConstructorData(Type type, E annotation) {
-        String[] constructorNames = Arrays.stream(retrieveConstructorArguments(annotation))
+        ConstructorArgument[] arguments = retrieveConstructorArguments(annotation);
+        String[] constructorNames = Arrays.stream(arguments)
                 .map(ConstructorArgument::value)
                 .toArray(String[]::new);
 
-        Class<R> rawType = getRawType(type);
+        Class<R> rawType = rawType(type);
         List<Field> fields = mapper.getFieldAccessor().acquire(rawType);
 
         List<Field> matchedFields = new ArrayList<>();
         List<Class<?>> constructorTypes = new ArrayList<>();
 
-        // O(n^2) matching XD
-        for (String name : constructorNames) {
-            for (Field field : fields) {
-                if (field.getName().equals(name)) {
-                    matchedFields.add(field);
-                    constructorTypes.add(field.getType());
+        if (rawType.getGenericSuperclass() instanceof ParameterizedType) {
+            // Resolve actual parameter types in case our type is subclass of GenericType
+            Map<String, Type> resolvedTypes = mapper.getTypeResolver().resolveTypes(rawType, type);
+            for (String name : constructorNames) {
+                for (Field field : fields) {
+                    String fn = field.getName();
+                    if (fn.equals(name)) {
+                        matchedFields.add(field);
+                        Type resolved = resolvedTypes.get(fn);
+                        constructorTypes.add(resolved instanceof Class<?> cls
+                                ? cls
+                                : field.getType());
+                    }
+                }
+            }
+        } else {
+            for (String name : constructorNames) {
+                for (Field field : fields) {
+                    String fn = field.getName();
+                    if (fn.equals(name)) {
+                        matchedFields.add(field);
+                        constructorTypes.add(field.getType());
+                    }
                 }
             }
         }
 
         if (constructorTypes.size() != constructorNames.length) {
-            throw new MappingException("Invalid specified constructor arguments: " + Arrays.toString(constructorNames));
+            for (int i = 0; i < arguments.length; i++) {
+                Class<?> ct = arguments[i].type();
+                if (ct != void.class) {
+                    constructorTypes.add(i, ct);
+                    for (Field field : fields) {
+                        Class<?> ft = field.getType();
+                        if (ft == ct || ft.isAssignableFrom(ct)) {
+                            matchedFields.add(i, field);
+                        }
+                    }
+                }
+            }
+
+            if (constructorTypes.size() != constructorNames.length) {
+                throw new MappingException("Invalid specified constructor arguments: " + Arrays.toString(constructorNames));
+            }
         }
 
         ConstructorWrapper<R> cw = getConstructorWrapper(type);
@@ -204,7 +240,9 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
             try {
                 MethodType shape = shapeOf(constructorTypes);
                 constructorHandle = LOOKUP.findConstructor(rawType, shape);
-            } catch (NoSuchMethodException | IllegalAccessException e) {
+            } catch (NoSuchMethodException e) {
+                throw new MappingException("No constructor with such types: " + constructorTypes, e);
+            } catch (IllegalAccessException e) {
                 throw new MappingException(e);
             }
 

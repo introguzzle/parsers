@@ -66,7 +66,7 @@ public interface TypeResolver {
      * @param type the type from which to extract the component type.
      * @return the component type if the type is an array, otherwise {@code null}.
      */
-    Class<?> getComponentType(Type type);
+    Class<?> getComponentType(@NotNull Type type);
 
     /**
      * Creates a new instance of {@link TypeResolver}.

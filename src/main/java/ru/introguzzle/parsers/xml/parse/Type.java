@@ -1,9 +1,9 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-public enum Type implements Serializable {
+enum Type implements Serializable {
     ELEMENT_HEAD,
     ELEMENT_TAIL,
     SELF_CLOSING_ELEMENT,

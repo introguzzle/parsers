@@ -17,6 +17,10 @@ public final class NamingUtilities {
             return input;
         }
 
+        if (input.chars().allMatch(Character::isUpperCase)) {
+            return input.toLowerCase();
+        }
+
         StringBuilder result = new StringBuilder();
 
         char[] characters = input.toCharArray();

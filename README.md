@@ -54,7 +54,7 @@ Lombok
 
 ```java
 import ru.introguzzle.parsers.json.JSONParser;
-import ru.introguzzle.parsers.json.entityUnion.JSONObject;
+import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.json.parse.JSONParser;
 
 public class Example {
@@ -77,9 +77,9 @@ package ru.introguzzle.parsers.example;
 import lombok.AllArgsConstructor;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
 import ru.introguzzle.parsers.common.mapping.deserialization.TypeToken;
-import ru.introguzzle.parsers.json.entityUnion.JSONObject;
-import ru.introguzzle.parsers.json.entityUnion.annotation.JSONEntity;
-import ru.introguzzle.parsers.json.entityUnion.annotation.JSONField;
+import ru.introguzzle.parsers.json.entity.JSONObject;
+import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
+import ru.introguzzle.parsers.json.entity.annotation.JSONField;
 import ru.introguzzle.parsers.json.mapping.deserialization.ObjectMapper;
 import ru.introguzzle.parsers.json.mapping.serialization.JSONMapper;
 import ru.introguzzle.parsers.json.parse.JSONParser;
@@ -130,11 +130,11 @@ package ru.introguzzle.parsers.example;
 
 import lombok.AllArgsConstructor;
 import ru.introguzzle.parsers.common.annotation.ConstructorArgument;
-import ru.introguzzle.parsers.xml.entityUnion.XMLDocument;
-import ru.introguzzle.parsers.xml.entityUnion.annotation.XMLEntity;
-import ru.introguzzle.parsers.xml.entityUnion.annotation.XMLField;
-import ru.introguzzle.parsers.xml.entityUnion.annotation.XMLRoot;
-import ru.introguzzle.parsers.xml.entityUnion.type.XMLType;
+import ru.introguzzle.parsers.xml.entity.XMLDocument;
+import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
+import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
+import ru.introguzzle.parsers.xml.entity.annotation.XMLRoot;
+import ru.introguzzle.parsers.xml.entity.type.XMLType;
 import ru.introguzzle.parsers.xml.mapping.deserialization.ObjectMapper;
 import ru.introguzzle.parsers.xml.mapping.serialization.Bindable;
 import ru.introguzzle.parsers.xml.mapping.serialization.XMLMapper;

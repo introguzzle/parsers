@@ -6,7 +6,7 @@ import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceSt
 import java.util.Map;
 import java.util.Set;
 
-class Validation {
+class Types {
     private static final Configuration CONFIGURATION;
     private static final boolean VALIDATION_ENABLED;
 
@@ -17,7 +17,7 @@ class Validation {
 
     static {
         CONFIGURATION = Configuration.instance();
-        VALIDATION_ENABLED = CONFIGURATION.getEntityValidationEnabled().getValue();
+        VALIDATION_ENABLED = CONFIGURATION.getEntityValidationEnabledProperty().getValue();
         PERMITTED_CLASSES = Set.of(
                 Number.class, String.class, JSONObject.class,
                 JSONArray.class, Boolean.class, CircularReference.class);
@@ -32,54 +32,42 @@ class Validation {
      * Checks if the specified type is permitted to be stored in the {@link JSONArray} or {@link JSONObject}
      *
      * @param object the object to check
+     * @param union union that defines class on which behalf this validation executes
      */
     public static <T> T requirePermittedType(T object, EntityUnion union) {
-        if (!VALIDATION_ENABLED) {
-            return object;
-        }
-
-        if (object == null) {
-            return null;
-        }
+        if (!VALIDATION_ENABLED) return object;
+        if (object == null) return null;
 
         Class<?> type = object.getClass();
-        if (!isPermitted(type)) {
+        if (!isPermitted(type))
             throw new IllegalArgumentException(type + " is not permitted in " + union);
-        }
 
         return object;
     }
 
-    public static <T extends Iterable<?>> T requirePermittedType(T iterable) {
+    public static <T extends Iterable<?>> T requirePermittedTypes(T iterable) {
         if (!VALIDATION_ENABLED) {
             return iterable;
         }
 
         for (Object object : iterable) {
-            if (object == null) {
-                continue;
-            }
-
+            if (object == null) continue;
             requirePermittedType(object, EntityUnion.ARRAY);
         }
 
         return iterable;
     }
 
-    public static Map<? extends String, ?> requirePermittedType(Map<? extends String, ?> map) {
+    public static Map<? extends String, ?> requirePermittedTypes(Map<? extends String, ?> map) {
         if (!VALIDATION_ENABLED) {
             return map;
         }
 
         for (Map.Entry<? extends String, ?> entry : map.entrySet()) {
-            if (entry.getKey() == null) {
+            if (entry.getKey() == null)
                 throw new IllegalArgumentException("Null key is not permitted in JSONObject");
-            }
 
-            if (entry.getValue() == null) {
-                continue;
-            }
-
+            if (entry.getValue() == null) continue;
             requirePermittedType(entry.getValue(), EntityUnion.OBJECT);
         }
 

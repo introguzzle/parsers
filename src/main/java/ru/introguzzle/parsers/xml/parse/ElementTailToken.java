@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serial;
 
 @Getter
-public non-sealed class ElementTailToken extends Token {
+non-sealed class ElementTailToken extends Token {
     @Serial
     private static final long serialVersionUID = -8333004118487882595L;
 

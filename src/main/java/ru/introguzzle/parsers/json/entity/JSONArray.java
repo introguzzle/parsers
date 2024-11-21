@@ -7,10 +7,7 @@ import ru.introguzzle.parsers.common.visit.Visitor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents a JSON array as a list of objects.
@@ -68,9 +65,10 @@ public class JSONArray extends UntypedArray implements
      * {@code Boolean}, and {@code CircularReference}.
      */
     public static final Set<Class<?>> PERMITTED_CLASSES;
+    private static final DeepCopier COPIER = new DeepCopier();
 
     static {
-        PERMITTED_CLASSES = Validation.PERMITTED_CLASSES;
+        PERMITTED_CLASSES = Types.PERMITTED_CLASSES;
     }
 
     /**
@@ -98,7 +96,7 @@ public class JSONArray extends UntypedArray implements
      * @throws IllegalArgumentException if class of any element of {@code collection} is not permitted
      */
     public JSONArray(@NotNull Collection<?> collection) {
-        super(Validation.requirePermittedType(collection));
+        super(Types.requirePermittedTypes(collection));
     }
 
     /**
@@ -108,7 +106,7 @@ public class JSONArray extends UntypedArray implements
      * @throws IllegalArgumentException if class of any element of {@code array} is not permitted
      */
     public JSONArray(@NotNull Object[] array) {
-        super(Validation.requirePermittedType(List.of(array)));
+        super(Types.requirePermittedTypes(List.of(array)));
     }
 
     /**
@@ -118,7 +116,7 @@ public class JSONArray extends UntypedArray implements
      * @throws IllegalArgumentException if class of any element of {@code list} is not permitted
      */
     public JSONArray(@NotNull List<?> list) {
-        super(Validation.requirePermittedType(list));
+        super(Types.requirePermittedTypes(list));
     }
 
     /**
@@ -127,7 +125,7 @@ public class JSONArray extends UntypedArray implements
      */
     @Override
     public boolean addAll(@NotNull Collection<?> c) {
-        return super.addAll(Validation.requirePermittedType(c));
+        return super.addAll(Types.requirePermittedTypes(c));
     }
 
     /**
@@ -136,7 +134,7 @@ public class JSONArray extends UntypedArray implements
      */
     @Override
     public boolean addAll(int index, @NotNull Collection<?> c) {
-        return super.addAll(index, Validation.requirePermittedType(c));
+        return super.addAll(index, Types.requirePermittedTypes(c));
     }
 
     /**
@@ -169,7 +167,7 @@ public class JSONArray extends UntypedArray implements
      * @throws IllegalArgumentException if the class of {@code element} is not permitted
      */
     public boolean addChecked(Object element) {
-        return super.add(Validation.requirePermittedType(element, EntityUnion.ARRAY));
+        return super.add(Types.requirePermittedType(element, EntityUnion.ARRAY));
     }
 
     /**
@@ -260,5 +258,13 @@ public class JSONArray extends UntypedArray implements
     @Override
     public String getClosingSymbol() {
         return "]";
+    }
+
+    public JSONArray asImmutable() {
+        return new JSONArray(Collections.unmodifiableList(this));
+    }
+
+    public JSONArray deepCopy() {
+        return COPIER.createDeepCopy(this);
     }
 }

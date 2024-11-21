@@ -1,16 +1,15 @@
 package ru.introguzzle.parsers.xml.parse;
 
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import ru.introguzzle.parsers.common.util.Streams;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
-import ru.introguzzle.parsers.xml.token.DeclarationToken;
-import ru.introguzzle.parsers.xml.token.ElementHeadToken;
-import ru.introguzzle.parsers.xml.token.Token;
 
 import java.io.Serial;
 import java.util.List;
 
-public class XMLParser extends Parser {
+@ExtensionMethod(Streams.class)
+class XMLParser extends Parser {
     @Serial
     private static final long serialVersionUID = 7848273065459808396L;
 
@@ -24,7 +23,7 @@ public class XMLParser extends Parser {
         }
 
         Token root = tokens.stream()
-                .filter(ElementHeadToken.class::isInstance)
+                .select(ElementHeadToken.class)
                 .findFirst()
                 .orElseThrow(() -> new XMLParseException("No root element found"));
 

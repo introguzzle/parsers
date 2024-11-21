@@ -1,23 +1,23 @@
-package ru.introguzzle.parsers.json.mapping;
+package ru.introguzzle.parsers.xml.mapping;
 
 import org.jetbrains.annotations.NotNull;
+import ru.introguzzle.parsers.common.annotation.Excluded;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.field.AbstractFieldAccessor;
-import ru.introguzzle.parsers.common.annotation.Excluded;
-import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
+import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-public class FieldAccessorImpl extends AbstractFieldAccessor<JSONEntity> {
+public class XMLFieldAccessor extends AbstractFieldAccessor<XMLEntity> {
     private static final Cache<Class<?>, List<Field>> CACHE;
     static {
         CACHE = CACHE_SUPPLIER.newCache();
     }
 
-    public FieldAccessorImpl() {
-        super(JSONEntity.class);
+    public XMLFieldAccessor() {
+        super(XMLEntity.class);
     }
 
     @Override
@@ -26,12 +26,14 @@ public class FieldAccessorImpl extends AbstractFieldAccessor<JSONEntity> {
     }
 
     @Override
-    public List<String> retrieveExcluded(JSONEntity annotation) {
-        return Arrays.stream(annotation.excluded()).map(Excluded::value).toList();
+    public List<String> retrieveExcluded(XMLEntity annotation) {
+        return Arrays.stream(annotation.excluded())
+                .map(Excluded::value)
+                .toList();
     }
 
     @Override
-    public int retrieveAccessLevel(JSONEntity annotation) {
+    public int retrieveAccessPolicy(XMLEntity annotation) {
         return annotation.accessPolicy();
     }
 }

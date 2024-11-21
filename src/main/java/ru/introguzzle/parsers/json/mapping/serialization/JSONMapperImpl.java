@@ -18,7 +18,7 @@ import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapter;
 import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapters;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.annotation.JSONField;
-import ru.introguzzle.parsers.json.mapping.FieldAccessorImpl;
+import ru.introguzzle.parsers.json.mapping.JSONFieldAccessor;
 import ru.introguzzle.parsers.json.mapping.JSONFieldNameConverter;
 import ru.introguzzle.parsers.json.mapping.JSONObjectConvertable;
 import ru.introguzzle.parsers.json.mapping.MappingContext;
@@ -55,14 +55,14 @@ class JSONMapperImpl implements JSONMapper {
     private static final Cache<Class<?>, TypeAdapter<?>> TYPE_HANDLER_CACHE = CACHE_SUPPLIER.newCache();
 
     private final FieldNameConverter<JSONField> nameConverter;
-    private final Map<Class<?>, TypeAdapter<?>> typeHandlers =
+    private final Map<Class<?>, TypeAdapter<?>> typeAdapters =
             Maps.of(TypeAdapters.DEFAULT, Map.ofEntries(
                     TypeAdapter.newEntry(Number.class, this::handleNumber),
                     TypeAdapter.newEntry(Boolean.class, this::handleBoolean),
                     TypeAdapter.newEntry(String.class, this::handleString)
             ));
 
-    private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
+    private final FieldAccessor fieldAccessor = new JSONFieldAccessor();
     private final Traverser<Class<?>> traverser = new ClassTraverser();
     private final ReadingInvoker readingInvoker = new MethodHandleInvoker.Reading();
 
@@ -106,7 +106,7 @@ class JSONMapperImpl implements JSONMapper {
     }
 
     private TypeAdapter<?> findMostSpecificTypeHandler(Class<?> type) {
-        return getTraverser().findMostSpecificMatch(typeHandlers, type).orElse(null);
+        return getTraverser().findMostSpecificMatch(typeAdapters, type).orElse(null);
     }
 
     @SuppressWarnings("unchecked")
@@ -116,19 +116,19 @@ class JSONMapperImpl implements JSONMapper {
 
     @Override
     public <T> @NotNull JSONMapper withTypeAdapter(@NotNull Class<T> type, @NotNull TypeAdapter<? super T> typeAdapter) {
-        this.typeHandlers.put(type, typeAdapter);
+        typeAdapters.put(type, typeAdapter);
         return this;
     }
 
     @Override
     public @NotNull JSONMapper withTypeAdapters(@NotNull Map<Class<?>, TypeAdapter<?>> adapters) {
-        this.typeHandlers.putAll(adapters);
+        typeAdapters.putAll(adapters);
         return this;
     }
 
     @Override
     public @NotNull JSONMapper clearTypeAdapters() {
-        this.typeHandlers.clear();
+        typeAdapters.clear();
         return this;
     }
 
@@ -196,6 +196,15 @@ class JSONMapperImpl implements JSONMapper {
     }
 
     @Override
+    public @NotNull JSONArray toJSONArray(@NotNull Object[] array, @NotNull MappingContext context) {
+        return toJSONArray((Object) array, context);
+    }
+
+    @Override
+    public @NotNull JSONArray toJSONArray(@NotNull Iterable<?> iterable, @NotNull MappingContext context) {
+        return toJSONArray((Object) iterable, context);
+    }
+
     public @NotNull JSONArray toJSONArray(@NotNull Object iterable, @NotNull MappingContext context) {
         if (iterable.getClass().isArray() || iterable instanceof Iterable<?>) {
             return handleArray(iterable.getClass(), iterable, context);
@@ -291,7 +300,13 @@ class JSONMapperImpl implements JSONMapper {
             } else {
                 Object[] objects = (Object[]) fieldValue;
                 for (Object item : objects) {
-                    array.add(map(item, context));
+                    boolean nested = item != null && (item.getClass().isArray() || item instanceof Iterable<?>);
+
+                    array.add(nested
+                            // item is not null
+                            ? handleArray(item.getClass(), item, context)
+                            : map(item, context)
+                    );
                 }
             }
             return array;
@@ -300,7 +315,12 @@ class JSONMapperImpl implements JSONMapper {
         if (Iterable.class.isAssignableFrom(fieldType)) {
             Iterable<?> iterable = (Iterable<?>) fieldValue;
             for (Object item : iterable) {
-                array.add(map(item, context));
+                boolean nested = item != null && (item.getClass().isArray() || item instanceof Iterable<?>);
+                array.add(nested
+                        // item is not null
+                        ? handleArray(item.getClass(), item, context)
+                        : map(item, context)
+                );
             }
         }
 

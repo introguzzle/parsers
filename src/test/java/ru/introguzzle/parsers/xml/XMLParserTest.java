@@ -6,12 +6,11 @@ import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.xml.entity.XMLElement;
 import ru.introguzzle.parsers.xml.parse.Parser;
 import ru.introguzzle.parsers.xml.parse.XMLParseException;
-import ru.introguzzle.parsers.xml.parse.XMLParser;
 
 import static org.junit.Assert.*;
 
 public class XMLParserTest {
-    private final Parser parser = new XMLParser();
+    private final Parser parser = Parser.newParser();
 
     @Test
     public void test1() {

@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import lombok.Getter;
 
@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.util.List;
 
 @Getter
-public abstract non-sealed class ElementToken extends Token {
+abstract non-sealed class ElementToken extends Token {
     @Serial
     private static final long serialVersionUID = 1090634404338707380L;
 

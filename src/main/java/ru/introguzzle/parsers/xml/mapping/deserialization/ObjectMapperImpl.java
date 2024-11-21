@@ -17,7 +17,7 @@ import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.xml.entity.XMLElement;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
-import ru.introguzzle.parsers.xml.mapping.FieldAccessorImpl;
+import ru.introguzzle.parsers.xml.mapping.XMLFieldAccessor;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
@@ -51,7 +51,7 @@ class ObjectMapperImpl implements ObjectMapper {
 
     private final FieldNameConverter<XMLField> nameConverter;
 
-    private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
+    private final FieldAccessor fieldAccessor = new XMLFieldAccessor();
     private final Traverser<Class<?>> traverser = new ClassTraverser();
     private final WritingInvoker writingInvoker = new MethodHandleInvoker.Writing();
     private final ObjectElementMapper elementMapper = new ObjectElementMapperImpl(this);

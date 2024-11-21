@@ -1,10 +1,7 @@
 package ru.introguzzle.parsers.common.util;
 
-import lombok.experimental.UtilityClass;
 import ru.introguzzle.parsers.common.function.*;
 
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,7 +52,7 @@ public final class Streams {
     // casting
     //
 
-    public static <T, R extends T> Stream<T> select(Stream<T> stream, Class<R> type) {
+    public static <T> Stream<T> select(Stream<T> stream, Class<? extends T> type) {
         return stream.filter(type::isInstance);
     }
 
@@ -73,26 +70,26 @@ public final class Streams {
 
     public static <T>
     boolean anyMatchThrowing(Stream<T> stream,
-                               ThrowingPredicate<? super T> predicate,
-                               Transformer<? extends RuntimeException> handler) {
-        return stream.anyMatch(predicate.toPredicate(handler));
+                             ThrowingPredicate<? super T> predicate,
+                             Transformer<? extends RuntimeException> handler) {
+        return stream.anyMatch(predicate.asPredicate(handler));
     }
 
     public static <T>
     boolean allMatchThrowing(Stream<T> stream,
                              ThrowingPredicate<? super T> predicate,
                              Transformer<? extends RuntimeException> handler) {
-        return stream.allMatch(predicate.toPredicate(handler));
+        return stream.allMatch(predicate.asPredicate(handler));
     }
 
     public static <T>
     void forEachThrowing(Stream<T> stream, ThrowingConsumer<T> consumer) {
-        stream.forEach(consumer.toConsumer());
+        stream.forEach(consumer.asConsumer());
     }
 
     public static <T>
     Stream<T> peekThrowing(Stream<T> stream, ThrowingConsumer<? super T> consumer) {
-        return stream.peek(consumer.toConsumer());
+        return stream.peek(consumer.asConsumer());
     }
 
     public static <T>
@@ -105,28 +102,34 @@ public final class Streams {
     Stream<T> filterThrowing(Stream<T> stream,
                              ThrowingPredicate<? super T> predicate,
                              Transformer<? extends RuntimeException> transformer) {
-        return stream.filter(predicate.toPredicate(transformer));
+        return stream.filter(predicate.asPredicate(transformer));
     }
 
     public static <T>
     Stream<T> filterThrowing(Stream<T> stream,
                              ThrowingPredicate<? super T> predicate,
                              Handler handler) {
-        return stream.filter(predicate.toPredicate(handler));
+        return stream.filter(predicate.asPredicate(handler));
+    }
+
+    public static <T>
+    Stream<T> rejectThrowing(Stream<T> stream,
+                             ThrowingPredicate<? super T> predicate) {
+        return stream.filter(predicate.negate().asPredicate());
     }
 
     public static <T>
     Stream<T> rejectThrowing(Stream<T> stream,
                              ThrowingPredicate<? super T> predicate,
                              Transformer<? extends RuntimeException> transformer) {
-        return stream.filter(predicate.negate().toPredicate(transformer));
+        return stream.filter(predicate.negate().asPredicate(transformer));
     }
 
     public static <T>
     Stream<T> rejectThrowing(Stream<T> stream,
                              ThrowingPredicate<? super T> predicate,
                              Handler handler) {
-        return stream.filter(predicate.negate().toPredicate(handler));
+        return stream.filter(predicate.negate().asPredicate(handler));
     }
 
     public static <T> Set<T> toSet(Stream<T> stream) {
@@ -153,14 +156,14 @@ public final class Streams {
     public static <T, R>
     Stream<R> mapThrowing(Stream<T> stream,
                           ThrowingFunction<? super T, ? extends R> mapper) {
-        return stream.map(mapper.toFunction());
+        return stream.map(mapper.asFunction());
     }
 
     public static <T, R>
     Stream<R> mapThrowing(Stream<T> stream,
                           ThrowingFunction<? super T, ? extends R> mapper,
                           Transformer<? extends RuntimeException> transformer) {
-        return stream.map(mapper.toFunction(transformer));
+        return stream.map(mapper.asFunction(transformer));
     }
 
     public static <T, R>
@@ -183,14 +186,14 @@ public final class Streams {
     public static <T, R>
     Stream<R> flatMapThrowing(Stream<T> stream,
                               ThrowingFunction<? super T, ? extends Stream<R>> mapper) {
-        return stream.flatMap(mapper.toFunction());
+        return stream.flatMap(mapper.asFunction());
     }
 
     public static <T, R>
     Stream<R> flatMapThrowing(Stream<T> stream,
                               ThrowingFunction<? super T, ? extends Stream<R>> mapper,
                               Transformer<? extends RuntimeException> transformer) {
-        return stream.flatMap(mapper.toFunction(transformer));
+        return stream.flatMap(mapper.asFunction(transformer));
     }
 
     //
@@ -208,6 +211,19 @@ public final class Streams {
     @SafeVarargs
     public static <T> Stream<T> append(Stream<? extends T> stream, T... elements) {
         return Stream.concat(stream, Stream.of(elements));
+    }
+
+    public static <T> Stream<T> prepend(Stream<? extends T> stream, Stream<? extends T> other) {
+        return Stream.concat(other, stream);
+    }
+
+    public static <T> Stream<T> prepend(Stream<? extends T> stream, Iterable<? extends T> iterable) {
+        return Stream.concat(StreamSupport.stream(iterable.spliterator(), stream.isParallel()), stream);
+    }
+
+    @SafeVarargs
+    public static <T> Stream<T> prepend(Stream<? extends T> stream, T... elements) {
+        return Stream.concat(Stream.of(elements), stream);
     }
 
     public static <T> Stream<T> duplicate(Stream<T> stream) {

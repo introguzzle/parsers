@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public abstract sealed class Token implements Serializable permits AttributeToken,
+abstract sealed class Token implements Serializable permits AttributeToken,
         CharacterDataToken, CommentToken, DeclarationToken,
         ElementTailToken, ElementToken, TextToken {
     @Serial

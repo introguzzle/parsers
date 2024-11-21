@@ -22,31 +22,31 @@ public final class CacheService implements ScheduledExecutorService, CacheSuppli
      * Default initial capacity for the caches.
      * Determines the initial size of the underlying data structures.
      */
-    public static final int INITIAL_CAPACITY = CONFIGURATION.getCacheInitialCapacity().getValue();
+    public static final int INITIAL_CAPACITY = CONFIGURATION.getCacheInitialCapacityProperty().getValue();
 
     /**
      */
-    public static final float LOAD_FACTOR = CONFIGURATION.getLoadFactor().getValue();
+    public static final float LOAD_FACTOR = CONFIGURATION.getLoadFactorProperty().getValue();
 
-    public static final int CONCURRENCY_LEVEL = CONFIGURATION.getConcurrencyLevel().getValue();
+    public static final int CONCURRENCY_LEVEL = CONFIGURATION.getConcurrencyLevelProperty().getValue();
 
     /**
      * Default period between cache invalidation tasks.
      * Specifies how frequently the caches should be cleared.
      */
-    public static final long INVALIDATE_PERIOD = CONFIGURATION.getCacheInvalidatePeriod().getValue();
+    public static final long INVALIDATE_PERIOD = CONFIGURATION.getCacheInvalidatePeriodProperty().getValue();
 
     /**
      * Time unit for the cache invalidation period.
      * Specifies the unit of time for the PERIOD constant.
      */
-    public static final TimeUnit TIME_UNIT = CONFIGURATION.getCacheTimeUnit().getValue();
+    public static final TimeUnit TIME_UNIT = CONFIGURATION.getCacheTimeUnitProperty().getValue();
 
     /**
      * Maximum number of entries allowed in each cache.
      * Prevents the cache from growing indefinitely and helps manage memory usage.
      */
-    public static final int MAXIMAL_CAPACITY = CONFIGURATION.getCacheMaximalCapacity().getValue();
+    public static final int MAXIMAL_CAPACITY = CONFIGURATION.getCacheMaximalCapacityProperty().getValue();
 
     /**
      * Default ThreadFactory provided by the Executors framework.
@@ -65,8 +65,15 @@ public final class CacheService implements ScheduledExecutorService, CacheSuppli
         return thread;
     };
 
+    /**
+     * Singleton
+     */
     private static final CacheService INSTANCE = new CacheService(Executors.newSingleThreadScheduledExecutor(THREAD_FACTORY));
 
+    /**
+     * Return singleton {@link CacheService}
+     * @return singleton {@link CacheService}
+     */
     public static CacheService instance() {
         return INSTANCE;
     }
@@ -97,97 +104,148 @@ public final class CacheService implements ScheduledExecutorService, CacheSuppli
                 .build();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public ScheduledFuture<?> schedule(@NotNull Runnable command, long delay, @NotNull TimeUnit unit) {
         return scheduler.schedule(command, delay, unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public <V> ScheduledFuture<V> schedule(@NotNull Callable<V> callable, long delay, @NotNull TimeUnit unit) {
         return scheduler.schedule(callable, delay, unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(@NotNull Runnable command, long initialDelay, long period, @NotNull TimeUnit unit) {
         return scheduler.scheduleAtFixedRate(command, initialDelay, period, unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(@NotNull Runnable command, long initialDelay, long delay, @NotNull TimeUnit unit) {
         return scheduler.scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void shutdown() {
         scheduler.shutdown();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public List<Runnable> shutdownNow() {
         return scheduler.shutdownNow();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isShutdown() {
         return scheduler.isShutdown();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isTerminated() {
         return scheduler.isTerminated();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean awaitTermination(long timeout, @NotNull TimeUnit unit) throws InterruptedException {
         return scheduler.awaitTermination(timeout, unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public <T> Future<T> submit(@NotNull Callable<T> task) {
         return scheduler.submit(task);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public <T> Future<T> submit(@NotNull Runnable task, T result) {
         return scheduler.submit(task, result);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public Future<?> submit(@NotNull Runnable task) {
         return scheduler.submit(task);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public <T> List<Future<T>> invokeAll(@NotNull Collection<? extends Callable<T>> tasks) throws InterruptedException {
         return scheduler.invokeAll(tasks);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public <T> List<Future<T>> invokeAll(@NotNull Collection<? extends Callable<T>> tasks, long timeout, @NotNull TimeUnit unit) throws InterruptedException {
         return scheduler.invokeAll(tasks, timeout, unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     public <T> T invokeAny(@NotNull Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
         return scheduler.invokeAny(tasks);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> T invokeAny(@NotNull Collection<? extends Callable<T>> tasks, long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         return scheduler.invokeAny(tasks, timeout, unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void execute(@NotNull Runnable command) {
         scheduler.execute(command);

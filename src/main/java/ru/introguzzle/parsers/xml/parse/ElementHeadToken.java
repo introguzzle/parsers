@@ -1,4 +1,4 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Function;
 
 @Getter
-public class ElementHeadToken extends ElementToken {
+class ElementHeadToken extends ElementToken {
     @Serial
     private static final long serialVersionUID = -4985289472805806457L;
 

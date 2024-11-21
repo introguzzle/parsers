@@ -19,7 +19,7 @@ import ru.introguzzle.parsers.xml.entity.XMLElement;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLRoot;
-import ru.introguzzle.parsers.xml.mapping.FieldAccessorImpl;
+import ru.introguzzle.parsers.xml.mapping.XMLFieldAccessor;
 import ru.introguzzle.parsers.xml.meta.Encoding;
 import ru.introguzzle.parsers.xml.meta.Version;
 
@@ -35,7 +35,7 @@ class XMLMapperImpl implements XMLMapper {
 
     private final FieldNameConverter<XMLField> nameConverter;
 
-    private final FieldAccessor fieldAccessor = new FieldAccessorImpl();
+    private final FieldAccessor fieldAccessor = new XMLFieldAccessor();
     private final Traverser<Class<?>> traverser = new ClassTraverser();
     private final ReadingInvoker readingInvoker = new MethodHandleInvoker.Reading();
 
@@ -53,7 +53,7 @@ class XMLMapperImpl implements XMLMapper {
 
         String name = type.retrieveAnnotation(XMLRoot.class)
                 .map(XMLRoot::value)
-                .orElse(CONFIGURATION.getRootName().getValue());
+                .orElse(CONFIGURATION.getRootNameProperty().getValue());
 
         Optional<XMLEntity> annotation = type.retrieveAnnotation(XMLEntity.class);
 

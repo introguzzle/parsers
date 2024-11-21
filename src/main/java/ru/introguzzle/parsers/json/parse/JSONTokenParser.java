@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
-import ru.introguzzle.parsers.json.parse.tokenize.TokenizerImpl;
 import ru.introguzzle.parsers.json.parse.tokenize.Token;
 import ru.introguzzle.parsers.json.parse.tokenize.Tokenizer;
 import ru.introguzzle.parsers.json.parse.tokenize.Type;
@@ -12,11 +11,11 @@ import ru.introguzzle.parsers.json.parse.tokenize.Type;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class JSONTokenParser extends Parser {
+class JSONTokenParser extends Parser {
     private final Tokenizer tokenizer;
 
     public JSONTokenParser() {
-        this(new TokenizerImpl());
+        this(Tokenizer.newTokenizer());
     }
 
     public JSONTokenParser(Tokenizer tokenizer) {
@@ -24,7 +23,7 @@ public class JSONTokenParser extends Parser {
     }
 
     @Override
-    public <T> T parse(@Nullable String data, @NotNull Class<? extends T> type) {
+    public <T> @Nullable T parse(@Nullable String data, @NotNull Class<? extends T> type) {
         if (data == null) return null;
         if (data.isEmpty()) {
             return handleEmptyString(data, type);
@@ -42,7 +41,7 @@ public class JSONTokenParser extends Parser {
         return map(new TokenBuffer(tokens), type);
     }
 
-    <T> T map(TokenBuffer buffer, Class<? extends T> type) {
+    <T> T map(@NotNull TokenBuffer buffer, @NotNull Class<? extends T> type) {
         Token token = buffer.current();
         Type tokenType = token.getType();
 
@@ -58,7 +57,7 @@ public class JSONTokenParser extends Parser {
         return type.cast(result);
     }
 
-    JSONObject parseObject(TokenBuffer buffer) {
+    @NotNull JSONObject parseObject(@NotNull TokenBuffer buffer) {
         JSONObject object = new JSONObject();
         buffer.next();
         Token current = buffer.current();
@@ -75,7 +74,7 @@ public class JSONTokenParser extends Parser {
         return object;
     }
 
-    JSONArray parseArray(TokenBuffer buffer) {
+    @NotNull JSONArray parseArray(@NotNull TokenBuffer buffer) {
         JSONArray array = new JSONArray();
         buffer.next();
         Token current = buffer.current();

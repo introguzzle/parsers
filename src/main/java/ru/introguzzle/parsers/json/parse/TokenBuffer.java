@@ -4,7 +4,7 @@ import ru.introguzzle.parsers.json.parse.tokenize.Token;
 
 import java.util.List;
 
-public final class TokenBuffer {
+final class TokenBuffer {
     int position;
     final List<Token> tokens;
 

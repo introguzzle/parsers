@@ -29,7 +29,7 @@ import java.util.List;
 public interface FieldAccessor {
 
     /**
-     * Retrieves a list of {@link Field} instances from the specified class that are relevant
+     * Retrieves an immutable {@link List} of {@link Field} instances from the specified class that are relevant
      * for processing. The returned fields are already accessible, eliminating the need to
      * modify their accessibility using {@code setAccessible(true)}.
      *
@@ -44,7 +44,7 @@ public interface FieldAccessor {
      * </p>
      *
      * @param type the {@code Class} object from which to retrieve fields
-     * @return a {@code List} of {@link Field} instances that are relevant for processing
+     * @return an immutable {@code List} of {@link Field} instances that are relevant for processing
      * @throws NullPointerException if the {@code type} parameter is {@code null}
      */
     @NotNull List<Field> acquire(@NotNull Class<?> type);

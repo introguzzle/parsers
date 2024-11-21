@@ -1,10 +1,10 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import org.jetbrains.annotations.NotNull;
 
-public non-sealed class CharacterDataToken extends Token {
-    public static final String HEAD = "<![CDATA[";
-    public static final String TAIL = "]]>";
+non-sealed class CharacterDataToken extends Token {
+    public static final String HEAD = CharacterData.HEAD;
+    public static final String TAIL = CharacterData.TAIL;
 
     public CharacterDataToken(@NotNull String data) {
         super(data, Type.CHARACTER_DATA);

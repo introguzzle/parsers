@@ -1,8 +1,8 @@
-package ru.introguzzle.parsers.xml.token;
+package ru.introguzzle.parsers.xml.parse;
 
 import java.io.Serial;
 
-public non-sealed class TextToken extends Token {
+non-sealed class TextToken extends Token {
     @Serial
     private static final long serialVersionUID = 9103245221931499913L;
 

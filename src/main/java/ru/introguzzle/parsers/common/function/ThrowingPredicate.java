@@ -3,7 +3,6 @@ package ru.introguzzle.parsers.common.function;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.util.Nullability;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -77,6 +76,10 @@ public interface ThrowingPredicate<T> {
         return (ThrowingPredicate<T>) Nullability.requireNonNull(target, "target").negate();
     }
 
+    default @NotNull Predicate<T> asPredicate() {
+        return asPredicate(Transformer.runtime());
+    }
+
     /**
      * Converts this {@code ThrowingPredicate} to a standard {@link Predicate}, transforming any
      * checked exceptions thrown by this predicate into unchecked exceptions using the specified
@@ -86,7 +89,7 @@ public interface ThrowingPredicate<T> {
      * @return a {@code Predicate} that wraps this predicate and handles checked exceptions
      * @throws NullPointerException if {@code handler} is {@code null}
      */
-    default @NotNull Predicate<T> toPredicate(@NotNull Transformer<? extends RuntimeException> handler) {
+    default @NotNull Predicate<T> asPredicate(@NotNull Transformer<? extends RuntimeException> handler) {
         return t -> {
             try {
                 return test(t);
@@ -106,7 +109,7 @@ public interface ThrowingPredicate<T> {
      *         returning {@code false} on error
      * @throws NullPointerException if {@code handler} is {@code null}
      */
-    default @NotNull Predicate<T> toPredicate(@NotNull Handler handler) {
+    default @NotNull Predicate<T> asPredicate(@NotNull Handler handler) {
         return t -> {
             try {
                 return test(t);
