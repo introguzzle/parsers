@@ -57,7 +57,7 @@ abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotation, F e
     @Override
     public <R> @NotNull R acquire(@NotNull T object, @NotNull Type type) {
         requireNonNull(object, type);
-        Class<R> rawType = rawType(type);
+        Class<R> rawType = raw(type);
         Optional<E> optional = rawType.retrieveAnnotation(annotationData.entityAnnotationClass());
         if (optional.isEmpty() || retrieveConstructorArguments(optional.get()).length == 0) {
             try {
@@ -83,7 +83,7 @@ abstract class ReflectionAnnotationInstanceSupplier<T, E extends Annotation, F e
      */
     private <R> R getWithArguments(T object, Type type, E annotation) {
         String[] constructorNames = getConstructorNames(annotation);
-        Class<R> rawType = rawType(type);
+        Class<R> rawType = raw(type);
         List<Field> fields = mapper.getFieldAccessor().acquire(rawType);
 
         Function<Field, Field> matcher = field -> {

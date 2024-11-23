@@ -108,11 +108,10 @@ public interface InstanceSupplier<T> {
 
     static <T, E extends Annotation, F extends Annotation>
     InstanceSupplier<T> getReflectionSupplier(WritingMapper<?> mapper,
-                                              Class<E> entityClass,
-                                              Class<F> fieldClass,
+                                              AnnotationData<E, F> annotationData,
                                               Function<E, ConstructorArgument[]> constructorRetriever,
                                               BiFunction<T, String, Object> valueRetriever) {
-        return new ReflectionAnnotationInstanceSupplier<>(mapper, new AnnotationData<>(entityClass, fieldClass)) {
+        return new ReflectionAnnotationInstanceSupplier<>(mapper, annotationData) {
 
             @Override
             public ConstructorArgument[] retrieveConstructorArguments(E annotation) {
@@ -128,12 +127,11 @@ public interface InstanceSupplier<T> {
 
     static <T, E extends Annotation, F extends Annotation>
     InstanceSupplier<T> getMethodHandleSupplier(WritingMapper<?> mapper,
-                                                Class<E> entityClass,
-                                                Class<F> fieldClass,
+                                                AnnotationData<E, F> annotationData,
                                                 Function<E, ConstructorArgument[]> constructorRetriever,
                                                 BiFunction<T, String, Object> valueRetriever,
                                                 Cache<Class<?>, E> cache) {
-        return new CachingAnnotationInstanceSupplier<>(mapper, new AnnotationData<>(entityClass, fieldClass)) {
+        return new CachingAnnotationInstanceSupplier<>(mapper, annotationData) {
             @Override
             public ConstructorArgument[] retrieveConstructorArguments(E annotation) {
                 return constructorRetriever.apply(annotation);

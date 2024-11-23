@@ -8,6 +8,7 @@ import ru.introguzzle.parsers.common.cache.CacheSupplier;
 import ru.introguzzle.parsers.common.field.MethodHandleInvoker;
 import ru.introguzzle.parsers.common.field.WritingInvoker;
 import ru.introguzzle.parsers.common.function.TriConsumer;
+import ru.introguzzle.parsers.common.mapping.AnnotationData;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
 import ru.introguzzle.parsers.common.util.DelegatingMap;
@@ -28,7 +29,7 @@ class InvokeObjectMapper extends AbstractObjectMapper {
 
     private final WritingInvoker writingInvoker = new MethodHandleInvoker.Writing();
     private final InstanceSupplier<JSONObject> instanceSupplier = InstanceSupplier.getMethodHandleSupplier(
-            this, JSONEntity.class, JSONField.class, JSONEntity::constructorArguments, DelegatingMap::get, ANNOTATION_CACHE);
+            this, AnnotationData.JSON, JSONEntity::constructorArguments, DelegatingMap::get, ANNOTATION_CACHE);
 
     private static final Cache<Class<?>, Class<?>> ARRAY_TYPE_CACHE;
     private static final Cache<Class<?>, MethodHandle> ARRAY_CONSTRUCTOR_CACHE;

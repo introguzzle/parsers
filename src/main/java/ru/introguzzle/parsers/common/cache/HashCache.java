@@ -5,7 +5,10 @@ import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.common.function.ThrowingFunction;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -119,8 +122,6 @@ class HashCache<K, V> implements Cache<K, V> {
         scheduler.shutdownNow();
     }
 
-
-    @SuppressWarnings("unused")
     public static class HashCacheBuilder<K, V> implements CacheBuilder<K, V> {
         private int initialCapacity;
         private float loadFactor;

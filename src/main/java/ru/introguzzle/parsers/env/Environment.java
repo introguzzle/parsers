@@ -1,14 +1,28 @@
 package ru.introguzzle.parsers.env;
 
 import ru.introguzzle.parsers.common.util.DelegatingMap;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public final class Environment extends DelegatingMap<String, String> {
-    public Environment() {
+/**
+ * Class that represents .env file as {@code Map<String, String>}.
+ * Can be created by {@link Parser} by parsing file with lines of pairs of keys and values separated by '='
+ * @see Parser
+ */
+public class Environment extends DelegatingMap<String, String> {
+    /**
+     * Constructs a new empty Environment with {@link LinkedHashMap} as delegate
+     */
+    Environment() {
         super();
     }
 
-    public Environment(Map<? extends String, ? extends String> m) {
+    /**
+     * Constructs a new Environment with specified {@code m} as map to delegate
+     * @param m delegate
+     */
+    Environment(Map<? extends String, ? extends String> m) {
         super(m);
     }
 

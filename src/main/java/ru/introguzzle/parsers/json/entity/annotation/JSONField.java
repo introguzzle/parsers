@@ -37,4 +37,6 @@ public @interface JSONField {
      * @return the field type in JSON
      */
     @NotNull JSONType type() default JSONType.UNSPECIFIED;
+
+    boolean exclude() default false;
 }

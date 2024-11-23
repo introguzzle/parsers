@@ -8,6 +8,7 @@ import ru.introguzzle.parsers.common.field.FieldAccessor;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.common.field.MethodHandleInvoker;
 import ru.introguzzle.parsers.common.field.WritingInvoker;
+import ru.introguzzle.parsers.common.mapping.AnnotationData;
 import ru.introguzzle.parsers.common.mapping.ClassTraverser;
 import ru.introguzzle.parsers.common.mapping.Traverser;
 import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
@@ -57,7 +58,7 @@ class ObjectMapperImpl implements ObjectMapper {
     private final ObjectElementMapper elementMapper = new ObjectElementMapperImpl(this);
     private final TypeResolver typeResolver = TypeResolver.newResolver(fieldAccessor);
     private final InstanceSupplier<XMLElement> instanceSupplier = InstanceSupplier.getMethodHandleSupplier(
-        this, XMLEntity.class, XMLField.class, XMLEntity::constructorArguments, XMLElement::get, ANNOTATION_CACHE);
+        this, AnnotationData.XML, XMLEntity::constructorArguments, XMLElement::get, ANNOTATION_CACHE);
 
     private static final Cache<Class<?>, XMLEntity> ANNOTATION_CACHE = CacheService.instance().newCache();
 

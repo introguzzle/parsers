@@ -1,6 +1,10 @@
 package ru.introguzzle.parsers.common.mapping;
 
 import org.jetbrains.annotations.NotNull;
+import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;
+import ru.introguzzle.parsers.json.entity.annotation.JSONField;
+import ru.introguzzle.parsers.xml.entity.annotation.XMLEntity;
+import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 
 import java.lang.annotation.Annotation;
 
@@ -16,4 +20,30 @@ import java.lang.annotation.Annotation;
 public record AnnotationData<E extends Annotation, F extends Annotation>(
         @NotNull Class<E> entityAnnotationClass,
         @NotNull Class<F> fieldAnnotationClass
-) {}
+) {
+    public static final AnnotationData<JSONEntity, JSONField> JSON;
+    public static final AnnotationData<XMLEntity, XMLField> XML;
+
+    static {
+        JSON = new AnnotationData<>(JSONEntity.class, JSONField.class);
+        XML = new AnnotationData<>(XMLEntity.class, XMLField.class);
+    }
+
+    /**
+     * Retrieves entity level annotation class
+     * @return entity level annotation class
+     */
+    @Override
+    public Class<E> entityAnnotationClass() {
+        return entityAnnotationClass;
+    }
+
+    /**
+     * Retrieves field level annotation class
+     * @return field level annotation class
+     */
+    @Override
+    public Class<F> fieldAnnotationClass() {
+        return fieldAnnotationClass;
+    }
+}

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.mapping.AccessPolicy;
+import ru.introguzzle.parsers.common.mapping.AnnotationData;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.util.Streams;
 import ru.introguzzle.parsers.common.cache.Cache;
@@ -25,11 +26,12 @@ import static ru.introguzzle.parsers.common.mapping.AccessPolicy.*;
  * Inheritors of this class should only specify how to get excluded fields and access policy
  * from annotation (since annotations don't support inheritance)
  *
- * @param <A> entity-level annotation that contains such settings as field access policy or excluded fields
+ * @param <E> entity-level annotation that contains such settings as field access policy or excluded fields
+ * @param <F> field-level annotation
  */
 @ExtensionMethod({Streams.class})
 @AllArgsConstructor
-public abstract class AbstractFieldAccessor<A extends Annotation> implements FieldAccessor {
+public abstract class AbstractFieldAccessor<E extends Annotation, F extends Annotation> implements FieldAccessor {
     /**
      * Cache producer
      */
@@ -59,9 +61,9 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
     );
 
     /**
-     * Class of entity-level annotation
+     * Annotation data that contains classes of annotations
      */
-    private final Class<A> annotationType;
+    private final AnnotationData<E, F> annotationData;
 
     /**
      * {@inheritDoc}
@@ -89,7 +91,7 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
      * @param annotation entity-level annotation
      * @return immutable list of excluded field names from {@code annotation}
      */
-    public abstract List<String> retrieveExcluded(A annotation);
+    public abstract List<String> retrieveExcluded(E annotation);
 
     /**
      * Retrieves bit flags of access policy from {@code annotation}
@@ -97,7 +99,9 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
      * @return bit flags of access policy from {@code annotation}
      * @see AccessPolicy
      */
-    public abstract int retrieveAccessPolicy(A annotation);
+    public abstract int retrieveAccessPolicy(E annotation);
+
+    public abstract boolean retrieveExcludeFlag(F annotation);
 
     /**
      * Actual computation method
@@ -105,7 +109,7 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
      * @return immutable list of fields
      */
     private @NotNull List<Field> cache(@NotNull Class<?> type) {
-        A annotation = type.getAnnotation(annotationType);
+        E annotation = type.getAnnotation(annotationData.entityAnnotationClass());
 
         List<Field> fields = acquireThroughHierarchy(type);
         Stream<Field> stream = fields.stream();
@@ -127,7 +131,10 @@ public abstract class AbstractFieldAccessor<A extends Annotation> implements Fie
             }
         }
 
-        return stream.toList();
+        return stream.reject(f -> {
+            F fieldAnnotation = f.getAnnotation(annotationData.fieldAnnotationClass());
+            return fieldAnnotation != null && retrieveExcludeFlag(fieldAnnotation);
+        }).toList();
     }
 
     /**

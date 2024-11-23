@@ -103,8 +103,9 @@ abstract class AbstractObjectMapper implements ObjectMapper {
 
                 Map<Object, Object> map = new HashMap<>();
 
-                Type keyType = pt.getActualTypeArguments()[0];
-                Type valueType = pt.getActualTypeArguments()[1];
+                Type[] actualTypeArguments = pt.getActualTypeArguments();
+                Type keyType = actualTypeArguments[0];
+                Type valueType = actualTypeArguments[1];
 
                 for (Map.Entry<String, Object> entry : object.entrySet()) {
                     Object key = keyType == String.class
@@ -311,6 +312,7 @@ abstract class AbstractObjectMapper implements ObjectMapper {
 
         return switch (value) {
             case null -> null;
+
             case JSONObject object -> {
                 if (referenceMap.containsKey(object)) {
                     yield referenceMap.get(object);
@@ -323,6 +325,7 @@ abstract class AbstractObjectMapper implements ObjectMapper {
 
                 yield map(object, fieldType);
             }
+
             case JSONArray array -> handleArray(array, fieldType);
             default -> {
                 TypeAdapter<?> typeAdapter = raw == null ? null : findTypeAdapter(raw);

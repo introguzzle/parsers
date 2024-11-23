@@ -2,9 +2,7 @@ package ru.introguzzle.parsers.common.util;
 
 import ru.introguzzle.parsers.common.function.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -132,21 +130,33 @@ public final class Streams {
         return stream.filter(predicate.negate().asPredicate(handler));
     }
 
-    public static <T> Set<T> toSet(Stream<T> stream) {
-        return stream.collect(Collectors.toSet());
+    public static <T> List<T> toUnmodifiableList(Stream<T> stream) {
+        return Collections.unmodifiableList((List<T>) stream.collect(Collectors.toCollection(ArrayList::new)));
+    }
+
+    public static <T> List<T> toModifiableList(Stream<T> stream) {
+        return stream.collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public static <T> Set<T> toUnmodifiableSet(Stream<T> stream) {
+        return Collections.unmodifiableSet((Set<T>) stream.collect(Collectors.toCollection(HashSet::new)));
+    }
+
+    public static <T> Set<T> toModifiableSet(Stream<T> stream) {
+        return stream.collect(Collectors.toCollection(HashSet::new));
     }
 
     public static <T, K, V>
     Map<K, V> toMap(Stream<T> stream,
                     Function<? super T, ? extends K> keyMapper,
                     Function<? super T, ? extends V> valueMapper) {
-        return stream.collect(Collectors.toMap(keyMapper, valueMapper));
+        return new HashMap<>(stream.collect(Collectors.toMap(keyMapper, valueMapper)));
     }
 
     public static <T, K>
     Map<K, List<T>> groupBy(Stream<T> stream,
                             Function<? super T, ? extends K> classifier) {
-        return stream.collect(Collectors.groupingBy(classifier));
+        return new HashMap<>(stream.collect(Collectors.groupingBy(classifier)));
     }
 
     //

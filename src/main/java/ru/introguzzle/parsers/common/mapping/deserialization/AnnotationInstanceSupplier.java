@@ -50,7 +50,7 @@ public abstract class AnnotationInstanceSupplier<T, E extends Annotation, F exte
     public abstract Object retrieveValue(T object, String name);
 
     @SuppressWarnings("unchecked")
-    protected <R> Class<R> rawType(Type type) {
+    protected <R> Class<R> raw(Type type) {
         return (Class<R>) mapper.getTypeResolver().getRawType(type);
     }
 }

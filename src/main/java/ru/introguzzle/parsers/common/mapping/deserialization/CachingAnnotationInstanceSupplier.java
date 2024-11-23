@@ -2,6 +2,7 @@ package ru.introguzzle.parsers.common.mapping.deserialization;
 
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import ru.introguzzle.parsers.common.annotation.ConstructorArguments;
 import ru.introguzzle.parsers.common.cache.Cache;
 import ru.introguzzle.parsers.common.cache.CacheService;
 import ru.introguzzle.parsers.common.cache.CacheSupplier;
@@ -19,11 +20,13 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
- * Optimized version of {@link ReflectionAnnotationInstanceSupplier}
+ * Optimized version of {@link ReflectionAnnotationInstanceSupplier} with improved functionality
  *
  * @param <T> the type of the source object used during instance acquisition (e.g., {@code XMLDocument})
  * @param <E> the type of the entity-level annotation providing metadata for constructor argument mapping
@@ -38,7 +41,11 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
     private static final MethodType DEFAULT_CONSTRUCTOR_SHAPE;
 
     static {
+        // Constructors should be public or lookup doesn't make sense
+        // Or it's public because we don't wanna access private constructors
         LOOKUP = MethodHandles.publicLookup();
+
+        // Default constructor with no args
         DEFAULT_CONSTRUCTOR_SHAPE = MethodType.methodType(void.class);
     }
 
@@ -115,13 +122,23 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
     }
 
     @SuppressWarnings("unchecked")
+    private <R> ConstructorArgument[] retrieveConstructorArguments(Class<?> type) {
+        E annotation = getAnnotation((Class<R>) type);
+
+        return Optional.ofNullable(type.getAnnotation(ConstructorArguments.class))
+                .map(ConstructorArguments::value)
+                .orElse(annotation != null
+                        ? retrieveConstructorArguments(annotation) : new ConstructorArgument[]{});
+    }
+
+    @SuppressWarnings("unchecked")
     private <R> ConstructorWrapper<R> getConstructorWrapper(Type type) {
         return (ConstructorWrapper<R>) CONSTRUCTOR_CACHE.get(type);
     }
 
     @SuppressWarnings("unchecked")
-    private <R> ConstructorData<R> getConstructorData(Type type, E annotation) {
-        return (ConstructorData<R>) CONSTRUCTOR_DATA_CACHE.get(type, t -> createConstructorData(t, annotation));
+    private <R> ConstructorData<R> getConstructorData(Type type, ConstructorArgument[] constructorArguments) {
+        return (ConstructorData<R>) CONSTRUCTOR_DATA_CACHE.get(type, t -> createConstructorData(t, constructorArguments));
     }
 
     public abstract Cache<Class<?>, E> getAnnotationCache();
@@ -133,10 +150,10 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
     @Override
     public <R> @NotNull R acquire(@NotNull T object, @NotNull Type type) {
         requireNonNull(object, type);
-        Class<R> rawType = rawType(type);
+        Class<R> rawType = raw(type);
 
-        E annotation = getAnnotation(rawType);
-        if (annotation == null || retrieveConstructorArguments(annotation).length == 0) {
+        ConstructorArgument[] constructorArguments = retrieveConstructorArguments(rawType);
+        if (constructorArguments.length == 0) {
             ConstructorWrapper<R> cw = getConstructorWrapper(rawType);
 
             if (cw == null) {
@@ -156,12 +173,12 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
             return cw.invoke();
         }
 
-        return getWithArguments(object, type, annotation);
+        return getWithArguments(object, type, constructorArguments);
     }
 
-    private <R> R getWithArguments(T object, Type type, E annotation) {
-        Class<R> rawType = rawType(type);
-        ConstructorData<R> constructorData = getConstructorData(type, annotation);
+    private <R> R getWithArguments(T object, Type type, ConstructorArgument[] constructorArguments) {
+        Class<R> rawType = raw(type);
+        ConstructorData<R> constructorData = getConstructorData(type, constructorArguments);
         Map<String, Type> resolved = mapper.getTypeResolver().resolveTypes(rawType, type);
 
         Object[] args = constructorData.fields.stream()
@@ -176,48 +193,39 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
         return constructorData.wrapper.invoke(args);
     }
 
-    private <R> ConstructorData<R> createConstructorData(Type type, E annotation) {
-        ConstructorArgument[] arguments = retrieveConstructorArguments(annotation);
-        String[] constructorNames = Arrays.stream(arguments)
+    private <R> ConstructorData<R> createConstructorData(Type type, ConstructorArgument[] constructorArguments) {;
+        String[] constructorNames = Arrays.stream(constructorArguments)
                 .map(ConstructorArgument::value)
                 .toArray(String[]::new);
 
-        Class<R> rawType = rawType(type);
+        Class<R> rawType = raw(type);
         List<Field> fields = mapper.getFieldAccessor().acquire(rawType);
 
         List<Field> matchedFields = new ArrayList<>();
         List<Class<?>> constructorTypes = new ArrayList<>();
 
+        Map<String, Type> resolvedTypes = new HashMap<>();
         if (rawType.getGenericSuperclass() instanceof ParameterizedType) {
-            // Resolve actual parameter types in case our type is subclass of GenericType
-            Map<String, Type> resolvedTypes = mapper.getTypeResolver().resolveTypes(rawType, type);
-            for (String name : constructorNames) {
-                for (Field field : fields) {
-                    String fn = field.getName();
-                    if (fn.equals(name)) {
-                        matchedFields.add(field);
-                        Type resolved = resolvedTypes.get(fn);
-                        constructorTypes.add(resolved instanceof Class<?> cls
+            resolvedTypes.putAll(mapper.getTypeResolver().resolveTypes(rawType, type));
+        }
+
+        for (String name : constructorNames) {
+            for (Field field : fields) {
+                String fn = field.getName();
+                if (fn.equals(name)) {
+                    matchedFields.add(field);
+                    constructorTypes.add(resolvedTypes.get(fn) instanceof Class<?> cls
                                 ? cls
-                                : field.getType());
-                    }
-                }
-            }
-        } else {
-            for (String name : constructorNames) {
-                for (Field field : fields) {
-                    String fn = field.getName();
-                    if (fn.equals(name)) {
-                        matchedFields.add(field);
-                        constructorTypes.add(field.getType());
-                    }
+                                : field.getType()
+                    );
                 }
             }
         }
 
+        // Try to resolve it by type
         if (constructorTypes.size() != constructorNames.length) {
-            for (int i = 0; i < arguments.length; i++) {
-                Class<?> ct = arguments[i].type();
+            for (int i = 0; i < constructorArguments.length; i++) {
+                Class<?> ct = constructorArguments[i].type();
                 if (ct != void.class) {
                     constructorTypes.add(i, ct);
                     for (Field field : fields) {
@@ -229,6 +237,7 @@ public abstract class CachingAnnotationInstanceSupplier<T, E extends Annotation,
                 }
             }
 
+            // Malformed constructor arguments
             if (constructorTypes.size() != constructorNames.length) {
                 throw new MappingException("Invalid specified constructor arguments: " + Arrays.toString(constructorNames));
             }

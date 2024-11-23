@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.field.ReflectionInvoker;
 import ru.introguzzle.parsers.common.field.WritingInvoker;
 import ru.introguzzle.parsers.common.function.TriConsumer;
+import ru.introguzzle.parsers.common.mapping.AnnotationData;
 import ru.introguzzle.parsers.common.mapping.MappingException;
 import ru.introguzzle.parsers.common.mapping.deserialization.InstanceSupplier;
 import ru.introguzzle.parsers.common.util.DelegatingMap;
@@ -23,7 +24,7 @@ class ReflectionObjectMapper extends AbstractObjectMapper {
 
     private final WritingInvoker writingInvoker = new ReflectionInvoker.Writing();
     private final InstanceSupplier<JSONObject> instanceSupplier = InstanceSupplier.getReflectionSupplier(
-            this, JSONEntity.class, JSONField.class, JSONEntity::constructorArguments, DelegatingMap::get);
+            this, AnnotationData.JSON, JSONEntity::constructorArguments, DelegatingMap::get);
 
     @Override
     protected @NotNull String getCircularPlaceholder() {

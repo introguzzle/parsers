@@ -14,20 +14,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JSONEntity {
     /**
-     *
      * @return bit flags of access policy
      * @see AccessPolicy
      */
     @MagicConstant(valuesFromClass = AccessPolicy.class)
     int accessPolicy() default AccessPolicy.DEFAULT;
+
     /**
-     *
      * @return array of excluded annotations
      */
     Excluded[] excluded() default {};
 
     /**
-     *
      * @return array of constructor argument annotations
      */
     ConstructorArgument[] constructorArguments() default {};

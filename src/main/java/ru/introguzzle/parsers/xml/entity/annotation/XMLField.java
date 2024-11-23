@@ -14,4 +14,5 @@ public @interface XMLField {
     String name() default "";
     String element() default "";
     @NotNull XMLType type();
+    boolean exclude() default false;
 }
