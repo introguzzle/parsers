@@ -85,8 +85,8 @@ loadScripts(document, 'script');</script>
 <h1 title="Class FieldAccessorImpl" class="title">Class FieldAccessorImpl</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance"><a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">ru.introguzzle.parsers.common.field.AbstractFieldAccessor</a>&lt;<a href="../entityUnion/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entityUnion.annotation">XMLEntity</a>&gt;
-<div class="inheritance">ru.introguzzle.parsers.xml.mapping.XMLFieldAccessor</div>
+<div class="inheritance"><a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">ru.introguzzle.parsers.common.field.AbstractFieldAccessor</a>&lt;<a href="../entity/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entity.annotation">XMLEntity</a>&gt;
+<div class="inheritance">ru.introguzzle.parsers.xml.mapping.FieldAccessorImpl</div>
 </div>
 </div>
 <section class="class-description" id="class-description">
@@ -97,7 +97,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">FieldAccessorImpl</span>
-<span class="extends-implements">extends <a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">AbstractFieldAccessor</a>&lt;<a href="../entityUnion/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entityUnion.annotation">XMLEntity</a>&gt;</span></div>
+<span class="extends-implements">extends <a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">AbstractFieldAccessor</a>&lt;<a href="../entity/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entity.annotation">XMLEntity</a>&gt;</span></div>
 </div>
 </section>
 <section class="summary">
@@ -139,10 +139,10 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCache()" class="member-name-link">getCache</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieveAccessLevel(ru.introguzzle.parsers.xml.entityUnion.annotation.XMLEntity)" class="member-name-link">retrieveAccessLevel</a><wbr>(<a href="../entityUnion/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entityUnion.annotation">XMLEntity</a>&nbsp;annotation)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieveAccessLevel(ru.introguzzle.parsers.xml.entity.annotation.XMLEntity)" class="member-name-link">retrieveAccessLevel</a><wbr>(<a href="../entity/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entity.annotation">XMLEntity</a>&nbsp;annotation)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieveExcluded(ru.introguzzle.parsers.xml.entityUnion.annotation.XMLEntity)" class="member-name-link">retrieveExcluded</a><wbr>(<a href="../entityUnion/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entityUnion.annotation">XMLEntity</a>&nbsp;annotation)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieveExcluded(ru.introguzzle.parsers.xml.entity.annotation.XMLEntity)" class="member-name-link">retrieveExcluded</a><wbr>(<a href="../entity/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entity.annotation">XMLEntity</a>&nbsp;annotation)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
@@ -188,31 +188,31 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="../../common/cache/Cache.html" title="interface in ru.introguzzle.parsers.common.cache">Cache</a>&lt;<a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/reflect/Field.html" title="class or interface in java.lang.reflect" class="external-link">Field</a>&gt;&gt;</span>&nbsp;<span class="element-name">getCache</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../common/field/AbstractFieldAccessor.html#getCache()">getCache</a></code>&nbsp;in class&nbsp;<code><a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">AbstractFieldAccessor</a>&lt;<a href="../entityUnion/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entityUnion.annotation">XMLEntity</a>&gt;</code></dd>
+<dd><code><a href="../../common/field/AbstractFieldAccessor.html#getCache()">getCache</a></code>&nbsp;in class&nbsp;<code><a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">AbstractFieldAccessor</a>&lt;<a href="../entity/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entity.annotation">XMLEntity</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="retrieveExcluded(ru.introguzzle.parsers.xml.entityUnion.annotation.XMLEntity)">
+<section class="detail" id="retrieveExcluded(ru.introguzzle.parsers.xml.entity.annotation.XMLEntity)">
 <h3>retrieveExcluded</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">retrieveExcluded</span><wbr><span class="parameters">(<a href="../entityUnion/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entityUnion.annotation">XMLEntity</a>&nbsp;annotation)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">retrieveExcluded</span><wbr><span class="parameters">(<a href="../entity/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entity.annotation">XMLEntity</a>&nbsp;annotation)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../common/field/AbstractFieldAccessor.html#retrieveExcluded(A)">retrieveExcluded</a></code>&nbsp;in class&nbsp;<code><a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">AbstractFieldAccessor</a>&lt;<a href="../entityUnion/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entityUnion.annotation">XMLEntity</a>&gt;</code></dd>
+<dd><code><a href="../../common/field/AbstractFieldAccessor.html#retrieveExcluded(A)">retrieveExcluded</a></code>&nbsp;in class&nbsp;<code><a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">AbstractFieldAccessor</a>&lt;<a href="../entity/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entity.annotation">XMLEntity</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="retrieveAccessLevel(ru.introguzzle.parsers.xml.entityUnion.annotation.XMLEntity)">
+<section class="detail" id="retrieveAccessLevel(ru.introguzzle.parsers.xml.entity.annotation.XMLEntity)">
 <h3>retrieveAccessLevel</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">retrieveAccessLevel</span><wbr><span class="parameters">(<a href="../entityUnion/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entityUnion.annotation">XMLEntity</a>&nbsp;annotation)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">retrieveAccessLevel</span><wbr><span class="parameters">(<a href="../entity/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entity.annotation">XMLEntity</a>&nbsp;annotation)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../common/field/AbstractFieldAccessor.html#retrieveAccessLevel(A)">retrieveAccessLevel</a></code>&nbsp;in class&nbsp;<code><a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">AbstractFieldAccessor</a>&lt;<a href="../entityUnion/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entityUnion.annotation">XMLEntity</a>&gt;</code></dd>
+<dd><code><a href="../../common/field/AbstractFieldAccessor.html#retrieveAccessLevel(A)">retrieveAccessLevel</a></code>&nbsp;in class&nbsp;<code><a href="../../common/field/AbstractFieldAccessor.html" title="class in ru.introguzzle.parsers.common.field">AbstractFieldAccessor</a>&lt;<a href="../entity/annotation/XMLEntity.html" title="annotation interface in ru.introguzzle.parsers.xml.entity.annotation">XMLEntity</a>&gt;</code></dd>
 </dl>
 </div>
 </section>

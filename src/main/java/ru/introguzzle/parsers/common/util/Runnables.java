@@ -1,6 +1,14 @@
 package ru.introguzzle.parsers.common.util;
 
 public final class Runnables {
+    public static Runnable repeatable(Runnable runnable, int times) {
+        return () -> {
+            for (int i = 0; i < times; i++) {
+                runnable.run();
+            }
+        };
+    }
+
     /**
      * Composes a few {@code Runnable} objects
      * @param runnable first

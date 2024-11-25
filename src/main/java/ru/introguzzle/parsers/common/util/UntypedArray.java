@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * List that contains elements as {@code Object} instances.
  */
-public abstract class UntypedArray extends DelegatingArray<Object> {
+public class UntypedArray extends DelegatingArray<Object> {
     /**
      * Constructs a new empty UntypedArray with {@link ArrayList} as delegate
      */

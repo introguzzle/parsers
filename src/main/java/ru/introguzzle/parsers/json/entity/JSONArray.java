@@ -260,10 +260,6 @@ public class JSONArray extends UntypedArray implements
         return "]";
     }
 
-    public JSONArray asImmutable() {
-        return new JSONArray(Collections.unmodifiableList(this));
-    }
-
     public JSONArray deepCopy() {
         return COPIER.createDeepCopy(this);
     }
