@@ -2,7 +2,7 @@ package ru.introguzzle.parsers.yaml;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import ru.introguzzle.parsers.common.line.Line;
+import ru.introguzzle.parsers.common.util.Line;
 
 import java.util.function.Supplier;
 

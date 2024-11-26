@@ -5,7 +5,12 @@ import org.jetbrains.annotations.Nullable;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 class JSONParser extends Parser {
     private static final Map<Character, Character> BRACKET_MAP = Map.of(

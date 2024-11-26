@@ -18,7 +18,7 @@ non-sealed class AttributeToken extends Token {
         String[] split = getData().split("=", 2);
 
         if (split.length != 2) {
-            throw new XMLParseException("Invalid attribute syntax");
+            throw new XMLParseException("Invalid attribute syntax: " + data);
         }
 
         this.name = split[0];

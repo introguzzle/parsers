@@ -2,8 +2,8 @@ package ru.introguzzle.parsers.env;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.introguzzle.parsers.common.line.Line;
-import ru.introguzzle.parsers.common.line.Line.Pair;
+import ru.introguzzle.parsers.common.util.Line;
+import ru.introguzzle.parsers.common.util.Line.Pair;
 
 import java.util.List;
 

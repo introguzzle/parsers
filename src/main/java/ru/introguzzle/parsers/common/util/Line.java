@@ -1,9 +1,8 @@
-package ru.introguzzle.parsers.common.line;
+package ru.introguzzle.parsers.common.util;
 
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.introguzzle.parsers.common.util.Streams;
 
 import java.io.Serial;
 import java.io.Serializable;

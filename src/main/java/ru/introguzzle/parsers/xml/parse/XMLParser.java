@@ -17,8 +17,8 @@ class XMLParser extends Parser {
     public @NotNull XMLDocument parse(@NotNull String data) throws XMLParseException {
         List<Token> tokens = getTokenizer().tokenize(data);
 
-        Token token = tokens.getFirst();
-        if (!(token instanceof DeclarationToken declarationToken)) {
+        Token first = tokens.getFirst();
+        if (!(first instanceof DeclarationToken declarationToken)) {
             throw new XMLParseException("No declaration found");
         }
 

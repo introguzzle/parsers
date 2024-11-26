@@ -2,7 +2,7 @@ package ru.introguzzle.parsers.env;
 
 import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.io.IO;
-import ru.introguzzle.parsers.common.line.Line;
+import ru.introguzzle.parsers.common.util.Line;
 import ru.introguzzle.parsers.common.parse.BaseParser;
 
 import java.nio.charset.Charset;

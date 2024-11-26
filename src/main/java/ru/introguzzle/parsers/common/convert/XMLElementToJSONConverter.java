@@ -20,18 +20,24 @@ public class XMLElementToJSONConverter implements Converter<XMLElement, JSONObje
     private String textPlaceholder;
     private String characterDataPlaceholder;
 
-    private interface AttributePredicate extends Predicate<XMLAttribute> {
-        @Override
-        boolean test(XMLAttribute attribute);
-    }
+    private interface AttributePredicate extends Predicate<XMLAttribute> {}
 
-    private JSONObject convert(XMLElement element, AttributePredicate predicate) {
+    private Object convert(XMLElement element, AttributePredicate predicate) {
         JSONObject object = new JSONObject();
 
         for (XMLAttribute attribute : element.getAttributes()) {
             if (predicate.test(attribute)) {
                 object.put(attributePrefix + nameConverter.apply(attribute.name()), attribute.value());
             }
+        }
+
+        if (element.isIterable()) {
+            JSONArray array = new JSONArray();
+            for (XMLElement child : element.getChildren()) {
+                array.add(convert(child, predicate));
+            }
+
+            return array;
         }
 
         for (XMLElement child : element.getChildren()) {
@@ -70,11 +76,11 @@ public class XMLElementToJSONConverter implements Converter<XMLElement, JSONObje
 
     @Override
     public @NotNull JSONObject convertWithMetadata(@NotNull XMLElement element) {
-        return convert(element, _ -> true);
+        return (JSONObject) convert(element, _ -> true);
     }
 
     @Override
     public @NotNull JSONObject convert(@NotNull XMLElement element) {
-        return convert(element, attribute -> !attribute.name().startsWith("xmlns"));
+        return (JSONObject) convert(element, attribute -> !attribute.name().startsWith("xmlns"));
     }
 }

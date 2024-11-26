@@ -3,6 +3,7 @@ package ru.introguzzle.parsers.json.parse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import ru.introguzzle.parsers.common.parse.BaseParser;
 import ru.introguzzle.parsers.common.util.NumberUtilities;
 import ru.introguzzle.parsers.json.entity.JSONArray;
 import ru.introguzzle.parsers.json.entity.JSONObject;
@@ -28,7 +29,7 @@ import java.util.function.Supplier;
  * @see Boolean
  * @see String
  */
-public abstract class Parser {
+public abstract class Parser implements BaseParser<Object> {
     protected Executor executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public final Parser setExecutor(Executor executor) {
@@ -46,6 +47,11 @@ public abstract class Parser {
 
     public static Parser newTokenParser(Tokenizer tokenizer) {
         return new JSONTokenParser(tokenizer);
+    }
+
+    @Override
+    public final Object parse(@NotNull String data) {
+        return parse(data, Object.class);
     }
 
     /**

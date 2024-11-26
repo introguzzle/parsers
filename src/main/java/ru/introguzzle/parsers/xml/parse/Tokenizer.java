@@ -84,13 +84,47 @@ class Tokenizer implements Serializable {
                 Math.max(opening.lastIndexOf("'"), opening.lastIndexOf('"')) + 1
         );
 
-        return Arrays.stream(content.split(" "))
+        return splitAttributes(content)
+                .stream()
                 .map(s -> s.replace("\"", ""))
                 .filter(s -> !s.isBlank() && !s.isEmpty())
                 .map(AttributeToken::new)
                 .toList();
     }
 
+    @SuppressWarnings("ALL")
+    private static List<String> splitAttributes(String line) {
+        List<String> attributes = new ArrayList<>();
+        StringBuilder currentAttribute = new StringBuilder();
+        boolean inQuotes = false;
+        char quoteChar = '\0';
+
+        for (char c : line.toCharArray()) {
+            if (c == '"' || c == '\'') {
+                if (inQuotes && c == quoteChar) {
+                    inQuotes = false;
+                } else if (!inQuotes) {
+                    inQuotes = true;
+                    quoteChar = c;
+                }
+            }
+
+            if (Character.isWhitespace(c) && !inQuotes) {
+                if (currentAttribute.length() > 0) {
+                    attributes.add(currentAttribute.toString().strip());
+                    currentAttribute.setLength(0);
+                }
+            } else {
+                currentAttribute.append(c);
+            }
+        }
+
+        if (currentAttribute.length() > 0) {
+            attributes.add(currentAttribute.toString().strip());
+        }
+
+        return attributes;
+    }
 
     private @NotNull Token handle(String line) {
         if (line.startsWith("<!--")) {

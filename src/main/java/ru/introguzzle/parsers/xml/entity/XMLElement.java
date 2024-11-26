@@ -1,5 +1,6 @@
 package ru.introguzzle.parsers.xml.entity;
 
+import jdk.jshell.spi.SPIResolutionException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -119,9 +120,34 @@ public class XMLElement implements Serializable, JSONObjectConvertable, XMLEleme
 
         XMLElement first = getChildren().getFirst();
 
+        // Ambiguous case
+        if (getChildren().size() == 1) {
+            return inferIterabilityForSingle(this, first);
+        }
+
         return getChildren()
                 .stream()
-                .anyMatch(e -> e.name.equals(first.name));
+                .allMatch(e -> e.name.equals(first.name));
+    }
+
+    private static boolean inferIterabilityForSingle(XMLElement parent, XMLElement single) {
+        String p = parent.name;
+        String s = single.name;
+
+        // Standard case: apples and apple
+        if (p.endsWith("s") && s.equals(p.substring(0, p.length() - 1))) {
+            return true;
+        }
+
+        int matchingPrefixLength = 0;
+        for (int i = 0; i < Math.min(p.length(), s.length()); i++) {
+            if (p.charAt(i) == s.charAt(i)) matchingPrefixLength++;
+            else break;
+        }
+
+        double matchRatio = (double) matchingPrefixLength / Math.max(p.length(), s.length());
+        // Let's say if child matches 50% of parent it's iterable
+        return matchRatio > 0.5;
     }
 
     /**
