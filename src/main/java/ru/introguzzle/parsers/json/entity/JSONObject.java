@@ -172,6 +172,27 @@ public class JSONObject extends UntypedMap implements
     }
 
     /**
+     * Retrieves element by key in dot notation
+     * @param key key in dot notation
+     * @param type class of element of last key
+     * @return element of last key
+     * @param <T> type of element of last key
+     */
+    public <T> T getMulti(String key, Class<? extends T> type) {
+        String[] keys = key.split("\\.");
+        if (keys.length == 1) {
+            return get(key, type);
+        }
+
+        JSONObject last = getObject(keys[0]);
+        for (int i = 1; i < keys.length - 1; i++) {
+            last = last.getObject(keys[i]);
+        }
+
+        return last.get(keys[keys.length - 1], type);
+    }
+
+    /**
      * Associates the specified value with the specified key in this object.
      * Only values of permitted types are allowed.
      *
@@ -446,5 +467,10 @@ public class JSONObject extends UntypedMap implements
 
     public JSONObject deepCopy() {
         return COPIER.createDeepCopy(this);
+    }
+
+    @Override
+    public String toString() {
+        return toJSONString();
     }
 }

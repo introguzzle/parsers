@@ -349,7 +349,7 @@ public class ObjectMapperTest {
             @ConstructorArgument("numbers")
     })
     @SuppressWarnings("ALL")
-    @EqualsAndHashCode
+    @EqualsAndHashCode(callSuper = false)
     public static class InheritingFromChar extends Char {
         private final char[] address;
         private final int[] numbers;

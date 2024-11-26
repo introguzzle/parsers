@@ -183,7 +183,9 @@ public final class Configuration {
             try {
                 String value = RESOURCE.get(key, String.class);
                 T result = function.apply(value);
-                return new Property<>(key, result, false);
+                return result != null
+                        ? new Property<>(key, result, false)
+                        : new Property<>(key, defaultValue, true);
             } catch (Throwable e) {
                 return new Property<>(key, defaultValue, true);
             }

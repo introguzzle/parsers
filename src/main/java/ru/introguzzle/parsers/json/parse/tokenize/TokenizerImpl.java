@@ -16,7 +16,7 @@ class TokenizerImpl implements Tokenizer {
 
         boolean inQuotes;
 
-        char[] charArray = input.toCharArray();
+        char[] charArray = input.replace(System.lineSeparator(), "").toCharArray();
         int index = 0;
         while (index < charArray.length) {
             char c = charArray[index];
