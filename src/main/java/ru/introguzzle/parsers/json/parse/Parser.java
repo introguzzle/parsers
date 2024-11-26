@@ -29,7 +29,7 @@ import java.util.function.Supplier;
  * @see Boolean
  * @see String
  */
-public abstract class Parser implements BaseParser<Object> {
+public abstract class Parser implements BaseParser<JSONObject> {
     protected Executor executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public final Parser setExecutor(Executor executor) {
@@ -50,8 +50,8 @@ public abstract class Parser implements BaseParser<Object> {
     }
 
     @Override
-    public final Object parse(@NotNull String data) {
-        return parse(data, Object.class);
+    public final JSONObject parse(@NotNull String data) {
+        return parse(data, JSONObject.class);
     }
 
     /**
