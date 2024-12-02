@@ -125,6 +125,7 @@ public class Example {
 }
 ```
 ### Complex example
+
 ```java
 package ru.introguzzle.parsers.example;
 
@@ -136,7 +137,6 @@ import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.entity.annotation.XMLRoot;
 import ru.introguzzle.parsers.xml.entity.type.XMLType;
 import ru.introguzzle.parsers.xml.mapping.deserialization.ObjectMapper;
-import ru.introguzzle.parsers.xml.mapping.serialization.Bindable;
 import ru.introguzzle.parsers.xml.mapping.serialization.XMLMapper;
 import ru.introguzzle.parsers.xml.parse.XMLParser;
 

@@ -10,8 +10,6 @@ import ru.introguzzle.parsers.common.field.FieldAccessor;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.common.field.MethodHandleInvoker;
 import ru.introguzzle.parsers.common.field.ReadingInvoker;
-import ru.introguzzle.parsers.common.inject.BindException;
-import ru.introguzzle.parsers.common.inject.Binder;
 import ru.introguzzle.parsers.common.mapping.ClassTraverser;
 import ru.introguzzle.parsers.common.mapping.Traverser;
 import ru.introguzzle.parsers.common.mapping.serialization.TypeAdapter;
@@ -72,22 +70,6 @@ class JSONMapperImpl implements JSONMapper {
 
     public JSONMapperImpl(FieldNameConverter<JSONField> nameConverter) {
         this.nameConverter = nameConverter;
-    }
-
-    private Binder<JSONMapper, Bindable> createBinder(Class<? extends Bindable> type) {
-        return new JSONMethodBinder(this, type);
-    }
-
-    @Override
-    public @NotNull JSONMapper bindTo(@NotNull Class<? extends Bindable> type) throws BindException {
-        createBinder(type).inject(type);
-        return this;
-    }
-
-    @Override
-    public @NotNull JSONMapper unbind(@NotNull Class<? extends Bindable> type) throws BindException {
-        createBinder(type).uninject(type);
-        return this;
     }
 
     @Override

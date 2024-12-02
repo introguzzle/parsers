@@ -7,7 +7,7 @@ import ru.introguzzle.parsers.common.util.NamingUtilities;
 import ru.introguzzle.parsers.xml.entity.XMLDocument;
 import ru.introguzzle.parsers.xml.mapping.XMLFieldNameConverter;
 
-public interface XMLMapper extends ReadingMapper<XMLMapper, Bindable> {
+public interface XMLMapper extends ReadingMapper<XMLMapper> {
     @NotNull XMLDocument toXMLDocument(@NotNull Object object);
     @NotNull XMLElementMapper getElementMapper();
 

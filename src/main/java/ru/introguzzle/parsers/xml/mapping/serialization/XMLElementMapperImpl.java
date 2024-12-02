@@ -71,18 +71,6 @@ class XMLElementMapperImpl implements XMLElementMapper {
         return this;
     }
 
-    @Override
-    public @NotNull XMLElementMapper bindTo(@NotNull Class<? extends Bindable> targetType) {
-        parent.bindTo(targetType);
-        return this;
-    }
-
-    @Override
-    public @NotNull XMLElementMapper unbind(@NotNull Class<? extends Bindable> targetType) {
-        parent.unbind(targetType);
-        return this;
-    }
-
     private TypeAdapter<?> findMostSpecificTypeHandler(Class<?> type) {
         return getTraverser().findMostSpecificMatch(typeHandlers, type).orElse(null);
     }

@@ -77,7 +77,7 @@ import java.util.Objects;
  * @see MappingException
  */
 @SuppressWarnings("unused")
-public interface JSONMapper extends ReadingMapper<JSONMapper, Bindable> {
+public interface JSONMapper extends ReadingMapper<JSONMapper> {
     /**
      * Default naming converter that transforms field names to snake_case.
      */

@@ -309,31 +309,4 @@ public class JSONMapperTest {
         JSONObject object = mapper.toJSONObject(new Implements(), MappingContext.getDefault());
         assertEquals(object, Implements.OBJECT);
     }
-
-    @Test
-    public void test_injection() {
-        mapper.bindTo(Other.class);
-        Other other = new Other("1337");
-        System.out.println(other.toJSONObject().toJSONString());
-    }
-
-    @Test
-    public void test_injections() {
-        JSONMapper mapper1 = new JSONMapperImpl()
-                .withTypeAdapter(String.class, _ -> "mapper1 handle");
-
-        JSONMapper mapper2 = new JSONMapperImpl()
-                .withTypeAdapter(String.class, _ -> "mapper2 handle");
-
-        mapper1.bindTo(Other.class);
-        mapper2.bindTo(Set.of(Foreign.class, ru.introguzzle.parsers.foreign.Test.class));
-
-        var test = new ru.introguzzle.parsers.foreign.Test("doesnt matter");
-        Other other = new Other("doesnt matter");
-        Foreign foreign = new Foreign("doesnt matter");
-
-        System.out.println(test.toJSONObject().toJSONString());
-        System.out.println(other.toJSONObject().toJSONString());
-        System.out.println(foreign.toJSONObject().toJSONString());
-    }
 }

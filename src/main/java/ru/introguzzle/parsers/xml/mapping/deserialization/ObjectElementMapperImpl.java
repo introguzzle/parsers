@@ -219,24 +219,6 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
     }
 
     @Override
-    public @NotNull ObjectElementMapper bindTo(@NotNull Class<?> targetType) {
-        parent.bindTo(targetType);
-        return this;
-    }
-
-    @Override
-    public @NotNull ObjectElementMapper unbind(@NotNull Class<?> targetType) {
-        parent.unbind(targetType);
-        return this;
-    }
-
-    @Override
-    public @NotNull ObjectElementMapper unbindAll() {
-        parent.unbindAll();
-        return this;
-    }
-
-    @Override
     public @NotNull WritingInvoker getWritingInvoker() {
         return parent.getWritingInvoker();
     }

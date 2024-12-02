@@ -21,35 +21,11 @@ import ru.introguzzle.parsers.xml.entity.annotation.XMLField;
 import ru.introguzzle.parsers.xml.mapping.XMLFieldAccessor;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.function.BiFunction;
 
 class ObjectMapperImpl implements ObjectMapper {
-    private static final MethodHandle BIND_TO_HANDLE, UNBIND_HANDLE, UNBIND_ALL_HANDLE;
-
-    static {
-        try {
-            Class<?> internal = Class.forName("ru.introguzzle.parsers.xml.entity.Internal");
-            Field f = internal.getDeclaredField("BIND_TO_SINGLE");
-            f.setAccessible(true);
-            BIND_TO_HANDLE = (MethodHandle) f.get(null);
-
-            f = internal.getDeclaredField("UNBIND");
-            f.setAccessible(true);
-            UNBIND_HANDLE = (MethodHandle) f.get(null);
-
-            f = internal.getDeclaredField("UNBIND_ALL");
-            f.setAccessible(true);
-            UNBIND_ALL_HANDLE = (MethodHandle) f.get(null);
-
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private final FieldNameConverter<XMLField> nameConverter;
 
     private final FieldAccessor fieldAccessor = new XMLFieldAccessor();
@@ -93,39 +69,6 @@ class ObjectMapperImpl implements ObjectMapper {
     @Override
     public @NotNull Traverser<Class<?>> getTraverser() {
         return traverser;
-    }
-
-    @Override
-    public @NotNull ObjectMapper bindTo(@NotNull Class<?> targetType) {
-        try {
-            BIND_TO_HANDLE.invokeWithArguments(targetType, this);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull ObjectMapper unbind(@NotNull Class<?> targetType) {
-        try {
-            UNBIND_HANDLE.invokeWithArguments(targetType);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull ObjectMapper unbindAll() {
-        try {
-            UNBIND_ALL_HANDLE.invokeWithArguments();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-
-        return this;
     }
 
     @Override

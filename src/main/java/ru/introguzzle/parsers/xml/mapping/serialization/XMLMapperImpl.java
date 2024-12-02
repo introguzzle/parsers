@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.field.FieldAccessor;
 import ru.introguzzle.parsers.common.field.MethodHandleInvoker;
 import ru.introguzzle.parsers.common.field.ReadingInvoker;
-import ru.introguzzle.parsers.common.inject.Binder;
 import ru.introguzzle.parsers.common.field.FieldNameConverter;
 import ru.introguzzle.parsers.common.mapping.ClassTraverser;
 import ru.introguzzle.parsers.common.mapping.Traverser;
@@ -62,22 +61,6 @@ class XMLMapperImpl implements XMLMapper {
 
         XMLElement root = getElementMapper().toElement(name, object);
         return new XMLDocument(version, encoding, root);
-    }
-
-    private Binder<XMLMapper, Bindable> createBinder(Class<? extends Bindable> targetType) {
-        return new XMLMethodBinder(this, targetType);
-    }
-
-    @Override
-    public @NotNull XMLMapper bindTo(@NotNull Class<? extends Bindable> targetType) {
-        createBinder(targetType).inject(targetType);
-        return this;
-    }
-
-    @Override
-    public @NotNull XMLMapper unbind(@NotNull Class<? extends Bindable> targetType) {
-        createBinder(targetType).uninject(targetType);
-        return this;
     }
 
     @Override

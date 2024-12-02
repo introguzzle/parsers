@@ -20,7 +20,6 @@ import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.json.mapping.JSONFieldAccessor;
 import ru.introguzzle.parsers.json.mapping.reference.StandardCircularReferenceStrategies.CircularReference;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -41,28 +40,6 @@ import java.util.function.Supplier;
 
 @ExtensionMethod(Fields.class)
 abstract class AbstractObjectMapper implements ObjectMapper {
-    private static final MethodHandle BIND_TO_HANDLE, UNBIND_HANDLE, UNBIND_ALL_HANDLE;
-
-    static {
-        try {
-            Class<?> internal = Class.forName("ru.introguzzle.parsers.json.entity.Internal");
-            Field f = internal.getDeclaredField("BIND_TO");
-            f.setAccessible(true);
-            BIND_TO_HANDLE = (MethodHandle) f.get(null);
-
-            f = internal.getDeclaredField("UNBIND");
-            f.setAccessible(true);
-            UNBIND_HANDLE = (MethodHandle) f.get(null);
-
-            f = internal.getDeclaredField("UNBIND_ALL");
-            f.setAccessible(true);
-            UNBIND_ALL_HANDLE = (MethodHandle) f.get(null);
-
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private <T extends Collection<Object>>
     Map.Entry<Class<T>, TypeAdapter<T>> newEntryOfIterable(Class<T> type,
                                                            Supplier<? extends T> supplier) {
@@ -146,39 +123,6 @@ abstract class AbstractObjectMapper implements ObjectMapper {
     @Override
     public @NotNull FieldAccessor getFieldAccessor() {
         return fieldAccessor;
-    }
-
-    @Override
-    public @NotNull ObjectMapper bindTo(@NotNull Class<?> targetType) {
-        try {
-            BIND_TO_HANDLE.invokeWithArguments(targetType, this);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull ObjectMapper unbindAll() {
-        try {
-            UNBIND_ALL_HANDLE.invokeWithArguments();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull ObjectMapper unbind(@NotNull Class<?> targetType) {
-        try {
-            UNBIND_HANDLE.invokeWithArguments(targetType);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-
-        return this;
     }
 
     protected abstract @NotNull String getCircularPlaceholder();

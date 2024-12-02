@@ -21,7 +21,7 @@ public class XMLMapperTest {
             @ConstructorArgument("age")
     })
     @XMLRoot("Person")
-    static class Person implements Bindable {
+    static class Person {
         @XMLField(type = XMLType.ATTRIBUTE, name = "attribute")
         double version;
 
@@ -33,11 +33,6 @@ public class XMLMapperTest {
 
         @XMLField(type = XMLType.ELEMENT, name = "Salary")
         Salary salary;
-
-        @Override
-        public XMLDocument toXMLDocument() {
-            return Bindable.super.toXMLDocument();
-        }
     }
 
     @AllArgsConstructor
@@ -60,13 +55,6 @@ public class XMLMapperTest {
     public void test() {
         Person person = new Person(1.11, 1337, "NAME", new Salary(9999, Type.TYPE_1));
         System.out.println(mapper.toXMLDocument(person).toXMLString());
-    }
-
-    @Test
-    public void test_inject() {
-        Person person = new Person(1.11, 1337, "NAME", new Salary(9999, Type.TYPE_1));
-        mapper.bindTo(Person.class);
-        System.out.println(person.toXMLDocument().toXMLString());
     }
 
     @AllArgsConstructor

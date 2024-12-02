@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.introguzzle.parsers.common.function.ThrowingFunction;
 import ru.introguzzle.parsers.common.io.resource.ResourceLoader;
 
+import java.lang.reflect.Field;
 import java.util.function.BiFunction;
 
 public class PropertyFactory<R> {
@@ -37,9 +38,21 @@ public class PropertyFactory<R> {
         return base.cast(Class.forName(name).getConstructor().newInstance());
     }
 
+    private static <T> T readStaticField(String name, Class<T> base) throws Exception {
+        Field field = base.getDeclaredField(name);
+        field.setAccessible(true);
+
+        return base.cast(field.get(null));
+    }
+
     @SuppressWarnings("ALL")
     public <T> Configuration.Property<T> ofClass(String key, Class<T> base, T defaultValue) {
         return of(key, className -> instanceFrom(className, base), defaultValue);
+    }
+
+    @SuppressWarnings("ALL")
+    public <T> Configuration.Property<T> ofStaticField(String key, Class<T> base, T defaultValue) {
+        return of(key, fieldName -> readStaticField(fieldName, base), defaultValue);
     }
 
     @SuppressWarnings("ALL")
