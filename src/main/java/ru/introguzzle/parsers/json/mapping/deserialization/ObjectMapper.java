@@ -137,7 +137,7 @@ public interface ObjectMapper extends WritingMapper<ObjectMapper> {
      * @throws MappingException if deserialization fails due to type mismatches, missing fields, or other mapping issues
      */
     @NotNull
-    Object toObject(@NotNull JSONObject object, @NotNull Type type);
+    <T> T toObject(@NotNull JSONObject object, @NotNull Type type);
 
     /**
      * Converts a {@link JSONArray} into an array of objects of the specified {@code Type}.
@@ -149,7 +149,7 @@ public interface ObjectMapper extends WritingMapper<ObjectMapper> {
      * @throws MappingException if deserialization fails due to type mismatches or other mapping issues
      */
     @NotNull
-    Object[] toArray(@NotNull JSONArray array, @NotNull Type type);
+    <T> T[] toArray(@NotNull JSONArray array, @NotNull Type type);
 
     /**
      * Converts a {@link JSONObject} into object of the specified class.

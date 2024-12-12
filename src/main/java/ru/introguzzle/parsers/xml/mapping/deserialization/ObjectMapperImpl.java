@@ -52,8 +52,9 @@ class ObjectMapperImpl implements ObjectMapper {
     }
 
     @Override
-    public @NotNull Object toObject(@NotNull XMLDocument document, @NotNull Type type) {
-        return elementMapper.toObject(document.getRoot(), type);
+    @SuppressWarnings("unchecked")
+    public @NotNull <T> T toObject(@NotNull XMLDocument document, @NotNull Type type) {
+        return (T) elementMapper.toObject(document.getRoot(), type);
     }
 
     @Override

@@ -193,9 +193,8 @@ public class ObjectElementMapperImpl implements ObjectElementMapper {
             if (pt == short.class || pt == Short.class) return Short.parseShort(value);
             if (pt == byte.class || pt == Byte.class) return Byte.parseByte(value);
             if (pt == char.class || pt == Character.class) {
-                if (value.length() != 1) {
+                if (value.length() != 1)
                     throw new MappingException("Cannot convert text to char: " + value);
-                }
 
                 return value.charAt(0);
             }

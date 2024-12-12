@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import ru.introguzzle.parsers.foreign.Foreign;
-import ru.introguzzle.parsers.foreign.Other;
 import ru.introguzzle.parsers.json.entity.JSONObject;
 import ru.introguzzle.parsers.common.annotation.Excluded;
 import ru.introguzzle.parsers.json.entity.annotation.JSONEntity;

@@ -178,7 +178,7 @@ public class JSONObject extends UntypedMap implements
      * @return element of last key
      * @param <T> type of element of last key
      */
-    public <T> T getMulti(String key, Class<? extends T> type) {
+    public <T> T getTraverse(String key, Class<? extends T> type) {
         String[] keys = key.split("\\.");
         if (keys.length == 1) {
             return get(key, type);
@@ -190,6 +190,29 @@ public class JSONObject extends UntypedMap implements
         }
 
         return last.get(keys[keys.length - 1], type);
+    }
+
+    /**
+     * Associates the specified value with the specified key in dot notation in this object.
+     * Only values of permitted types are allowed.
+     *
+     * @param key   the key in dot notation with which the specified value is to be associated
+     * @param value the value to be associated with the specified key
+     * @return the previous value associated with the key, or {@code null} if there was no mapping
+     * @throws IllegalArgumentException if the value's class is not permitted or key is {@code null}
+     */
+    public Object putTraverse(String key, Object value) {
+        String[] keys = key.split("\\.");
+        if (keys.length == 1) {
+            return put(key, value);
+        }
+
+        JSONObject last = getObject(keys[0]);
+        for (int i = 1; i < keys.length - 1; i++) {
+            last = last.getObject(keys[i]);
+        }
+
+        return last.put(keys[keys.length - 1], value);
     }
 
     /**

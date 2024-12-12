@@ -169,19 +169,21 @@ abstract class AbstractObjectMapper implements ObjectMapper {
     }
 
     @Override
-    public @NotNull Object toObject(@NotNull JSONObject object, @NotNull Type type) {
+    @SuppressWarnings("unchecked")
+    public @NotNull <T> T toObject(@NotNull JSONObject object, @NotNull Type type) {
         Object result = map(object, type);
         Nullability.requireNonNull(object, "object");
         Nullability.requireNonNull(type, "type");
 
         referenceMap.clear();
         assert result != null;
-        return result;
+        return (T) result;
     }
 
     @Override
-    public @NotNull Object[] toArray(@NotNull JSONArray array, @NotNull Type type) {
-        return (Object[]) handleArray(array, type);
+    @SuppressWarnings("unchecked")
+    public @NotNull <T> T[] toArray(@NotNull JSONArray array, @NotNull Type type) {
+        return (T[]) handleArray(array, type);
     }
 
     @Override

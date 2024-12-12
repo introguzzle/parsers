@@ -12,7 +12,7 @@ import ru.introguzzle.parsers.xml.mapping.XMLFieldNameConverter;
 import java.lang.reflect.Type;
 
 public interface ObjectMapper extends WritingMapper<ObjectMapper> {
-    @NotNull Object toObject(@NotNull XMLDocument document, @NotNull Type type);
+    @NotNull <T> T toObject(@NotNull XMLDocument document, @NotNull Type type);
 
     @NotNull
     @SuppressWarnings("unchecked")
